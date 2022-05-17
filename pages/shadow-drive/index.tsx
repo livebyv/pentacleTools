@@ -140,7 +140,7 @@ export default function ShdwDrivePage() {
         dispatch({
           type: "shdwBalance",
           payload: {
-            shdwBalance: shdwBalance.value.amount,
+            shdwBalance: (shdwBalance.value.uiAmount / LAMPORTS_PER_SOL).toFixed(2),
           },
         });
         dispatch({

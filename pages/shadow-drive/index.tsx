@@ -383,9 +383,7 @@ export default function ShdwDrivePage() {
             <div className="card bg-gray-900 max-w-full p-6">
               {!state.storageAccounts.length && (
                 <div>
-                  No storage accounts yet. Soon you will be able to create new
-                  storage accounts from here. <br />
-                  Until then please use the CLI for that.
+                  No storage accounts yet. 
                 </div>
               )}
 

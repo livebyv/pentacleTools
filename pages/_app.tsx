@@ -241,7 +241,7 @@ function Context({ children }: { children: React.ReactNode }) {
             >
               <img
                 className="w-16 mx-auto"
-                src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y/logo.png"
+                src={ImageURI.GenesysGo}
                 alt="Genesysgo"
               />
             </a>

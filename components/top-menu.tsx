@@ -39,7 +39,7 @@ export default function TopMenu() {
             rel="noreferrer noopener"
             className="py-2 grid place-content-center"
           >
-            <img
+            <Image
               src={ImageURI.PentacleLogo}
               width={221}
               height={65}

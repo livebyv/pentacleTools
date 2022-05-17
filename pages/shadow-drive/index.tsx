@@ -1,25 +1,19 @@
-import React, { useContext, useEffect, useReducer, useState } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { useForm } from "react-hook-form";
-import { AlertContext } from "../../providers/alert-provider";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import ShdwDrive from "@shadow-drive/sdk";
 import { StorageAccount } from "@shadow-drive/sdk/dist/types";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
+
+import { AlertContext } from "../../providers/alert-provider";
 import { sizeMB } from "../../components/file-tile";
 import { ModalContext } from "../../providers/modal-provider";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { ImageURI } from "../../util/image-uri";
 import { SHDW_TOKEN } from "../../util/accounts";
-
-function ExplorerLink({ txId }: { txId: string }) {
-  return (
-    <a href={`https://solscan.io/tx/${txId}`} target="_blank" rel="noreferrer">
-      See on explorer
-    </a>
-  );
-}
+import { ExplorerLink } from "../../components/explorer-link";
 
 export default function ShdwDrivePage() {
   const initState: {
@@ -30,6 +24,7 @@ export default function ShdwDrivePage() {
     storageAccounts: { account: StorageAccount; publicKey: PublicKey }[];
     buttonsLoading: Record<string, boolean>;
     isCreatingStorageAccount: boolean;
+    loading: boolean;
   } = {
     balance: "",
     shdwBalance: "",
@@ -38,11 +33,13 @@ export default function ShdwDrivePage() {
     storageAccounts: [],
     buttonsLoading: {},
     isCreatingStorageAccount: false,
+    loading: true,
   };
   const [state, dispatch] = useReducer(
     (
       state: typeof initState,
       action:
+        | { type: "loading"; payload?: { loading: boolean } }
         | { type: "balance"; payload?: { balance: string } }
         | { type: "shdwBalance"; payload?: { shdwBalance: string } }
         | {
@@ -69,6 +66,8 @@ export default function ShdwDrivePage() {
           }
     ) => {
       switch (action.type) {
+        case "loading":
+          return { ...state, loading: action.payload.loading };
         case "balance":
           return { ...state, balance: action.payload.balance };
         case "storageAccounts":
@@ -138,6 +137,7 @@ export default function ShdwDrivePage() {
           type: "balance",
           payload: { balance: (solBalance / LAMPORTS_PER_SOL).toFixed(2) },
         });
+        dispatch({ type: "loading", payload: { loading: false } });
       }
     })();
   }, [wallet?.publicKey]);
@@ -367,6 +367,12 @@ export default function ShdwDrivePage() {
         <hr className="opacity-10 my-4" />
       </div>
       <div>
+        {wallet.connected && !!state.loading && (
+          <div className="w-full text-center">
+            {" "}
+            <button className="btn btn-ghost loading mx-auto"></button>
+          </div>
+        )}
         {!wallet.connected && (
           <div className="w-full flex justify-center items-center">
             <WalletMultiButton />

@@ -55,7 +55,7 @@ export default function SideMenu() {
         </MenuLink>
         <MenuLink href="/shadow-drive">
           <img
-            src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y/logo.png"
+            src={ImageURI.GenesysGo}
             alt=""
             className="mr-2"
             style={{

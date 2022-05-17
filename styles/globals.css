@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+  Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: priori-sans, sans-serif;
+  @apply bg-black;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.ant-upload.ant-upload-drag .ant-upload {
+  padding: 16px;
+}
+#__next {
+  min-height: 100vh;
+}
+.priori-italic {
+  font-family: priori-sans, sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.priori-regular {
+  font-family: priori-sans, sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.priori-bold {
+  font-family: priori-sans, sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.file-upload {
+  @apply flex;
+  @apply flex-col;
+  @apply items-center;
+  @apply p-4;
+  @apply rounded-md;
+  @apply shadow-md;
+  @apply tracking-wide;
+  @apply uppercase;
+  @apply border ;
+  @apply border-primary;
+  @apply cursor-pointer;
+  @apply hover:bg-primary;
+  @apply hover:text-white;
+  @apply text-primary;
+  @apply ease-linear;
+  @apply transition-all;
+  @apply duration-150;
+  @apply min-h-full;
+}

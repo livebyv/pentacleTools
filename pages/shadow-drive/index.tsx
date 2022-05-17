@@ -10,6 +10,16 @@ import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { sizeMB } from "../../components/file-tile";
 import { ModalContext } from "../../providers/modal-provider";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { ImageURI } from "../../util/image-uri";
+import { SHDW_TOKEN } from "../../util/accounts";
+
+function ExplorerLink({ txId }: { txId: string }) {
+  return (
+    <a href={`https://solscan.io/tx/${txId}`} target="_blank" rel="noreferrer">
+      See on explorer
+    </a>
+  );
+}
 
 export default function ShdwDrivePage() {
   const initState: {
@@ -115,10 +125,7 @@ export default function ShdwDrivePage() {
         });
 
         const shdwBalance = await connection.getTokenAccountBalance(
-          await getAssociatedTokenAddress(
-            new PublicKey("SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y"),
-            wallet.publicKey
-          )
+          await getAssociatedTokenAddress(SHDW_TOKEN, wallet.publicKey)
         );
         const solBalance = await connection.getBalance(wallet.publicKey);
         dispatch({
@@ -178,13 +185,7 @@ export default function ShdwDrivePage() {
             <div>
               <h3>Storage Account created!</h3>
               <p>
-                <a
-                  href={`https://solscan.io/tx/${response.transaction_signature}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  See on explorer
-                </a>
+                <ExplorerLink txId={response.transaction_signature} />
               </p>
             </div>
           ),
@@ -241,13 +242,7 @@ export default function ShdwDrivePage() {
           <div>
             <h3>Storage Account will be deleted</h3>
             <p>
-              <a
-                href={`https://solscan.io/tx/${response.txid}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                See on explorer
-              </a>
+              <ExplorerLink txId={response.txid} />
             </p>
           </div>
         ),
@@ -300,13 +295,7 @@ export default function ShdwDrivePage() {
           <div>
             <h3>Storage Account delete request will be cancelled</h3>
             <p>
-              <a
-                href={`https://solscan.io/tx/${response.txid}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                See on explorer
-              </a>
+              <ExplorerLink txId={response.txid} />
             </p>
           </div>
         ),
@@ -348,7 +337,7 @@ export default function ShdwDrivePage() {
       <div className="max-w-full text-center mb-3">
         <h1 className="text-4xl text-white">
           <img
-            src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y/logo.png"
+            src={ImageURI.GenesysGo}
             alt=""
             className="mr-2"
             style={{
@@ -359,7 +348,7 @@ export default function ShdwDrivePage() {
           />
           SHDW Drive
           <img
-            src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y/logo.png"
+            src={ImageURI.GenesysGo}
             alt=""
             className="ml-2"
             style={{

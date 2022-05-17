@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ArweaveURI } from "../util/arweave-uri";
+import { ImageURI } from "../util/image-uri";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -21,7 +21,7 @@ export default function SideMenu() {
             className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
             <Image
-              src={ArweaveURI.PentacleLogo}
+              src={ImageURI.PentacleLogo}
               width={221}
               height={64}
               alt="Pentacle"

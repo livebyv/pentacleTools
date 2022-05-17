@@ -18,6 +18,7 @@ import { AppProps } from "next/app";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useContext } from "react";
 import { AlertContext } from "../providers/alert-provider";
+import { ImageURI } from "../util/image-uri";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
 const WalletProvider = dynamic(
@@ -114,8 +115,8 @@ function Context({ children }: { children: React.ReactNode }) {
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/shadow-drive">
               <img
-                src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y/logo.png"
-                alt=""
+                src={ImageURI.GenesysGo}
+                alt="GenesysGo"
                 className="mr-2"
                 style={{
                   filter: " grayscale(100%)",

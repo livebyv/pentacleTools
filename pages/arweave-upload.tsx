@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { getArweave } from "../util/upload-arweave-bundles/reference";
 import { shortenAddress } from "../util/shorten-address";
 import { AlertContext } from "../providers/alert-provider";
-import { ArweaveURI } from "../util/arweave-uri";
+import { ImageURI } from "../util/image-uri";
 import { useFiles } from "../hooks/use-files";
 import { WebBundlr } from "@bundlr-network/client";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -277,7 +277,7 @@ export default function GetARLinks() {
             <div className="card-body p-4">
               <div className="flex flex-row gap-5 items-center">
                 <Image
-                  src={ArweaveURI.ArweaveLogo}
+                  src={ImageURI.ArweaveLogo}
                   className="rounded-full w-14 h-14 shadow-lg"
                   width="56"
                   height="56"

@@ -5,6 +5,8 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { shortenAddress } from "../util/shorten-address";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { BundlrContext } from "../providers/bundlr-provider";
+import Image from "next/image";
+import { ImageURI } from "../util/image-uri";
 
 export default function ArweaveWallet() {
   const wallet = useWallet();
@@ -30,9 +32,8 @@ export default function ArweaveWallet() {
       <div className="card bg-primary">
         <div className="card-body p-4">
           <div className="flex flex-row gap-5 items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="arweave-logo.jpeg"
+            <Image
+              src={ImageURI.ArweaveLogo}
               className="rounded-full w-14 h-14"
               width="56"
               height="56"

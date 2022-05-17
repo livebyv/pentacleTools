@@ -28,6 +28,7 @@ export const METAPLEX_ID =
   "p1exdMJcjVao65QdewkaZRUnU6VPSXhus9n2GzWfh98" as StringPublicKey;
 
 export const SYSTEM = new PublicKey("11111111111111111111111111111111");
+export const SHDW_TOKEN = new PublicKey("SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y");
 
 export const programIds = () => {
   return {

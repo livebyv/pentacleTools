@@ -10,9 +10,8 @@ import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { sizeMB } from "../../components/file-tile";
 import { ModalContext } from "../../providers/modal-provider";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
-import Link from "next/link";
 
-export default function GetARLinks() {
+export default function ShdwDrivePage() {
   const initState: {
     balance: string;
     shdwBalance: string;
@@ -99,12 +98,12 @@ export default function GetARLinks() {
   useEffect(() => {
     (async () => {
       if (wallet?.publicKey) {
-        const drive = await new ShdwDrive(connection, wallet).init();
+        const shdwDrive = await new ShdwDrive(connection, wallet).init();
         dispatch({
           type: "shdwDrive",
-          payload: { shdwDrive: drive },
+          payload: { shdwDrive },
         });
-        const storageAccounts = await drive.getStorageAccounts();
+        const storageAccounts = await shdwDrive.getStorageAccounts();
         dispatch({
           type: "storageAccounts",
           payload: {

@@ -14,7 +14,17 @@ import { ModalContext } from "../../providers/modal-provider";
 import { ImageURI } from "../../util/image-uri";
 import { SHDW_TOKEN } from "../../util/accounts";
 import { ExplorerLink } from "../../components/explorer-link";
-
+const isValidUnit = (str: string) => {
+  const num = parseFloat(str);
+  if (isNaN(num)) {
+    return false;
+  }
+  const unit = str.split(`${num}`)[1].toUpperCase();
+  if (!["MB", "KB", "GB"].includes(unit)) {
+    return false;
+  }
+  return true;
+};
 export default function ShdwDrivePage() {
   const initState: {
     balance: string;
@@ -99,7 +109,7 @@ export default function ShdwDrivePage() {
     initState
   );
   const { setModalState } = useContext(ModalContext);
-  const { register, handleSubmit, formState, getValues, reset } = useForm();
+  const { register, handleSubmit, getValues, reset } = useForm();
   const { setAlertState } = useContext(AlertContext);
   const { connection } = useConnection();
   const wallet = useWallet();
@@ -142,17 +152,6 @@ export default function ShdwDrivePage() {
     })();
   }, [wallet?.publicKey]);
 
-  const isValidUnit = (str: string) => {
-    const num = parseFloat(str);
-    if (isNaN(num)) {
-      return false;
-    }
-    const unit = str.split(`${num}`)[1].toUpperCase();
-    if (!["MB", "KB", "GB"].includes(unit)) {
-      return false;
-    }
-    return true;
-  };
   const onSubmit = handleSubmit(
     async ({ storageAccountName, storageAccountSize }) => {
       if (!storageAccountName || !isValidUnit(storageAccountSize)) {

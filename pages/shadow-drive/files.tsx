@@ -1,62 +1,95 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import { useDebounce } from "../../hooks/use-debounce";
-
 
 export default function ShadowFiles() {
   const { query } = useRouter();
-  const [loading, setLoading] = useState(true);
+  const initState: {
+    balance: string;
+    searchTerm: string;
+    loading: boolean;
+    filteredData: any[];
+  } = {
+    balance: "",
+    searchTerm: "",
+    loading: true,
+    filteredData: [],
+  };
+  const [state, dispatch] = useReducer(
+    (
+      state: typeof initState,
+      action:
+        | { type: "loading"; payload?: { loading: boolean } }
+        | { type: "balance"; payload?: { balance: string } }
+        | { type: "searchTerm"; payload?: { searchTerm: string } }
+        | { type: "filteredData"; payload?: { filteredData: any[] } }
+    ) => {
+      switch (action.type) {
+        case "loading":
+          return { ...state, loading: action.payload.loading };
+        case "balance":
+          return { ...state, balance: action.payload.balance };
+        case "searchTerm":
+          return { ...state, searchTerm: action.payload.searchTerm };
+        case "filteredData":
+          return { ...state, filteredData: action.payload.filteredData };
+        default: {
+          throw new Error(
+            "unsupported action type given on SHDW Drive reducer"
+          );
+        }
+      }
+    },
+    initState
+  );
   const data = useRef<any[]>();
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const debouncedSearchTerm = useDebounce(state.searchTerm, 500);
   // Effect for API call
   useEffect(
     () => {
       if (debouncedSearchTerm) {
-        setFilteredData(
-          data.current
-            .filter((d) =>
-              (d || "")
-                .toLowerCase()
-                .includes((debouncedSearchTerm || "").toLowerCase())
-            )
-            ?.sort((a, b) => a.localeCompare(b))
-            .reduce((acc, curr) => {
-              const idx = acc.findIndex(
-                (a) => a.title === curr[0].toUpperCase()
-              );
-              if (idx >= 0) {
-                acc[idx].items.push(curr);
-              } else {
-                acc.push({
-                  title: curr[0].toUpperCase(),
-                  items: [curr],
-                });
-              }
-              return acc;
-            }, [])
-        );
+        const filtered = data.current
+          .filter((d) =>
+            (d || "")
+              .toLowerCase()
+              .includes((debouncedSearchTerm || "").toLowerCase())
+          )
+          ?.sort((a, b) => a.localeCompare(b))
+          .reduce((acc, curr) => {
+            const idx = acc.findIndex((a) => a.title === curr[0].toUpperCase());
+            if (idx >= 0) {
+              acc[idx].items.push(curr);
+            } else {
+              acc.push({
+                title: curr[0].toUpperCase(),
+                items: [curr],
+              });
+            }
+            return acc;
+          }, []);
+        dispatch({ type: "filteredData", payload: { filteredData: filtered } });
       } else {
-        setFilteredData(
-          data.current
-            ?.sort((a, b) => a.localeCompare(b))
-            .reduce((acc, curr) => {
-              const idx = acc.findIndex(
-                (a) => a.title === curr[0].toUpperCase()
-              );
-              if (idx >= 0) {
-                acc[idx].items.push(curr);
-              } else {
-                acc.push({
-                  title: curr[0].toUpperCase(),
-                  items: [curr],
-                });
-              }
-              return acc;
-            }, [])
-        );
+        const filtered = data.current
+          ?.sort((a, b) => a.localeCompare(b))
+          .reduce((acc, curr) => {
+            const idx = acc.findIndex((a) => a.title === curr[0].toUpperCase());
+            if (idx >= 0) {
+              acc[idx].items.push(curr);
+            } else {
+              acc.push({
+                title: curr[0].toUpperCase(),
+                items: [curr],
+              });
+            }
+            return acc;
+          }, []);
+        dispatch({
+          type: "filteredData",
+          payload: {
+            filteredData: filtered,
+          },
+        });
       }
     },
     [debouncedSearchTerm] // Only call effect if debounced search term changes
@@ -76,30 +109,32 @@ export default function ShadowFiles() {
           }
         ).then((res) => res.json());
         data.current = d.keys;
-        setFilteredData(
-          d.keys
-            ?.sort((a, b) => a.localeCompare(b))
-            .reduce((acc, curr) => {
-              const idx = acc.findIndex(
-                (a) => a.title === curr[0].toUpperCase()
-              );
-              if (idx >= 0) {
-                acc[idx].items.push(curr);
-              } else {
-                acc.push({
-                  title: curr[0].toUpperCase(),
-                  items: [curr],
-                });
-              }
-              return acc;
-            }, [])
-        );
+        const filtered = d.keys
+          ?.sort((a, b) => a.localeCompare(b))
+          .reduce((acc, curr) => {
+            const idx = acc.findIndex((a) => a.title === curr[0].toUpperCase());
+            if (idx >= 0) {
+              acc[idx].items.push(curr);
+            } else {
+              acc.push({
+                title: curr[0].toUpperCase(),
+                items: [curr],
+              });
+            }
+            return acc;
+          }, []);
+        dispatch({
+          type: "filteredData",
+          payload: {
+            filteredData: filtered,
+          },
+        });
       }
-      setLoading(false);
+      dispatch({ type: "loading", payload: { loading: false } });
     })();
   }, [query.storageAccount]);
 
-  if (loading) {
+  if (state.loading) {
     return (
       <>
         Please wait... <button className="btn btn-ghost loading"></button>
@@ -139,15 +174,18 @@ export default function ShadowFiles() {
           type="text"
           placeholder="file name"
           className="input input-bordered w-64"
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-          }}
+          onChange={(e) =>
+            dispatch({
+              type: "searchTerm",
+              payload: { searchTerm: e.target.value },
+            })
+          }
         />
       </div>
-      <div className="">
-        {!!filteredData?.length &&
-          filteredData.map((item) => (
-            <div key={item.storageAccount} className="">
+      <div>
+        {!!state.filteredData?.length &&
+          state.filteredData.map((item) => (
+            <div key={item.storageAccount}>
               <div className=" sticky top-24 bg-black h-24  flex items-center border-b pb-5">
                 <h2 className="text-5xl">{item.title}</h2>
               </div>

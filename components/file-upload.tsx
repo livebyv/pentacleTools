@@ -1,9 +1,9 @@
-import React from "react";
-import { useFiles } from "../hooks/use-files";
+import React, { useContext } from "react";
+import { FileContext } from "../hooks/use-files";
 import PaginatedFiles from "./paginated-files";
 
 export function FileUpload() {
-  const { setFiles, files } = useFiles();
+  const { setFiles, files } = useContext(FileContext);
 
   const handleAddFiles = (e) => {
     setFiles([...files, ...(e.target as HTMLInputElement).files]);

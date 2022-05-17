@@ -24,6 +24,7 @@ module.exports = withTM({
   images: {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    domains: ["arweave.net", "www.arweave.net", "raw.githubusercontent.com", "ipfs.io", "shdw-drive.genesysgo.net"],
   },
   reactStrictMode: true,
   webpack: (config, { isServer }) => {
@@ -31,9 +32,6 @@ module.exports = withTM({
       config.resolve.fallback.fs = false;
     }
     return config;
-  },
-  images: {
-    domains: ["arweave.net", "www.arweave.net", "raw.githubusercontent.com", "ipfs.io", "shdw-drive.genesysgo.net"],
   },
   async redirects() {
     return [

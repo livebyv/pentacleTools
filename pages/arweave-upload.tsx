@@ -12,13 +12,9 @@ import { getArweave } from "../util/upload-arweave-bundles/reference";
 import { shortenAddress } from "../util/shorten-address";
 import { AlertContext } from "../providers/alert-provider";
 import { ImageURI } from "../util/image-uri";
-import { useFiles } from "../hooks/use-files";
+import { FileContext } from "../hooks/use-files";
 import { WebBundlr } from "@bundlr-network/client";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import {
-  getPhantomWallet,
-  getSolflareWallet,
-} from "@solana/wallet-adapter-wallets";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 
 export const generateArweaveWallet = async () => {
@@ -56,7 +52,7 @@ export default function GetARLinks() {
   const [jwk, setJwk] = useState<JWKInterface>();
   const [address, setAddress] = useState<string>();
   const [balance, setBalance] = useState("none");
-  const { files } = useFiles();
+  const { files } = useContext(FileContext);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm();
   const { setAlertState } = useContext(AlertContext);
@@ -350,7 +346,6 @@ export default function GetARLinks() {
               <div className="mt-4">
                 <FileUpload />
               </div>
-
               {!!files.length && (
                 <div className="text-center mt-6">
                   <button

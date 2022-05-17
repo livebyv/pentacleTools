@@ -19,6 +19,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useContext } from "react";
 import { AlertContext } from "../providers/alert-provider";
 import { ImageURI } from "../util/image-uri";
+import { FileProvider } from "../hooks/use-files";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
 const WalletProvider = dynamic(
@@ -30,7 +31,7 @@ const WalletProvider = dynamic(
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
+    <FileProvider>
       <WalletProvider>
         <AlertProvider>
           <ModalProvider>
@@ -38,7 +39,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           </ModalProvider>
         </AlertProvider>
       </WalletProvider>
-    </>
+    </FileProvider>
   );
 };
 function Context({ children }: { children: React.ReactNode }) {

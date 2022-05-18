@@ -2,16 +2,17 @@ import type { WalletProviderProps } from "@solana/wallet-adapter-react";
 import { WalletProvider } from "@solana/wallet-adapter-react";
 
 import {
+  GlowWalletAdapter,
   LedgerWalletAdapter,
   PhantomWalletAdapter,
   SlopeWalletAdapter,
   SolflareWalletAdapter,
-SolletWalletAdapter,
-} from '@solana/wallet-adapter-wallets'
+  SolletWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
 import { useMemo } from "react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 
-import('@solana/wallet-adapter-react-ui/styles.css' as any) ;
+import("@solana/wallet-adapter-react-ui/styles.css" as any);
 
 export function ClientWalletProvider(
   props: Omit<WalletProviderProps, "wallets">
@@ -22,7 +23,8 @@ export function ClientWalletProvider(
       new SolflareWalletAdapter(),
       new LedgerWalletAdapter(),
       new SolletWalletAdapter(),
-      new SlopeWalletAdapter()
+      new SlopeWalletAdapter(),
+      new GlowWalletAdapter(),
     ],
     []
   );

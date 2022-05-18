@@ -217,7 +217,11 @@ const createJsonObject = async (
 ): Promise<unknown> => {
   const tokenMetadata = await getMetadata(toPublicKey(key), connection);
   if (!tokenMetadata?.data?.uri) {
-    mints.push({ mint: key, failed: true, message: "no associated metadata found" });
+    mints.push({
+      mint: key,
+      failed: true,
+      message: "no associated metadata found",
+    });
     return Promise.resolve();
   }
   const arweaveData = await fetch(tokenMetadata.data.uri)
@@ -239,11 +243,6 @@ const createJsonObject = async (
     },
     metadata: arweaveData,
     mint: key,
-  });
-  return await new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(undefined);
-    }, 150);
   });
 };
 

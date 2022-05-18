@@ -45,45 +45,36 @@ export default function ShadowFiles() {
   );
   const data = useRef<any[]>();
   const debouncedSearchTerm = useDebounce(state.searchTerm, 500);
+  const filterData = ({ data }) => {
+    return data
+      ?.sort((a, b) => a.localeCompare(b))
+      .reduce((acc, curr) => {
+        const idx = acc.findIndex((a) => a.title === curr[0].toUpperCase());
+        if (idx >= 0) {
+          acc[idx].items.push(curr);
+        } else {
+          acc.push({
+            title: curr[0].toUpperCase(),
+            items: [curr],
+          });
+        }
+        return acc;
+      }, []);
+  };
   // Effect for API call
   useEffect(
     () => {
       if (debouncedSearchTerm) {
-        const filtered = data.current
-          .filter((d) =>
+        const filtered = filterData({
+          data: data.current.filter((d) =>
             (d || "")
               .toLowerCase()
               .includes((debouncedSearchTerm || "").toLowerCase())
-          )
-          ?.sort((a, b) => a.localeCompare(b))
-          .reduce((acc, curr) => {
-            const idx = acc.findIndex((a) => a.title === curr[0].toUpperCase());
-            if (idx >= 0) {
-              acc[idx].items.push(curr);
-            } else {
-              acc.push({
-                title: curr[0].toUpperCase(),
-                items: [curr],
-              });
-            }
-            return acc;
-          }, []);
+          ),
+        });
         dispatch({ type: "filteredData", payload: { filteredData: filtered } });
       } else {
-        const filtered = data.current
-          ?.sort((a, b) => a.localeCompare(b))
-          .reduce((acc, curr) => {
-            const idx = acc.findIndex((a) => a.title === curr[0].toUpperCase());
-            if (idx >= 0) {
-              acc[idx].items.push(curr);
-            } else {
-              acc.push({
-                title: curr[0].toUpperCase(),
-                items: [curr],
-              });
-            }
-            return acc;
-          }, []);
+        const filtered = filterData({ data: data.current });
         dispatch({
           type: "filteredData",
           payload: {
@@ -109,20 +100,7 @@ export default function ShadowFiles() {
           }
         ).then((res) => res.json());
         data.current = d.keys;
-        const filtered = d.keys
-          ?.sort((a, b) => a.localeCompare(b))
-          .reduce((acc, curr) => {
-            const idx = acc.findIndex((a) => a.title === curr[0].toUpperCase());
-            if (idx >= 0) {
-              acc[idx].items.push(curr);
-            } else {
-              acc.push({
-                title: curr[0].toUpperCase(),
-                items: [curr],
-              });
-            }
-            return acc;
-          }, []);
+        const filtered = filterData({ data: d.keys });
         dispatch({
           type: "filteredData",
           payload: {

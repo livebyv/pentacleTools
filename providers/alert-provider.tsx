@@ -43,6 +43,7 @@ export function AlertProvider({ children }) {
       {!!alertState?.open && (
         <div
           className={`
+          flex items-center
         alert ${typeof alertState?.message === 'string' ? 'p-4' : 'p-0'} absolute bottom-2 left-2 right-2 lg:bottom-auto lg:left-72 border border-gray-700 shadow lg:top-8 w-72 text-white
         ${alertState.severity === "error" ? "alert-error" : ""}
         ${alertState.severity === "info" ? "alert-info" : ""}

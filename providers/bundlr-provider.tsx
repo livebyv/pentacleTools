@@ -4,6 +4,7 @@ import BigNumber from "bignumber.js";
 import React from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import { AlertContext } from "./alert-provider";
+import { ModalContext } from "./modal-provider";
 
 const initialState: {
   updateFundAmount?: Function;
@@ -45,6 +46,7 @@ export function BundlrProvider({ children }) {
   const bundlerHttpAddress = "https://node1.bundlr.network";
   const [withdrawAmount, setWithdrawAmount] = React.useState<string>();
 
+  const { setModalState } = useContext(ModalContext);
   const { setAlertState } = useContext(AlertContext);
   const intervalRef = React.useRef<NodeJS.Timer>();
 
@@ -70,10 +72,10 @@ export function BundlrProvider({ children }) {
           })
           .catch((_) => clearInterval(intervalRef.current));
       }, 5000);
-  
+
       intervalRef.current = iv;
-  
-      return () => clearInterval(iv)
+
+      return () => clearInterval(iv);
     }
   }, []);
 
@@ -89,13 +91,16 @@ export function BundlrProvider({ children }) {
       bundler!.currencyConfig.base[1]
     );
     if (conv.isLessThan(1)) {
-      setAlertState({ severity: "error", message: `Value too small!`, open: true, duration: 3000 });
+      setAlertState({
+        severity: "error",
+        message: `Value too small!`,
+        open: true,
+        duration: 3000,
+      });
       return;
     }
     return conv;
   };
-
-
 
   const fund = async (fundAmount) => {
     if (bundler && fundAmount) {
@@ -104,20 +109,12 @@ export function BundlrProvider({ children }) {
       await bundler
         .fund(value)
         .then((res) => {
-          setAlertState({
-            severity: "success",
-            message: `Funded ${res?.target}
-        tx ID : ${res?.id}`,
-            duration: 10000,
-            open: true, 
-          });
+          setBalance(`${+balance + value.toFixed(4)}`);
         })
         .catch((e) => {
-          setAlertState({
-            severity: "error",
+          setModalState({
             message: `Failed to fund - ${e.data?.message || e.message}`,
-            open: true, 
-            duration: 10000
+            open: true,
           });
         });
     }
@@ -129,7 +126,7 @@ export function BundlrProvider({ children }) {
         severity: "info",
         message: "Withdrawing..",
         duration: 15000,
-        open: true
+        open: true,
       });
       const value = parseInput(withdrawAmount);
       if (!value) return;
@@ -140,7 +137,7 @@ export function BundlrProvider({ children }) {
             severity: "success",
             message: `Withdrawal successful - ${data.data?.tx_id}`,
             duration: 5000,
-        open: true
+            open: true,
           });
         })
         .catch((err: any) => {
@@ -152,7 +149,7 @@ export function BundlrProvider({ children }) {
             ${err.message}
             `,
             duration: 5000,
-        open: true
+            open: true,
           });
         });
     }
@@ -185,8 +182,7 @@ export function BundlrProvider({ children }) {
         severity: "error",
         message: `Failed to load provider ${defaultSelection}`,
         duration: 10000,
-        open: true
-
+        open: true,
       });
       console.log(e);
       return;
@@ -204,8 +200,7 @@ export function BundlrProvider({ children }) {
         severity: "error",
         message: `Failed to connect to bundlr ${bundlerHttpAddress}`,
         duration: 10000,
-        open: true
-
+        open: true,
       });
       return;
     }
@@ -221,7 +216,7 @@ export function BundlrProvider({ children }) {
       severity: "success",
       message: `Connected to ${bundlerHttpAddress}`,
       open: true,
-      duration: 5000
+      duration: 5000,
     });
     setBundler(bundlr);
   };

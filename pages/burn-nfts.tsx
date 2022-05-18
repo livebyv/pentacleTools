@@ -25,17 +25,34 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 
-function NFTPreview({ nft }) {
+function NFTPreview({
+  nft,
+  selectable = false,
+  selected = false,
+  handleNFTSelect = (...args: any) => {},
+}) {
   return (
     <>
-      <strong className="text-center">{nft.metadata?.name}</strong>
+      <strong
+        className={`text-center truncate max-w-full ${selectable && "mr-6"}`}
+      >
+        {nft.metadata?.name}
+      </strong>
       <div className="w-full bg-black flex items-center justify-center rounded">
+        {selectable && (
+          <input
+            type="checkbox"
+            className="checkbox absolute right-2 top-2"
+            onClick={() => handleNFTSelect(nft.mint)}
+            defaultChecked={selected}
+          />
+        )}
         {nft.image ? (
           // eslint-disable-next-line
           <img
             src={nft?.image}
             alt=""
-            className="w-full block h-24 object-contain"
+            className="w-full block h-32 object-contain"
           />
         ) : null}
         {nft.video ? (
@@ -59,18 +76,18 @@ export default function BurnNFTs() {
     nfts: any[];
     status: string;
     publicAddress: null | string;
-    itemsPerPage: 4 | 10 | 20 | 100;
+    itemsPerPage: 12 | 24 | 120;
     isModalOpen: boolean;
     isBurning: boolean;
-    selectedNFT: any;
+    selectedNFTs: PublicKey[];
   } = {
     nfts: [],
     publicAddress: null,
     status: "idle",
-    itemsPerPage: 4,
+    itemsPerPage: 12,
     isModalOpen: false,
     isBurning: false,
-    selectedNFT: null,
+    selectedNFTs: [],
   };
   const [state, dispatch] = useReducer(
     (
@@ -78,14 +95,15 @@ export default function BurnNFTs() {
       action:
         | { type: "started"; payload?: null }
         | { type: "error"; payload?: null }
-        | { type: "unselect"; payload?: null }
+        | { type: "unselectAll"; payload?: null }
         | { type: "burning"; payload?: null }
         | { type: "burned"; payload?: null }
         | { type: "success"; payload: { nfts: any[] } }
         | { type: "nfts"; payload: { nfts: any[] } }
+        | { type: "isModalOpen"; payload: { isModalOpen: boolean } }
         | { type: "publicAddress"; payload: { publicAddress: string } }
         | { type: "itemsPerPage"; payload: { itemsPerPage: number } }
-        | { type: "selectedNFT"; payload: { selectedNFT: any } }
+        | { type: "selectedNFTs"; payload: { selectedNFTs: PublicKey[] } }
     ) => {
       switch (action.type) {
         case "started":
@@ -100,17 +118,18 @@ export default function BurnNFTs() {
           return { ...state, status: "rejected" };
         case "itemsPerPage":
           return { ...state, itemsPerPage: action.payload.itemsPerPage };
+        case "isModalOpen":
+          return { ...state, isModalOpen: action.payload.isModalOpen };
         case "publicAddress":
           return { ...state, publicAddress: action.payload.publicAddress };
         case "success":
           return { ...state, status: "resolved", nfts: action.payload.nfts };
-        case "unselect":
-          return { ...state, selectedNFT: null, isModalOpen: false };
-        case "selectedNFT":
+        case "unselectAll":
+          return { ...state, selectedNFTs: [] };
+        case "selectedNFTs":
           return {
             ...state,
-            isModalOpen: true,
-            selectedNFT: action.payload.selectedNFT,
+            selectedNFTs: action.payload.selectedNFTs,
           };
         default:
           throw new Error("unsupported action type given on BurnNFTs reducer");
@@ -227,102 +246,141 @@ export default function BurnNFTs() {
     [dispatch]
   );
 
-  const handleNFTSelect = useCallback((selectedNFT: any) => {
-    dispatch({ type: "selectedNFT", payload: { selectedNFT } });
-  }, []);
+  const handleNFTSelect = useCallback(
+    (selectedNFT: string) => {
+      const newPubkey = new PublicKey(selectedNFT);
+      const idx = state.selectedNFTs.findIndex((nft) => nft.equals(newPubkey));
+      if (idx >= 0) {
+        const newItems = state.selectedNFTs.filter(
+          (nft) => !nft.equals(newPubkey)
+        );
+        dispatch({ type: "selectedNFTs", payload: { selectedNFTs: newItems } });
+      } else {
+        const newItems = [...state.selectedNFTs, newPubkey];
+        dispatch({ type: "selectedNFTs", payload: { selectedNFTs: newItems } });
+      }
+    },
+    [state.selectedNFTs]
+  );
 
-  const handleNFTUnselect = useCallback(() => {
-    dispatch({ type: "unselect" });
-  }, []);
+  const handleNFTUnselect = useCallback(
+    (mint: PublicKey) => {
+      const newItems = state.selectedNFTs.filter((nft) => !nft.equals(mint));
+      dispatch({ type: "selectedNFTs", payload: { selectedNFTs: newItems } });
+    },
+    [state.selectedNFTs]
+  );
 
   const removeNFT = useCallback(
-    (nft: any) => {
+    (nft: PublicKey) => {
       dispatch({
         type: "nfts",
-        payload: { nfts: state.nfts.filter((i) => i.mint !== nft.mint) },
+        payload: {
+          nfts: state.nfts.filter((i) => !new PublicKey(i.mint).equals(nft)),
+        },
       });
     },
     [state.nfts]
   );
 
   const handleBurn = useCallback(async () => {
-    if (!publicKey || !state.selectedNFT) {
+    if (!publicKey || !state.selectedNFTs) {
       return;
     }
 
     try {
       dispatch({ type: "burning" });
-      const mint = new PublicKey(state.selectedNFT.mint);
+      let counter = 1;
+      for (const mint of state.selectedNFTs) {
+        setAlertState({
+          message: (
+            <>
+              <button className="btn btn-ghost loading mr-2" />
+              <div className="flex-1">
+                {" "}
+                Burning {counter} of {state.selectedNFTs.length} NFTs
+              </div>
+            </>
+          ),
+          open: true,
+        });
+        const mintAssociatedAccountAddress = await getAssociatedTokenAddress(
+          mint,
+          publicKey,
+          false
+        );
+        const instruction = createBurnInstruction(
+          mintAssociatedAccountAddress,
+          mint,
+          publicKey,
+          1,
+          []
+        );
 
-      const mintAssociatedAccountAddress = await getAssociatedTokenAddress(
-        mint,
-        publicKey,
-        false
-      );
-      const instruction = createBurnInstruction(
-        mintAssociatedAccountAddress,
-        mint,
-        publicKey,
-        1,
-        []
-      );
+        const closeIx = createCloseAccountInstruction(
+          mintAssociatedAccountAddress,
+          publicKey,
+          publicKey,
+          []
+        );
 
-      const closeIx = createCloseAccountInstruction(
-        mintAssociatedAccountAddress,
-        publicKey,
-        publicKey,
-        []
-      );
+        const getBlockhashWithRetries = async () => {
+          while (true) {
+            try {
+              return (await connection.getRecentBlockhash()).blockhash;
+            } catch (e) {
+              console.error(e);
+            }
+          }
+        };
+        const transaction = new Transaction().add(instruction, closeIx);
+        transaction.recentBlockhash = await getBlockhashWithRetries();
+        transaction.feePayer = publicKey;
+        await signTransaction(transaction);
 
-      const getBlockhashWithRetries = async () => {
-        while (true) {
+        let tries = 0;
+        let completed = false;
+        while (!completed) {
           try {
-            return (await connection.getRecentBlockhash()).blockhash;
+            const signature = await connection.sendRawTransaction(
+              transaction.serialize()
+            );
+            await connection.confirmTransaction(signature, "processed");
+            dispatch({ type: "burned" });
+            removeNFT(mint);
+            handleNFTUnselect(mint);
+            completed = true;
           } catch (e) {
             console.error(e);
-          }
-        }
-      };
-      const transaction = new Transaction().add(instruction, closeIx);
-      transaction.recentBlockhash = await getBlockhashWithRetries();
-      transaction.feePayer = publicKey;
-      await signTransaction(transaction);
-
-      let tries = 0;
-      let completed = false;
-      while (!completed) {
-        try {
-          const signature = await connection.sendRawTransaction(
-            transaction.serialize()
-          );
-          await connection.confirmTransaction(signature, "processed");
-          setAlertState({
-            message: "Successfully burned your NFT!",
-            open: true,
-            duration: 5000,
-          });
-          dispatch({ type: "burned" });
-          removeNFT(state.selectedNFT);
-          handleNFTUnselect();
-          completed = true;
-        } catch (e) {
-          console.error(e);
-          await new Promise((resolve) => setTimeout(resolve, 500));
-          tries += 1;
-          if (tries >= 6) {
-            dispatch({ type: "burned" });
-            completed = true;
-            setModalState({
-              open: true,
-              message: "Error trying to send transaction!",
-            });
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            tries += 1;
+            if (tries >= 6) {
+              dispatch({ type: "burned" });
+              completed = true;
+              setModalState({
+                open: true,
+                message: "Error trying to send transaction!",
+              });
+            }
           }
         }
       }
+
+      setAlertState({
+        message: <></>,
+        open: false,
+      });
+      setModalState({
+        open: true,
+        message: "Burned all NFTs!",
+      });
     } catch (err) {
       setModalState({
         message: err.message,
         open: true,
+      });
+      setAlertState({
+        open: false,
       });
       dispatch({ type: "burned" });
     }
@@ -342,24 +400,43 @@ export default function BurnNFTs() {
           <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
             <div className="bg-gray-800 rounded-lg shadow-lg p-4 max-w-sm w-full">
               <p className="text-2xl text-white text-center">
-                Are you sure you want to permanently destroy this NFT?
+                Are you sure you want to permanently destroy{" "}
+                {`${
+                  state.selectedNFTs.length === 1
+                    ? "this NFT"
+                    : ` these ${state.selectedNFTs.length} NFTs?`
+                }`}
+                ?
+                <br />
+                <br />
+                <strong>
+                  It cannot be undone and they will be destroyed!!! Make sure
+                  you know what you are doing!
+                </strong>
               </p>
-
-              <div className="flex items-center flex-col w-1/2 m-auto mt-8 justify-center">
-                <NFTPreview nft={state.selectedNFT} />
-              </div>
 
               <div className="flex items-center justify-center p-4 w-full mt-8">
                 <button
                   type="button"
-                  onClick={handleNFTUnselect}
                   className="btn rounded-box mr-4"
+                  onClick={() => {
+                    dispatch({
+                      type: "isModalOpen",
+                      payload: { isModalOpen: false },
+                    });
+                  }}
                 >
                   nope
                 </button>
                 <button
                   type="button"
-                  onClick={handleBurn}
+                  onClick={() => {
+                    dispatch({
+                      type: "isModalOpen",
+                      payload: { isModalOpen: false },
+                    });
+                    handleBurn();
+                  }}
                   className={`btn rounded-box btn-primary ${
                     state.isBurning ? "loading" : ""
                   }`}
@@ -375,7 +452,7 @@ export default function BurnNFTs() {
   }, [state, handleNFTUnselect, handleBurn]);
 
   const itemsPerPageSelectionDisplay = useMemo(() => {
-    const options = [4, 10, 20, 50];
+    const options = [12, 24, 120];
 
     return (
       <div className="w-full mt-8 flex items-center justify-center">
@@ -443,7 +520,12 @@ export default function BurnNFTs() {
 
   const nftDisplay = useMemo(() => {
     if (["idle", "pending"].includes(state.status)) {
-      return <p className="text-center text-lg text-white">fetching NFTs...</p>;
+      return (
+        <p className="text-center text-lg text-white">
+          <button className="btn btn-ghost loading"></button>
+          fetching NFTs...
+        </p>
+      );
     }
 
     return state.status === "rejected" ? (
@@ -461,21 +543,36 @@ export default function BurnNFTs() {
             <div className="flex items-center flex-wrap">
               {nftsToRender?.map((nft) => (
                 <div className="w-full md:w-1/4 p-4" key={nft.mint}>
-                  <div className="flex flex-col items-center rounded-md bg-gray-800 object-contain h-60 justify-between p-4 shadow">
-                    <NFTPreview nft={nft} />
-                    <button
-                      type="button"
-                      className="btn btn-primary mt-2 rounded-full shadow"
-                      onClick={() => handleNFTSelect(nft)}
-                    >
-                      burn <i className="fa-solid fa-fire ml-3"></i>
-                    </button>
+                  <div className="flex flex-col items-center rounded-md bg-gray-800 object-contain h-48 justify-between px-3 py-2 shadow relative">
+                    <NFTPreview
+                      nft={nft}
+                      selectable
+                      handleNFTSelect={handleNFTSelect}
+                      selected={
+                        !!state.selectedNFTs.find((n) =>
+                          n.equals(new PublicKey(nft.mint))
+                        )
+                      }
+                    />
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+        <button
+          type="button"
+          className="btn btn-primary mt-2 rounded-full shadow"
+          disabled={!state.selectedNFTs.length}
+          onClick={() => {
+            dispatch({ type: "isModalOpen", payload: { isModalOpen: true } });
+          }}
+        >
+          {state.selectedNFTs.length
+            ? `burn ${state.selectedNFTs.length} items`
+            : "selecc to burn"}{" "}
+          <i className="fa-solid fa-fire ml-3"></i>
+        </button>
         {paginationDisplay}
         {itemsPerPageSelectionDisplay}
       </>

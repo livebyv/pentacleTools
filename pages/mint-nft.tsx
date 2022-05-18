@@ -15,6 +15,7 @@ import ArweaveWallet from "../components/arweave-wallet";
 import { BundlrContext } from "../providers/bundlr-provider";
 import { mintNFT } from "../util/mint";
 import { AlertContext } from "../providers/alert-provider";
+import { ModalContext } from "../providers/modal-provider";
 
 const fileToBuffer = (
   file: File
@@ -53,6 +54,7 @@ export default function GibAirdrop() {
     setFiles(files.filter((f) => f.name !== name));
   };
   const { setAlertState } = useContext(AlertContext);
+  const { setModalState } = useContext(ModalContext);
 
   const FilesForm = useMemo(
     () => (
@@ -286,18 +288,19 @@ export default function GibAirdrop() {
           while (!confirmed) {
             setAlertState!({
               message: (
-                <>
+                <div className="flex flex-row items-center">
                   <button className="loading btn btn-ghost"></button> Confirming
                   transaction{" "}
                   <a
                     href={`https://explorer.solana.com/tx/${mintTxId}`}
                     target="_blank"
                     rel="noreferrer"
+                    className="truncate"
                   >
                     {mintTxId.slice(0, 3)} ...{" "}
                     {mintTxId.slice(mintTxId.length - 3)}
                   </a>
-                </>
+                </div>
               ),
               open: true,
             });

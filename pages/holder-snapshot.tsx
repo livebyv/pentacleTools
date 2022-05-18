@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from "react";
-import { getHolders } from "../util/holder-snapshot";
+import { getOwners } from "../util/holder-snapshot";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
 import { ModalContext } from "../providers/modal-provider";
@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
 import { AlertContext } from "../providers/alert-provider";
 import Head from "next/head";
+import { useConnection } from "@solana/wallet-adapter-react";
 export default function GetHolders() {
   const {
     register,
@@ -20,6 +21,7 @@ export default function GetHolders() {
   const { setModalState } = useContext(ModalContext);
   const { setAlertState } = useContext(AlertContext);
   const endpoint = process.env.NEXT_PUBLIC_RPC!;
+  const { connection } = useConnection();
   const fetchHolders = useCallback(
     async ({ mints }: { mints: string }) => {
       const parsed = getAddresses(mints);
@@ -34,31 +36,23 @@ export default function GetHolders() {
       setLen(parsed.length);
       setLoading(true);
 
-      getHolders(
+      const owners = await getOwners(
         parsed,
+        connection,
         setCounter,
-        endpoint,
-        localStorage.getItem("auth-token") ||
-          (await (await fetch("/api/get-token")).json()).access_token
-      ).subscribe({
-        next: (e) => {
-          download("gib-holders.json", jsonFormat(e, { size: 1, type: "tab" }));
-          setLoading(false);
-        },
-        error: (e) => {
-          setModalState({
-            open: true,
-            message: JSON.stringify(e),
-          });
-          setLoading(false);
-        },
-        complete: () => {
-          setAlertState({
-            message: "",
-            open: false,
-          });
-        },
+      ).catch(() => {
+        setModalState({
+          open: true,
+          message: 'An error occured!',
+        });
+        setLoading(false);
       });
+
+      download(
+        "gib-holders.json",
+        jsonFormat(owners, { size: 1, type: "tab" })
+      );
+      setLoading(false);
     },
     [endpoint, setAlertState, setModalState]
   );

@@ -52,7 +52,7 @@ export function BundlrProvider({ children }) {
 
   useEffect(() => {
     if (wallet.publicKey) {
-      initBundlr(wallet.adapter);
+      initBundlr(wallet);
     }
   }, [wallet.publicKey]);
 

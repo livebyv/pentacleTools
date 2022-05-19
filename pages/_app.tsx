@@ -126,7 +126,7 @@ function Context({ children }: { children: React.ReactNode }) {
                   display: "inline",
                 }}
               />
-              Shadow Drive
+              Shadow Drive Viewer
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/burn-nfts">
               <i className="fa-solid fa-fire mr-3"></i>

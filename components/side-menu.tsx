@@ -65,7 +65,7 @@ export default function SideMenu() {
               display: "inline",
             }}
           />
-          Shadow Drive
+          Shadow Drive Viewer
         </MenuLink>
         <MenuLink href="/burn-nfts">
           <i className="fa-solid fa-fire mr-3"></i>

@@ -205,6 +205,7 @@ function Context({ children }: { children: React.ReactNode }) {
             className={`my-28 px-3 lg:col-span-1 col-span-2 relative`}
             style={{ maxWidth: "100%" }}
           >
+            
             <div className="mx-auto" style={{ maxWidth: "100%", width: 800 }}>
               {/* <div className="alert alert-warning mb-8">
                 <div>

@@ -1043,10 +1043,10 @@
     eventemitter3 "^4.0.7"
     uuid "^8.3.2"
 
-"@strata-foundation/web3-token-auth@^3.4.6-alpha.1":
-  version "3.4.6-alpha.1"
-  resolved "https://registry.yarnpkg.com/@strata-foundation/web3-token-auth/-/web3-token-auth-3.4.6-alpha.1.tgz#810dc54d72fa946e5575a4e43808b7ea51182377"
-  integrity sha512-CXb3gYlSg/qZ3Wl97IqUAHGRG/N9QYWn47XueBC3YSxInGKAdJwKwC/7GbpLdgmWYbyGJXaGWcMBdj+2wxjJNw==
+"@strata-foundation/web3-token-auth@^3.5.4":
+  version "3.5.4"
+  resolved "https://registry.yarnpkg.com/@strata-foundation/web3-token-auth/-/web3-token-auth-3.5.4.tgz#652bb63e1d6ae03fe942b68f1d309c0ac2f02b95"
+  integrity sha512-+ER4fGRj3q8f9Uz38bOw8aayxrZea2LeTczWWvrdSvaMIt1x7RUu2hl2E/m0O4m9gKMaBSbcmM73x6b/sDYMFQ==
   dependencies:
     "@solana/web3.js" "^1.32.0"
     localstorage-memory "^1.0.3"

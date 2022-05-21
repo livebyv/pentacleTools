@@ -65,7 +65,7 @@ function Context({ children }: { children: React.ReactNode }) {
       <div className="drawer drawer-end">
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
         <div className="h-screen drawer-content lg:ml-64 relative">
-          <div className="hidden lg:inline-block p-4 fixed right-6 top-4 z-50">
+          <div className="hidden lg:inline-block p-4 absolute right-0 top-4 z-50">
             <WalletMultiButton className="w-full" />
           </div>
           <div className="lg:hidden">

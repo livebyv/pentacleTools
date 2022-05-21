@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import ShdwDrive from "@shadow-drive/sdk";
+import { ShdwDrive } from "@shadow-drive/sdk";
 import { StorageAccount } from "@shadow-drive/sdk/dist/types";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
@@ -140,7 +140,9 @@ export default function ShdwDrivePage() {
         dispatch({
           type: "shdwBalance",
           payload: {
-            shdwBalance: (shdwBalance.value.uiAmount / LAMPORTS_PER_SOL).toFixed(2),
+            shdwBalance: (
+              shdwBalance.value.uiAmount / LAMPORTS_PER_SOL
+            ).toFixed(2),
           },
         });
         dispatch({
@@ -382,9 +384,7 @@ export default function ShdwDrivePage() {
           <>
             <div className="card bg-gray-900 max-w-full p-6">
               {!state.storageAccounts.length && (
-                <div>
-                  No storage accounts yet. 
-                </div>
+                <div>No storage accounts yet.</div>
               )}
 
               <ul>

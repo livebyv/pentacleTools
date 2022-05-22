@@ -49,7 +49,7 @@ export default function GetHolders() {
         while (!owner) {
           try {
             tx = await connection.getConfirmedSignaturesForAddress2(
-              new PublicKey(addy)
+              toPublicKey(addy)
             );
             firstSig = tx.sort((a, b) => a.blockTime - b.blockTime)[0];
             if (firstSig?.signature) {

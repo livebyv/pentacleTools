@@ -17,7 +17,7 @@ import { ParsedAccountData, PublicKey, Transaction } from "@solana/web3.js";
 import { ModalContext } from "../providers/modal-provider";
 import { AlertContext } from "../providers/alert-provider";
 import Head from "next/head";
-import { getMeta } from "../util/token-metadata";
+import { fetchMetaForUI } from "../util/token-metadata";
 import {
   createBurnInstruction,
   createCloseAccountInstruction,
@@ -174,7 +174,7 @@ export default function BurnNFTs() {
         )
         .map((a) => (a.account.data as ParsedAccountData).parsed.info.mint);
       const data = (
-        await getMeta(mints, () => {}, connection).toPromise()
+        await fetchMetaForUI(mints, () => {}, connection).toPromise()
       ).filter((e) => !e.failed);
 
       const nftsWithImages = data.map((nft) => {

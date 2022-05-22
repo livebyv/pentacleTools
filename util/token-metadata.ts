@@ -209,7 +209,7 @@ async function fetchMetadataFromPDA(pubkey: PublicKey, connection: Connection) {
 }
 
 let mints = [];
-const createJsonObject = async (
+const fetchOneMeta = async (
   key: string,
   setCounter: Function,
   connection: Connection
@@ -235,7 +235,7 @@ const createJsonObject = async (
       creators: tokenMetadata.data?.creators?.map((d) => {
         return {
           share: d.share,
-          address: toPublicKey(d.address).toBase58(),
+          address: d.address,
           verified: !!d.verified,
         };
       }),
@@ -245,15 +245,42 @@ const createJsonObject = async (
   });
 };
 
-export const getMeta = (
+export const fetchMetaForUI = (
   tokens: string[],
   setCounter: (a: any) => void,
   connection: Connection
 ) => {
   return from(tokens).pipe(
-    mergeMap((id) => createJsonObject(id, setCounter, connection), 10),
+    mergeMap((id) => fetchOneMeta(id, setCounter, connection), 10),
     toArray(),
-    map(() => [...mints]),
+    map(() =>
+      [...mints.filter((m) => !m.failed)].sort((a, b) => {
+        try {
+          const aAddress = a.tokenData?.creators?.find(
+            (c) => c.verified
+          )?.address;
+          const bAddress = b.tokenData?.creators?.find(
+            (c) => c.verified
+          )?.address;
+          const parsedAAddress =
+            typeof aAddress === "string"
+              ? aAddress
+              : aAddress instanceof Uint8Array
+              ? toPublicKey(aAddress).toBase58()
+              : "";
+          const parsedBAddress =
+            typeof bAddress === "string"
+              ? bAddress
+              : bAddress instanceof Uint8Array
+              ? toPublicKey(bAddress).toBase58()
+              : "";
+          return parsedAAddress.localeCompare(parsedBAddress);
+        } catch (e) {
+          console.log(e);
+          debugger;
+        }
+      })
+    ),
     tap(() => (mints = []))
   );
 };

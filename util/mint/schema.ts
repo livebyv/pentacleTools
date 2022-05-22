@@ -4,6 +4,7 @@ import { PublicKey } from "@solana/web3.js";
 type StringPublicKey = string;
 
 import BN from "bn.js";
+import { toPublicKey } from "../to-publickey";
 
 export class Creator {
   address: StringPublicKey;
@@ -113,7 +114,7 @@ export const extendBorsh = (): void => {
   (BinaryReader.prototype as any).readPubkey = function () {
     const reader = this as unknown as BinaryReader;
     const array = reader.readFixedArray(32);
-    return new PublicKey(array);
+    return toPublicKey(array);
   };
 
   (BinaryWriter.prototype as any).writePubkey = function (value: PublicKey) {

@@ -3,6 +3,7 @@ import { from, mergeMap, toArray } from "rxjs";
 import { download } from "./download";
 import jsonFormat from "json-format";
 import { sleep } from "@bundlr-network/client/build/common/utils";
+import { toPublicKey } from "./to-publickey";
 
 export const getMints = async (
   creatorId: string,
@@ -29,7 +30,7 @@ export const getMints = async (
     }
     try {
       resolvedTxs = await connection.getSignaturesForAddress(
-        new PublicKey(creatorId),
+        toPublicKey(creatorId),
         { before: before, limit: 1000 }
       );
       console.log({ tries, resolvedTxs: resolvedTxs.length });

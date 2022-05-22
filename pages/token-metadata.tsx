@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { getMeta } from "../util/token-metadata";
+import { fetchMetaForUI } from "../util/token-metadata";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
 import { ModalContext } from "../providers/modal-provider";
@@ -36,7 +36,7 @@ export default function GetMeta() {
 
     setLen(parsed.length);
     setLoading(true);
-    getMeta(parsed, setCounter, connection).subscribe({
+    fetchMetaForUI(parsed, setCounter, connection).subscribe({
       next: (e) => {
         download("gib-meta.json", jsonFormat(e, { size: 1, type: "tab" }));
         setLoading(false);

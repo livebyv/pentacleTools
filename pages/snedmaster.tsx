@@ -234,7 +234,8 @@ export default function Snedmaster() {
                     {wallet?.connected && (
                       <a
                         className="btn btn-circle btn-sm"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
+
                         target="_blank"
                         href={`https://solanabeach.io/address/${wallet?.publicKey}`}
                       >

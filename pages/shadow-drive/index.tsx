@@ -487,7 +487,8 @@ export default function ShdwDrivePage() {
                                 <a
                                   href={`https://solscan.io/account/${pubKeyString}`}
                                   target="_blank"
-                                  rel="noreferrer"
+                                  rel="noopener noreferrer"
+
                                 >
                                   {pubKeyString}
                                 </a>

@@ -327,7 +327,8 @@ export default function GetARLinks() {
                       href={`https://viewblock.io/arweave/address/${address}`}
                       target="_blank"
                       className="btn btn-circle btn-sm shadow-lg"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
+
                       title="View on explorer"
                     >
                       <i className="fa fa-external-link-alt"></i>

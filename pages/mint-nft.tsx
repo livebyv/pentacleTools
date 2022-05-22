@@ -291,7 +291,8 @@ export default function GibAirdrop() {
                   <a
                     href={`https://explorer.solana.com/tx/${mintTxId}`}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
+
                     className="truncate"
                   >
                     {mintTxId.slice(0, 3)} ...{" "}
@@ -353,7 +354,8 @@ export default function GibAirdrop() {
                 <a
                   href="https://docs.phantom.app/integrating/tokens/non-fungible-tokens"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
+
                   style={{ textDecoration: "underline" }}
                 >
                   here by Phantom
@@ -546,7 +548,8 @@ export default function GibAirdrop() {
             <a
               className="link"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
+
               href={`https://solscan.io/token/${mint}`}
             >
               View on SolScan

@@ -175,7 +175,8 @@ export default function ShadowFiles() {
                   <a
                     key={it}
                     href={`https://shdw-drive.genesysgo.net/${query.storageAccount}/${it}`}
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
+
                     target={"_blank"}
                   >
                     <span className="badge badge-outline">{it}</span>

@@ -1,4 +1,3 @@
-
 export function NFTPreview({
   nft,
   selectable = false,
@@ -21,14 +20,20 @@ export function NFTPreview({
             defaultChecked={selected}
           />
         )}
-        {nft.image ? (
+        {nft?.metadata?.image && (
           // eslint-disable-next-line
           <img
-            src={nft?.image}
+            src={nft?.metadata?.image}
             alt=""
             className="w-full block h-32 object-contain "
           />
-        ) : (
+        )}
+        {nft?.metadata?.animation_url ? (
+          <video width={100} height={300} autoPlay loop>
+            <source src={nft?.metadata?.animation_url} />
+          </video>
+        ) : null}
+        {!nft?.metadata?.image && !nft?.metadata?.animation_url && (
           <div className="flex items-center justify-center h-32">
             <svg
               fill="currentColor"
@@ -41,11 +46,6 @@ export function NFTPreview({
             </svg>
           </div>
         )}
-        {nft?.metadata?.animation_url ? (
-          <video width={100} height={300} autoPlay loop>
-            <source src={nft?.metadata?.animation_url} />
-          </video>
-        ) : null}
       </div>
     </>
   );

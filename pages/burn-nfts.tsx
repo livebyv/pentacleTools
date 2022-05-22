@@ -26,6 +26,7 @@ import {
 } from "@solana/spl-token";
 import { toPublicKey } from "../util/to-publickey";
 import { NFTPreview } from "../components/nft-preview";
+import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 
 export default function BurnNFTs() {
   const { setModalState } = useContext(ModalContext);
@@ -285,18 +286,8 @@ export default function BurnNFTs() {
           publicKey,
           []
         );
-
-        const getBlockhashWithRetries = async () => {
-          while (true) {
-            try {
-              return (await connection.getLatestBlockhash()).blockhash;
-            } catch (e) {
-              console.error(e);
-            }
-          }
-        };
         const transaction = new Transaction().add(instruction, closeIx);
-        transaction.recentBlockhash = await getBlockhashWithRetries();
+        transaction.recentBlockhash = (await getBlockhashWithRetries(connection)).blockhash;
         transaction.feePayer = publicKey;
         await signTransaction(transaction);
 

@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { ImageURI } from "../util/image-uri";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useContext } from "react";
@@ -12,7 +11,7 @@ export default function SideMenu() {
   return (
     <div className="drawer-side lg:hidden">
       <label htmlFor="my-drawer" className="drawer-overlay"></label>
-      <ul className="menu p-4 overflow-y-auto w-80 bg-base-300 border-l border-gray-700 shadow text-base-content gap-2">
+      <ul className="menu p-4 overflow-y-auto w-80 bg-base-300 border-l flex flex-col border-gray-700 shadow text-base-content gap-2">
         <li>
           <a
             href="https://pentacle.xyz"
@@ -84,11 +83,8 @@ export default function SideMenu() {
           <i className="fa-solid fa-hand-holding-dollar mr-3"></i>
           <span>SnedMaster</span>
         </MenuLink>
-        <li>
-          <WalletMultiButton className="w-full" />
-        </li>
 
-        <li className="absolute bottom-4 left-0 w-full">
+        <li className="mt-auto w-full">
           <div className={`flex gap-6 items-center justify-center`}>
             <a
               target="_blank"

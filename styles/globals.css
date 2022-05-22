@@ -65,3 +65,8 @@ a {
   @apply duration-150;
   @apply min-h-full;
 }
+
+
+.wallet-adapter-button.wallet-adapter-button-trigger {
+  @apply px-2;
+}

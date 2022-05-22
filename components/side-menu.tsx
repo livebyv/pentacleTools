@@ -4,6 +4,7 @@ import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useContext } from "react";
 import { AlertContext } from "../providers/alert-provider";
+import { MadeWithLove } from "./made-with-love";
 
 export default function SideMenu() {
   const { setAlertState } = useContext(AlertContext);
@@ -55,10 +56,10 @@ export default function SideMenu() {
         <MenuLink href="/shadow-drive">
           <img
             src={ImageURI.GenesysGo}
-            alt=""
+            alt="GenesysGos"
             className="mr-2"
             style={{
-              filter: " grayscale(100%)",
+              filter: "grayscale(100%)",
               width: 16,
               height: 16,
               display: "inline",
@@ -86,38 +87,7 @@ export default function SideMenu() {
 
         <li className="mt-auto w-full">
           <div className={`flex gap-6 items-center justify-center`}>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/penta-fun/sol-nft-tools/"
-            >
-              <i
-                className="fab fa-github"
-                style={{ fontStyle: "normal", fontSize: 24 }}
-              ></i>
-            </a>
-            <div className="text-center flex items-center justify-center flex-col">
-              <span>
-                Made with <i className="fa-solid fa-heart ml-1"></i>
-              </span>
-              <a
-                href="https://twitter.com/pentaclexyz"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                by 0xAlice
-              </a>
-            </div>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://twitter.com/pentaclexyz"
-            >
-              <i
-                className="fab fa-twitter"
-                style={{ fontStyle: "normal", fontSize: 24 }}
-              ></i>
-            </a>
+            <MadeWithLove />
           </div>
           <div>
             <div className="text-sm text-center">

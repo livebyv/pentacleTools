@@ -1,9 +1,15 @@
+interface NFTPreviewProps {
+  nft: any;
+  selectable: boolean;
+  selected: boolean;
+  handleNFTSelect: (...args: any) => void;
+}
 export function NFTPreview({
   nft,
   selectable = false,
   selected = false,
   handleNFTSelect = (...args: any) => {},
-}) {
+}: NFTPreviewProps) {
   return (
     <div
       className={`w-full flex flex-col items-center rounded-md bg-gray-800 object-contain h-48 justify-between px-3 py-2 shadow relative border-2 ${

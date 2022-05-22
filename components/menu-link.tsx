@@ -1,6 +1,10 @@
 import { useRouter } from "next/router";
-
-export const MenuLink = ({ href, children, activatesDrawer = true }) => {
+interface MenuLinkProps {
+  href: string;
+  children: any;
+  activatesDrawer?: boolean;
+}
+export const MenuLink = ({ href, children, activatesDrawer = true }: MenuLinkProps) => {
     const router = useRouter();
     const { pathname } = router;
     return (

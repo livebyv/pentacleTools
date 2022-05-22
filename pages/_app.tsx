@@ -20,6 +20,7 @@ import { useContext } from "react";
 import { AlertContext } from "../providers/alert-provider";
 import { ImageURI } from "../util/image-uri";
 import { FileProvider } from "../hooks/use-files";
+import { MadeWithLove } from "../components/made-with-love";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
 const WalletProvider = dynamic(
@@ -158,27 +159,8 @@ function Context({ children }: { children: React.ReactNode }) {
                   ></i>
                 </a>
                 <div className="text-center flex items-center justify-center flex-col">
-                  <span>
-                    Made with <i className="fa-solid fa-heart ml-1"></i>
-                  </span>
-                  <a
-                    href="https://twitter.com/0xAlice_"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    by 0xAlice
-                  </a>
+                  <MadeWithLove />
                 </div>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://twitter.com/pentaclexyz"
-                >
-                  <i
-                    className="fab fa-twitter"
-                    style={{ fontStyle: "normal", fontSize: 24 }}
-                  ></i>
-                </a>
               </div>
               <div>
                 <div className="text-sm text-center">
@@ -205,7 +187,6 @@ function Context({ children }: { children: React.ReactNode }) {
             className={`my-28 px-3 lg:col-span-1 col-span-2 relative`}
             style={{ maxWidth: "100%" }}
           >
-            
             <div className="mx-auto" style={{ maxWidth: "100%", width: 800 }}>
               {/* <div className="alert alert-warning mb-8">
                 <div>

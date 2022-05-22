@@ -3,12 +3,19 @@ import { usePagination } from "react-use-pagination";
 import FileTile from "./file-tile";
 import { Pagination } from "./pagination";
 
+interface PaginateFilesProps {
+  addMore: (e: any) => void;
+  handleClear: () => void;
+  files: File[];
+  handleRemoveFile: (name: string) => void;
+}
+
 export default function PaginatedFiles({
   addMore,
   files,
   handleClear,
   handleRemoveFile,
-}) {
+}: PaginateFilesProps) {
   const { currentPage, totalPages, startIndex, endIndex, setPage, pageSize } =
     usePagination({ totalItems: files.length, initialPageSize: 15 });
   return (

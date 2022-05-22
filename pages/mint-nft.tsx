@@ -16,6 +16,7 @@ import { BundlrContext } from "../providers/bundlr-provider";
 import { mintNFT } from "../util/mint";
 import { AlertContext } from "../providers/alert-provider";
 import { ModalContext } from "../providers/modal-provider";
+import { getRange } from "../util/get-range";
 
 const fileToBuffer = (
   file: File
@@ -88,17 +89,15 @@ export default function GibAirdrop() {
           )}
         </div>
         <div className="upload-field grid grid-cols-2 gap-4 my-4">
-          {Array.from({ length: numberOfFiles })
-            .fill("")
-            .map((num, i) => (
-              <FileTile
-                key={i}
-                file={files[i]}
-                remove={handleRemoveFile}
-                setFiles={setFiles}
-                files={files}
-              />
-            ))}
+          {getRange(numberOfFiles).map((i) => (
+            <FileTile
+              key={i}
+              file={files[i]}
+              remove={handleRemoveFile}
+              setFiles={setFiles}
+              files={files}
+            />
+          ))}
         </div>
 
         {!!files?.length && (

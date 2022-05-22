@@ -5,35 +5,32 @@ export function NFTPreview({
   handleNFTSelect = (...args: any) => {},
 }) {
   return (
-    <>
+    <div
+      className={`w-full flex flex-col items-center rounded-md bg-gray-800 object-contain h-48 justify-between px-3 py-2 shadow relative border-2 ${
+        selected ? "border-primary" : "border-transparent"
+      }`}
+      onClick={() => selectable && handleNFTSelect(nft.mint)}
+    >
       <strong
         className={`text-center truncate max-w-full ${selectable && "mr-6"}`}
       >
         {nft.metadata?.name || nft?.tokenData?.name}
       </strong>
-      <div className="w-full bg-black flex items-center justify-center rounded-lg">
-        {selectable ? (
-          <input
-            type="checkbox"
-            className="checkbox absolute right-2 top-2"
-            onClick={() => handleNFTSelect(nft.mint)}
-            defaultChecked={selected}
-          />
-        ) : (
-          <></>
-        )}
+      <div
+        className={`w-full bg-black flex items-center justify-center rounded-lg`}
+      >
         {nft?.metadata?.properties?.category !== "video" ? (
           // eslint-disable-next-line
           <img
             src={nft?.metadata?.image}
-            alt=""
+            alt={nft?.metadata?.name}
             className="w-full block h-32 object-contain "
           />
         ) : (
           <></>
         )}
         {nft?.metadata?.properties?.category === "video" ? (
-          <video width={100} height={300} autoPlay loop>
+          <video className="h-32 w-full" autoPlay loop>
             <source src={nft?.metadata?.animation_url} />
           </video>
         ) : (
@@ -55,6 +52,6 @@ export function NFTPreview({
           <></>
         )}
       </div>
-    </>
+    </div>
   );
 }

@@ -6,13 +6,11 @@ import React, {
   useMemo,
 } from "react";
 import { createPortal } from "react-dom";
-import {
-  WalletDisconnectButton,
-  WalletMultiButton,
-} from "@solana/wallet-adapter-react-ui";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import { ParsedAccountData, PublicKey, Transaction } from "@solana/web3.js";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import { ModalContext } from "../providers/modal-provider";
 import { AlertContext } from "../providers/alert-provider";
@@ -287,7 +285,9 @@ export default function BurnNFTs() {
           []
         );
         const transaction = new Transaction().add(instruction, closeIx);
-        transaction.recentBlockhash = (await getBlockhashWithRetries(connection)).blockhash;
+        transaction.recentBlockhash = (
+          await getBlockhashWithRetries(connection)
+        ).blockhash;
         transaction.feePayer = publicKey;
         await signTransaction(transaction);
 
@@ -495,19 +495,17 @@ export default function BurnNFTs() {
           ) : (
             <div className="flex items-center flex-wrap">
               {nftsToRender?.map((nft) => (
-                <div className="w-full md:w-1/4 p-4" key={nft.mint}>
-                  <div className="flex flex-col items-center rounded-md bg-gray-800 object-contain h-48 justify-between px-3 py-2 shadow relative">
-                    <NFTPreview
-                      nft={nft}
-                      selectable
-                      handleNFTSelect={handleNFTSelect}
-                      selected={
-                        !!state.selectedNFTs.find((n) =>
-                          n.equals(toPublicKey(nft.mint))
-                        )
-                      }
-                    />
-                  </div>
+                <div className="w-full md:w-1/4 p-2" key={nft.mint}>
+                  <NFTPreview
+                    nft={nft}
+                    selectable
+                    handleNFTSelect={handleNFTSelect}
+                    selected={
+                      !!state.selectedNFTs.find((n) =>
+                        n.equals(toPublicKey(nft.mint))
+                      )
+                    }
+                  />
                 </div>
               ))}
             </div>
@@ -553,20 +551,23 @@ export default function BurnNFTs() {
       </p>
       <div className="flex flex-col items-center justify-center my-4 text-sm">
         {publicKey ? (
-          <>
-            <p className="text-center break-all text-white">
-              <span>Connected Address:</span>
-              <br />
-              {state.publicAddress}
-            </p>
-            <WalletDisconnectButton
-              style={{
-                fontSize: "0.75rem",
-                height: "2rem",
-                marginTop: "1rem",
-              }}
-            />
-          </>
+          <p className="text-center break-all text-white">
+            <span>Connected Address:</span>
+            <br />
+
+            <CopyToClipboard
+              text={state.publicAddress}
+              onCopy={() =>
+                setAlertState({
+                  message: "Copied to clipboard!",
+                  duration: 2000,
+                  open: true,
+                })
+              }
+            >
+              <span className={`cursor-pointer`}>{state.publicAddress}</span>
+            </CopyToClipboard>
+          </p>
         ) : (
           <WalletMultiButton
             style={{

@@ -22,7 +22,7 @@ export function NFTPreview({
         ) : (
           <></>
         )}
-        {nft?.metadata?.image ? (
+        {nft?.metadata?.properties?.category !== "video" ? (
           // eslint-disable-next-line
           <img
             src={nft?.metadata?.image}
@@ -32,7 +32,7 @@ export function NFTPreview({
         ) : (
           <></>
         )}
-        {nft?.metadata?.animation_url ? (
+        {nft?.metadata?.properties?.category === "video" ? (
           <video width={100} height={300} autoPlay loop>
             <source src={nft?.metadata?.animation_url} />
           </video>

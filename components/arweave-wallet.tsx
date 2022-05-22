@@ -1,7 +1,7 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import React, { useContext, useEffect, useState } from "react";
 import { useAlert } from "../providers/alert-provider";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { shortenAddress } from "../util/shorten-address";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { BundlrContext } from "../providers/bundlr-provider";

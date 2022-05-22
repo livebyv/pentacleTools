@@ -4,9 +4,8 @@ import { FileUpload } from "../components/file-upload";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
 import Image from "next/image";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { makeArweaveBundleUploadGenerator } from "../util/upload-arweave-bundles/upload-generator";
-import { Spinner } from "../components/spinner";
 import { useForm } from "react-hook-form";
 import { getArweave } from "../util/upload-arweave-bundles/reference";
 import { shortenAddress } from "../util/shorten-address";
@@ -291,7 +290,7 @@ export default function GetARLinks() {
                   </CopyToClipboard>
                   <p>
                     Balance:{" "}
-                    {balance === "none" ? <Spinner /> : (+balance).toFixed(6)}
+                    {balance === "none" ? <button className="btn btn-ghost loading"/> : (+balance).toFixed(6)}
                   </p>
                 </div>
 

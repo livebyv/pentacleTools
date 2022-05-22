@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { ImageURI } from "../util/image-uri";
 import { MenuLink } from "./menu-link";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { useAlert } from "../providers/alert-provider";
 import { MadeWithLove } from "./made-with-love";
 
@@ -85,7 +85,7 @@ export default function SideMenu() {
         </MenuLink>
 
         <li className="mt-auto w-full">
-          <div className={`flex gap-6 items-center justify-center`}>
+          <div className={`text-center flex items-center justify-center flex-row gap-4`}>
             <MadeWithLove />
           </div>
           <div>

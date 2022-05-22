@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import jsonFormat from "json-format";
 import { download } from "../util/download";
-import { CopyToClipboard } from "react-copy-to-clipboard";
+import { CopyToClipboard } from "../components/copy-to-clipboard";
 import {
   LAMPORTS_PER_SOL,
   SystemProgram,

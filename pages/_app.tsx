@@ -1,24 +1,25 @@
 import "../styles/globals.css";
 import "@fortawesome/fontawesome-free/css/all.css";
-import { tokenAuthFetchMiddleware } from "@strata-foundation/web3-token-auth";
 
-import { ModalProvider } from "../providers/modal-provider";
-import React from "react";
-import { AlertProvider, useAlert } from "../providers/alert-provider";
-import Image from "next/image";
-import SideMenu from "../components/side-menu";
-import Head from "next/head";
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
-import dynamic from "next/dynamic";
-import TopMenu from "../components/top-menu";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { tokenAuthFetchMiddleware } from "@strata-foundation/web3-token-auth";
+import { AppProps } from "next/app";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import Head from "next/head";
+import React from "react";
+
+import { AlertProvider, useAlert } from "../providers/alert-provider";
+import { ModalProvider } from "../providers/modal-provider";
+import SideMenu from "../components/side-menu";
+import TopMenu from "../components/top-menu";
 import { MenuLink } from "../components/menu-link";
 import { BundlrProvider } from "../providers/bundlr-provider";
-import { AppProps } from "next/app";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import { ImageURI } from "../util/image-uri";
 import { FileProvider } from "../hooks/use-files";
 import { MadeWithLove } from "../components/made-with-love";
+import { CopyToClipboard } from "../components/copy-to-clipboard";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
 const WalletProvider = dynamic(
@@ -41,21 +42,24 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     </FileProvider>
   );
 };
+
 function Context({ children }: { children: React.ReactNode }) {
   const { setAlertState } = useAlert();
+
+  const fetchMiddleware = tokenAuthFetchMiddleware({
+    getToken: async () => {
+      const req = await fetch("/api/get-token");
+      const { access_token }: { access_token: string } = await req.json();
+      return access_token;
+    },
+  });
 
   return (
     <ConnectionProvider
       endpoint={endpoint}
       config={{
         confirmTransactionInitialTimeout: 120000,
-        fetchMiddleware: tokenAuthFetchMiddleware({
-          getToken: async () => {
-            const req = await fetch("/api/get-token");
-            const { access_token }: { access_token: string } = await req.json();
-            return access_token;
-          },
-        }),
+        fetchMiddleware,
       }}
     >
       <Head>
@@ -145,20 +149,10 @@ function Context({ children }: { children: React.ReactNode }) {
             </MenuLink>
 
             <li className="absolute bottom-4 left-0 w-full">
-              <div className={`flex gap-6 items-center justify-center`}>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://github.com/penta-fun/sol-nft-tools/"
-                >
-                  <i
-                    className="fab fa-github"
-                    style={{ fontStyle: "normal", fontSize: 24 }}
-                  ></i>
-                </a>
-                <div className="text-center flex items-center justify-center flex-col">
-                  <MadeWithLove />
-                </div>
+              <div
+                className={`text-center flex items-center justify-center flex-row gap-4`}
+              >
+                <MadeWithLove />
               </div>
               <div>
                 <div className="text-sm text-center">

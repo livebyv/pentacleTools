@@ -25,46 +25,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { toPublicKey } from "../util/to-publickey";
-
-function NFTPreview({
-  nft,
-  selectable = false,
-  selected = false,
-  handleNFTSelect = (...args: any) => {},
-}) {
-  return (
-    <>
-      <strong
-        className={`text-center truncate max-w-full ${selectable && "mr-6"}`}
-      >
-        {nft.metadata?.name}
-      </strong>
-      <div className="w-full bg-black flex items-center justify-center rounded">
-        {selectable && (
-          <input
-            type="checkbox"
-            className="checkbox absolute right-2 top-2"
-            onClick={() => handleNFTSelect(nft.mint)}
-            defaultChecked={selected}
-          />
-        )}
-        {nft.image ? (
-          // eslint-disable-next-line
-          <img
-            src={nft?.image}
-            alt=""
-            className="w-full block h-32 object-contain"
-          />
-        ) : null}
-        {nft.video ? (
-          <video width={100} height={300} autoPlay loop>
-            <source src={nft?.video?.uri} type={nft?.video?.type} />
-          </video>
-        ) : null}
-      </div>
-    </>
-  );
-}
+import { NFTPreview } from "../components/nft-preview";
 
 export default function BurnNFTs() {
   const { setModalState } = useContext(ModalContext);

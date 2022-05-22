@@ -2,10 +2,10 @@ import React, { useCallback, useContext, useState } from "react";
 import { getOwners } from "../util/holder-snapshot";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
-import { ModalContext } from "../providers/modal-provider";
+import { useModal } from "../providers/modal-provider";
 import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import Head from "next/head";
 import { useConnection } from "@solana/wallet-adapter-react";
 export default function GetHolders() {
@@ -18,8 +18,8 @@ export default function GetHolders() {
   const [counter, setCounter] = useState(0);
   const [len, setLen] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { setModalState } = useContext(ModalContext);
-  const { setAlertState } = useContext(AlertContext);
+  const { setModalState } = useModal();
+  const { setAlertState } = useAlert();
   const endpoint = process.env.NEXT_PUBLIC_RPC!;
   const { connection } = useConnection();
   const fetchHolders = useCallback(
@@ -36,17 +36,15 @@ export default function GetHolders() {
       setLen(parsed.length);
       setLoading(true);
 
-      const owners = await getOwners(
-        parsed,
-        connection,
-        setCounter,
-      ).catch(() => {
-        setModalState({
-          open: true,
-          message: 'An error occured!',
-        });
-        setLoading(false);
-      });
+      const owners = await getOwners(parsed, connection, setCounter).catch(
+        () => {
+          setModalState({
+            open: true,
+            message: "An error occured!",
+          });
+          setLoading(false);
+        }
+      );
 
       download(
         "gib-holders.json",

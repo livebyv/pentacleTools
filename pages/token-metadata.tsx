@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { fetchMetaForUI } from "../util/token-metadata";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
-import { ModalContext } from "../providers/modal-provider";
+import { useModal } from "../providers/modal-provider";
 import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import Head from "next/head";
 import { useConnection } from "@solana/wallet-adapter-react";
 
@@ -18,9 +18,9 @@ export default function GetMeta() {
   const [loading, setLoading] = useState(false);
   const [counter, setCounter] = useState(0);
   const [len, setLen] = useState(0);
-  const { setModalState } = useContext(ModalContext);
+  const { setModalState } = useModal();
   const { connection } = useConnection();
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
 
   const fetchMeta = ({ mints }: { mints: string }) => {
     const parsed = getAddresses(mints);

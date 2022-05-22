@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from "react";
+import React, { useEffect, useReducer } from "react";
 import { useForm } from "react-hook-form";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
@@ -8,9 +8,9 @@ import { StorageAccount } from "@shadow-drive/sdk/dist/types";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 
-import { AlertContext } from "../../providers/alert-provider";
+import { useAlert } from "../../providers/alert-provider";
 import { sizeMB } from "../../components/file-tile";
-import { ModalContext } from "../../providers/modal-provider";
+import { useModal } from "../../providers/modal-provider";
 import { ImageURI } from "../../util/image-uri";
 import { SHDW_TOKEN } from "../../util/accounts";
 import { ExplorerLink } from "../../components/explorer-link";
@@ -108,9 +108,9 @@ export default function ShdwDrivePage() {
     },
     initState
   );
-  const { setModalState } = useContext(ModalContext);
+  const { setModalState } = useModal();
   const { register, handleSubmit, getValues, reset } = useForm();
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
   const { connection } = useConnection();
   const wallet = useWallet();
 

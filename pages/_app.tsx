@@ -4,7 +4,7 @@ import { tokenAuthFetchMiddleware } from "@strata-foundation/web3-token-auth";
 
 import { ModalProvider } from "../providers/modal-provider";
 import React from "react";
-import { AlertProvider } from "../providers/alert-provider";
+import { AlertProvider, useAlert } from "../providers/alert-provider";
 import Image from "next/image";
 import SideMenu from "../components/side-menu";
 import Head from "next/head";
@@ -16,8 +16,6 @@ import { MenuLink } from "../components/menu-link";
 import { BundlrProvider } from "../providers/bundlr-provider";
 import { AppProps } from "next/app";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { useContext } from "react";
-import { AlertContext } from "../providers/alert-provider";
 import { ImageURI } from "../util/image-uri";
 import { FileProvider } from "../hooks/use-files";
 import { MadeWithLove } from "../components/made-with-love";
@@ -44,7 +42,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
   );
 };
 function Context({ children }: { children: React.ReactNode }) {
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
 
   return (
     <ConnectionProvider

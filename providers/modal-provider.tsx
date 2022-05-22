@@ -1,9 +1,10 @@
-import { createContext, ReactElement, useState } from "react";
+import { createContext, ReactElement, useContext, useState } from "react";
 
 const initialState: ModalContextState = {
   modalState: { open: false, message: <></> },
 };
 export const ModalContext = createContext(initialState);
+export const useModal = () => useContext(ModalContext);
 
 export function ModalProvider({ children }) {
   const [modalState, setModalState] = useState<ModalState>({

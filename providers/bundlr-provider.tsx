@@ -2,9 +2,9 @@ import { WebBundlr } from "@bundlr-network/client";
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 import React from "react";
-import { createContext, useContext, useEffect, useState } from "react";
-import { AlertContext } from "./alert-provider";
-import { ModalContext } from "./modal-provider";
+import { createContext, useEffect, useState } from "react";
+import { useAlert } from "./alert-provider";
+import { useModal } from "./modal-provider";
 
 const initialState: {
   updateFundAmount?: Function;
@@ -46,8 +46,8 @@ export function BundlrProvider({ children }) {
   const bundlerHttpAddress = "https://node1.bundlr.network";
   const [withdrawAmount, setWithdrawAmount] = React.useState<string>();
 
-  const { setModalState } = useContext(ModalContext);
-  const { setAlertState } = useContext(AlertContext);
+  const { setModalState } = useModal();
+  const { setAlertState } = useAlert();
   const intervalRef = React.useRef<NodeJS.Timer>();
 
   useEffect(() => {

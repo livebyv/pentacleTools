@@ -1,8 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SOL_ADDRESS_REGEXP } from "../util/validators";
-import { ModalContext } from "../providers/modal-provider";
-import { AlertContext } from "../providers/alert-provider";
+import { useModal } from "../providers/modal-provider";
+import { useAlert } from "../providers/alert-provider";
 import { getMints } from "../util/get-mints";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
@@ -16,9 +16,9 @@ export default function GibMints() {
     setValue,
   } = useForm();
   const [loading, setLoading] = useState(false);
-  const { setModalState } = useContext(ModalContext);
+  const { setModalState } = useModal();
   const { connection } = useConnection();
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
   const { connected, publicKey } = useWallet();
   const [counter, setCounter] = useState(0);
   const fetchMints = async (val = "") => {

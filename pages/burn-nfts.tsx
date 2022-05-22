@@ -12,8 +12,8 @@ import { useRouter } from "next/router";
 import { ParsedAccountData, PublicKey, Transaction } from "@solana/web3.js";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 
-import { ModalContext } from "../providers/modal-provider";
-import { AlertContext } from "../providers/alert-provider";
+import { useModal } from "../providers/modal-provider";
+import { useAlert } from "../providers/alert-provider";
 import Head from "next/head";
 import { fetchMetaForUI } from "../util/token-metadata";
 import {
@@ -27,8 +27,8 @@ import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 
 export default function BurnNFTs() {
-  const { setModalState } = useContext(ModalContext);
-  const { setAlertState } = useContext(AlertContext);
+  const { setModalState } = useModal();
+  const { setAlertState } = useAlert();
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
   const router = useRouter();

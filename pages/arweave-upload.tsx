@@ -10,7 +10,7 @@ import { Spinner } from "../components/spinner";
 import { useForm } from "react-hook-form";
 import { getArweave } from "../util/upload-arweave-bundles/reference";
 import { shortenAddress } from "../util/shorten-address";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import { ImageURI } from "../util/image-uri";
 import { FileContext } from "../hooks/use-files";
 import { WebBundlr } from "@bundlr-network/client";
@@ -55,7 +55,7 @@ export default function GetARLinks() {
   const { files } = useContext(FileContext);
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm();
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
   const wallet = useWallet();
 
   const generate = useCallback(async () => {
@@ -109,7 +109,7 @@ export default function GetARLinks() {
     (async () => {
       if (wallet.connected) {
         const bundlr = await initialiseBundlr();
-        console.log(bundlr)
+        console.log(bundlr);
       }
     })();
   }, [wallet.connected]);
@@ -198,7 +198,7 @@ export default function GetARLinks() {
 
   return (
     <>
-         <Head>
+      <Head>
         <title>🛠️ Pentacle Tools - ⬆️ Arweave Upload</title>
       </Head>
       <div className="prose max-w-full text-center mb-3">

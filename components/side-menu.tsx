@@ -2,12 +2,11 @@ import Image from "next/image";
 import { ImageURI } from "../util/image-uri";
 import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "react-copy-to-clipboard";
-import { useContext } from "react";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import { MadeWithLove } from "./made-with-love";
 
 export default function SideMenu() {
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
 
   return (
     <div className="drawer-side lg:hidden">

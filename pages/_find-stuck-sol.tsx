@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SOL_ADDRESS_REGEXP } from "../util/validators";
 import { getStuckSol } from "../util/get-stuck-sol";
-import { ModalContext } from "../providers/modal-provider";
+import { useModal } from "../providers/modal-provider";
 import { useForm } from "react-hook-form";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -15,9 +15,10 @@ export default function GibStuckSol() {
     formState: { errors },
   } = useForm();
   const [loading, setLoading] = useState(false);
-  const { setModalState } = useContext(ModalContext);
+  const { setModalState } = useModal();
   const endpoint = process.env.NEXT_PUBLIC_RPC!;
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
+
 
   const fetchStuckSol = ({ address }) => {
     setAlertState({

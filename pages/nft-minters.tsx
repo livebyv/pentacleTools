@@ -1,10 +1,10 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
-import { ModalContext } from "../providers/modal-provider";
+import { useModal } from "../providers/modal-provider";
 import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { from, mergeMap, tap, toArray } from "rxjs";
 import Head from "next/head";
@@ -20,8 +20,8 @@ export default function GetHolders() {
   const [counter, setCounter] = useState(0);
   const [len, setLen] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { setModalState } = useContext(ModalContext);
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
+  const { setModalState } = useModal();
   const endpoint = process.env.NEXT_PUBLIC_RPC!;
   const { connection } = useConnection();
 

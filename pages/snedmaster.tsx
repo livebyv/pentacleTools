@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import jsonFormat from "json-format";
 import { download } from "../util/download";
 import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -9,7 +9,7 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import IdField from "../components/id-field";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MEMO_ID } from "../util/accounts";
@@ -18,8 +18,8 @@ import { toPublicKey } from "../util/to-publickey";
 export default function Snedmaster() {
   const [loading, setLoading] = useState(false);
   const { connection } = useConnection();
+  const { setAlertState } = useAlert();
   const [solBalance, setSolBalance] = useState<number | "none">("none");
-  const { setAlertState } = useContext(AlertContext);
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const wallet = useWallet();
 

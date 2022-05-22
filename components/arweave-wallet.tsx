@@ -1,6 +1,6 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import React, { useContext, useEffect, useState } from "react";
-import { AlertContext } from "../providers/alert-provider";
+import { useAlert } from "../providers/alert-provider";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { shortenAddress } from "../util/shorten-address";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
@@ -15,7 +15,8 @@ export default function ArweaveWallet() {
   const { balance: bundlrBalance, bundlerHttpAddress } =
     useContext(BundlrContext);
 
-  const { setAlertState } = useContext(AlertContext);
+  const { setAlertState } = useAlert();
+
 
   useEffect(() => {
     if (wallet?.publicKey) {

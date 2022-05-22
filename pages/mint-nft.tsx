@@ -14,8 +14,7 @@ import { URL_MATCHER } from "../util/url-matcher";
 import ArweaveWallet from "../components/arweave-wallet";
 import { BundlrContext } from "../providers/bundlr-provider";
 import { mintNFT } from "../util/mint";
-import { AlertContext } from "../providers/alert-provider";
-import { ModalContext } from "../providers/modal-provider";
+import { useAlert } from "../providers/alert-provider";
 import { getRange } from "../util/get-range";
 
 const fileToBuffer = (
@@ -44,6 +43,7 @@ export default function GibAirdrop() {
     formState: { errors },
     control,
   } = useForm();
+  const { setAlertState } = useAlert();
   const [loading, setLoading] = useState(false);
   const wallet = useWallet();
   const [numberOfFiles, setNumberOfFiles] = useState(0);
@@ -54,8 +54,6 @@ export default function GibAirdrop() {
   const handleRemoveFile = (name: string) => {
     setFiles(files.filter((f) => f.name !== name));
   };
-  const { setAlertState } = useContext(AlertContext);
-  const { setModalState } = useContext(ModalContext);
 
   const FilesForm = useMemo(
     () => (

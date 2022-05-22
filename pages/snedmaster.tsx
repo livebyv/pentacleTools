@@ -4,7 +4,6 @@ import { download } from "../util/download";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import {
   LAMPORTS_PER_SOL,
-  PublicKey,
   SystemProgram,
   Transaction,
   TransactionInstruction,
@@ -13,7 +12,8 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { AlertContext } from "../providers/alert-provider";
 import IdField from "../components/id-field";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { createTransferInstruction } from "@solana/spl-token";
+import { MEMO_ID } from "../util/accounts";
+import { toPublicKey } from "../util/to-publickey";
 
 export default function Snedmaster() {
   const [loading, setLoading] = useState(false);
@@ -91,7 +91,7 @@ export default function Snedmaster() {
           while (!blockhash) {
             try {
               blockhash = await (
-                await connection.getRecentBlockhash()
+                await connection.getLatestBlockhash()
               ).blockhash;
             } catch (e) {
               console.log(e);
@@ -105,7 +105,7 @@ export default function Snedmaster() {
           }).add(
             SystemProgram.transfer({
               lamports: amount * LAMPORTS_PER_SOL,
-              toPubkey: new PublicKey(destination),
+              toPubkey: toPublicKey(destination),
               fromPubkey: wallet?.publicKey,
             }),
             new TransactionInstruction({
@@ -113,9 +113,7 @@ export default function Snedmaster() {
                 { pubkey: wallet?.publicKey, isSigner: true, isWritable: true },
               ],
               data: Buffer.from(`Sent by snedmaster at ${Date.now()}`, "utf-8"),
-              programId: new PublicKey(
-                "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr"
-              ),
+              programId: MEMO_ID,
             })
           );
           await new Promise((resolve) => setTimeout(resolve, 100));

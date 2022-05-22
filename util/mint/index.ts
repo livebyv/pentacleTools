@@ -26,12 +26,8 @@ import {
 } from "./utils";
 import BN from "bn.js";
 import { WalletContextState } from "@solana/wallet-adapter-react";
-const sleep = (ms: number) => new Promise(resolve =>  setTimeout(resolve, ms));
-
-const METAPLEX_PROGRAM_ID = new PublicKey(
-  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-);
-
+import { METADATA_PROGRAM_ID } from "../accounts";
+import { sleep } from "../sleep";
 export async function mintNFT(
   connection: Connection,
   wallet: WalletContextState,
@@ -72,13 +68,12 @@ export async function mintNFT(
     ).catch();
 
     // Create associated account for user
-    const createAssocTokenAccountIx =
-      createAssociatedTokenAccountInstruction(
-        publicKey,
-        assoc,
-        publicKey,
-        mint.publicKey
-      );
+    const createAssocTokenAccountIx = createAssociatedTokenAccountInstruction(
+      publicKey,
+      assoc,
+      publicKey,
+      mint.publicKey
+    );
 
     // Create mintTo ix; mint to user's associated account
     const mintToIx = createMintToInstruction(
@@ -86,30 +81,30 @@ export async function mintNFT(
       assoc,
       publicKey, // Mint authority
       1,
-      [], // No multi-sign signers
+      [] // No multi-sign signers
     );
 
     // Derive metadata account
     const metadataSeeds = [
       Buffer.from("metadata"),
-      METAPLEX_PROGRAM_ID.toBuffer(),
+      METADATA_PROGRAM_ID.toBuffer(),
       mint.publicKey.toBuffer(),
     ];
     const [metadataAccount, _pda] = await PublicKey.findProgramAddress(
       metadataSeeds,
-      METAPLEX_PROGRAM_ID
+      METADATA_PROGRAM_ID
     ).catch();
 
     // Derive Master Edition account
     const masterEditionSeeds = [
       Buffer.from("metadata"),
-      METAPLEX_PROGRAM_ID.toBuffer(),
+      METADATA_PROGRAM_ID.toBuffer(),
       mint.publicKey.toBuffer(),
       Buffer.from("edition"),
     ];
-    const [masterEditionAccount, _] = await PublicKey.findProgramAddress(
+    const [masterEditionAccount,  _] = await PublicKey.findProgramAddress(
       masterEditionSeeds,
-      METAPLEX_PROGRAM_ID
+      METADATA_PROGRAM_ID
     ).catch();
 
     let buffer = Buffer.from(
@@ -148,7 +143,7 @@ export async function mintNFT(
     let blockhash;
     while (!blockhash) {
       try {
-        blockhash = await (await connection.getRecentBlockhash()).blockhash;
+        blockhash = (await connection.getLatestBlockhash()).blockhash;
       } catch (e) {
         console.log(e);
         await sleep(1000);

@@ -1,10 +1,11 @@
 import base58 from "bs58";
 import { deserializeUnchecked, BinaryReader, BinaryWriter } from "borsh";
 import { Connection, PublicKey } from "@solana/web3.js";
-export const METADATA_PREFIX = "metadata";
 import { from, map, mergeMap, tap, toArray } from "rxjs";
-import { programIds } from "./accounts";
+import { METADATA_PROGRAM_ID } from "./accounts";
 import { toPublicKey } from "./to-publickey";
+
+export const METADATA_PREFIX = "metadata";
 
 class Creator {
   address: PublicKey;
@@ -143,7 +144,7 @@ const extendBorsh = () => {
   (BinaryReader.prototype as any).readPubkey = function () {
     const reader = this as unknown as BinaryReader;
     const array = reader.readFixedArray(32);
-    return new PublicKey(array);
+    return toPublicKey(array);
   };
 
   (BinaryWriter.prototype as any).writePubkey = function (value: any) {
@@ -186,16 +187,14 @@ async function getMetadata(pubkey: PublicKey, connection: Connection) {
 async function getMetadataKey(
   tokenMint: StringPublicKey
 ): Promise<StringPublicKey> {
-  const PROGRAM_IDS = programIds();
-
   return (
     await findProgramAddress(
       [
         Buffer.from(METADATA_PREFIX),
-        toPublicKey(PROGRAM_IDS.metadata).toBuffer(),
+        METADATA_PROGRAM_ID.toBuffer(),
         toPublicKey(tokenMint).toBuffer(),
       ],
-      toPublicKey(PROGRAM_IDS.metadata)
+      METADATA_PROGRAM_ID
     )
   )[0];
 }

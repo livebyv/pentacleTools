@@ -24,6 +24,7 @@ import {
   getAssociatedTokenAddress,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
+import { toPublicKey } from "../util/to-publickey";
 
 function NFTPreview({
   nft,
@@ -248,7 +249,7 @@ export default function BurnNFTs() {
 
   const handleNFTSelect = useCallback(
     (selectedNFT: string) => {
-      const newPubkey = new PublicKey(selectedNFT);
+      const newPubkey = toPublicKey(selectedNFT);
       const idx = state.selectedNFTs.findIndex((nft) => nft.equals(newPubkey));
       if (idx >= 0) {
         const newItems = state.selectedNFTs.filter(
@@ -276,7 +277,7 @@ export default function BurnNFTs() {
       dispatch({
         type: "nfts",
         payload: {
-          nfts: state.nfts.filter((i) => !new PublicKey(i.mint).equals(nft)),
+          nfts: state.nfts.filter((i) => !toPublicKey(i.mint).equals(nft)),
         },
       });
     },
@@ -327,7 +328,7 @@ export default function BurnNFTs() {
         const getBlockhashWithRetries = async () => {
           while (true) {
             try {
-              return (await connection.getRecentBlockhash()).blockhash;
+              return (await connection.getLatestBlockhash()).blockhash;
             } catch (e) {
               console.error(e);
             }
@@ -550,7 +551,7 @@ export default function BurnNFTs() {
                       handleNFTSelect={handleNFTSelect}
                       selected={
                         !!state.selectedNFTs.find((n) =>
-                          n.equals(new PublicKey(nft.mint))
+                          n.equals(toPublicKey(nft.mint))
                         )
                       }
                     />

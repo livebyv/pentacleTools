@@ -101,7 +101,7 @@ export default function GetHolders() {
         <hr className="opacity-10 my-4" />
       </div>
       <p className="px-2 text-center">
-        This tools gives you a list of first minters for a list of Solana NFTs.
+        This tool gives you a list of first minters for a list of Solana NFTs.
         This helps you e.g. for airdrops to those who initially minted your NFT
         collection.
       </p>

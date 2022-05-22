@@ -179,7 +179,7 @@ export default function Snedmaster() {
         <hr className="opacity-10 my-4" />
       </div>
       <p className="px-2 text-center">
-        This tools sends out a certain amount of Solana to different addresses.
+        This tool sends out a certain amount of Solana to different addresses.
         <br />
         <strong>Warning</strong>: always check the json for errors!
       </p>

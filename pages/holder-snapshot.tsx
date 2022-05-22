@@ -67,7 +67,7 @@ export default function GetHolders() {
         <hr className="opacity-10 my-4" />
       </div>
       <p className="px-2 text-center">
-        This tools gives you a snapshot of holders from Solana Mint IDs. It will
+        This tool gives you a snapshot of holders from Solana Mint IDs. It will
         return an object with holders, mints and amounts.
         <br />
         <strong>Works with SPLs as well as NFTs</strong>

@@ -49,7 +49,7 @@ function Context({ children }: { children: React.ReactNode }) {
     <ConnectionProvider
       endpoint={endpoint}
       config={{
-        confirmTransactionInitialTimeout: 180000,
+        confirmTransactionInitialTimeout: 120000,
         fetchMiddleware: tokenAuthFetchMiddleware({
           getToken: async () => {
             const req = await fetch("/api/get-token");

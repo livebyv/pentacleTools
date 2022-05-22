@@ -596,7 +596,7 @@ export default function BurnNFTs() {
         <hr className="opacity-10 my-4" />
       </div>
       <p className="px-2 text-center">
-        This tools facilitates the destruction of NFTs that the connected wallet
+        This tool facilitates the destruction of NFTs that the connected wallet
         owns. It also releases the rent (ca 0.002 SOL per NFT)
       </p>
       <div className="flex flex-col items-center justify-center my-4 text-sm">

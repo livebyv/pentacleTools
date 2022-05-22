@@ -1,15 +1,8 @@
 import { from } from "rxjs";
 import { mergeMap, toArray, map } from "rxjs/operators";
 import { Connection, ParsedInstruction, PublicKey } from "@solana/web3.js";
+import { sliceIntoChunks } from "./slice-into-chunks";
 
-function sliceIntoChunks(arr, chunkSize) {
-  const res = [];
-  for (let i = 0; i < arr.length; i += chunkSize) {
-    const chunk = arr.slice(i, i + chunkSize);
-    res.push(chunk);
-  }
-  return res;
-}
 let count = 0;
 export async function getMints(
   candy_id: string,

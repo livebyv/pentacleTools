@@ -495,7 +495,11 @@ export default function BurnNFTs() {
           ) : (
             <div className="flex items-center flex-wrap">
               {nftsToRender?.map((nft) => (
-                <div className="w-full md:w-1/4 p-2" key={nft.mint}>
+                <div
+                  className="w-1/2 sm:w-1/3 md:w-1/4 p-2"
+                  id={nft.mint}
+                  key={nft.mint}
+                >
                   <NFTPreview
                     nft={nft}
                     selectable

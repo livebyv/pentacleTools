@@ -27,10 +27,7 @@ export default function TopMenu() {
       <nav
         style={{ gridTemplateColumns: "1fr auto 1fr" }}
         // TODO: create class for this
-        className="grid fixed left-0 right-0 max-w-6xl
-            z-50 xl:mx-auto mx-4 my-2 py-1 xl:py-0 px-4 
-            bg-base-300 rounded-box items-center justify-between 
-            flex-wrap bg-blue-darkshadow-lg"
+        className="top-menu-nav"
       >
         <div className="flex items-center flex-no-shrink text-white mr-4" style={{width: 128}}>
           <a

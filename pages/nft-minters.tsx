@@ -6,9 +6,9 @@ import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
 import { AlertContext } from "../providers/alert-provider";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { PublicKey } from "@solana/web3.js";
 import { from, mergeMap, tap, toArray } from "rxjs";
 import Head from "next/head";
+import { toPublicKey } from "../util/to-publickey";
 
 export default function GetHolders() {
   const {

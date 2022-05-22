@@ -11,9 +11,7 @@ export function NFTPreview({
       }`}
       onClick={() => selectable && handleNFTSelect(nft.mint)}
     >
-      <strong
-        className={`text-center truncate max-w-full ${selectable && "mr-6"}`}
-      >
+      <strong className={`text-center truncate max-w-full`}>
         {nft.metadata?.name || nft?.tokenData?.name}
       </strong>
       <div

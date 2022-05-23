@@ -1,13 +1,23 @@
 import { useConnection } from "@solana/wallet-adapter-react";
-import { createContext, useCallback, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-const INTERVAL_TIMEOUT = 60000;
-const MIN_TPS = 1500;
+const INTERVAL_TIMEOUT = process.env.NEXT_TPS_TIMEOUT
+  ? +process.env.NEXT_TPS_TIMEOUT
+  : 60000;
+const MIN_TPS = process.env.NEXT_MIN_TPS ? +process.env.NEXT_MIN_TPS : 1500;
 
 const PerformanceContext = createContext({
   warning: "",
   tps: 0,
 });
+
+export const usePerformance = () => useContext(PerformanceContext);
 export function PerformanceProvider({ children }) {
   const [warning, setWarning] = useState<string>("");
   const [tps, setTps] = useState(0);
@@ -46,7 +56,7 @@ export function PerformanceProvider({ children }) {
   return (
     <PerformanceContext.Provider value={{ warning, tps }}>
       {warning && (
-        <div className="bg-red-800 fixed left-0 lg:left-64 p-1 right-0 text-center bottom-0 lg:bottom-auto lg:top-0">
+        <div className="bg-red-800 fixed left-0 lg:left-64 p-1 right-0 text-center bottom-0 lg:bottom-auto lg:top-0 z-50">
           {warning}
         </div>
       )}

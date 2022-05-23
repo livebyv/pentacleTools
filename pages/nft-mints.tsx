@@ -33,7 +33,7 @@ export default function GibMints() {
     setLoading(true);
     getMints(val, connection, setCounter)
       .then((mints) => {
-        debugger
+        debugger;
         download(`mints-cmid-${val}.json`, JSON.stringify(mints));
         setLoading(false);
       })
@@ -114,14 +114,16 @@ export default function GibMints() {
           </svg>
           <div className="block">
             <div>
-              Be aware: Solanas latest update killed the way that we used to
-              fetch the mints for a certain candy machine. Right now this site
-              is implementing experimental crawling. It can be quite slow
-              (&gt;30 minutes) and is not 100% reliable.
+              Be aware: One of the more recent updates to Solana included a size
+              filter for certain calls, which is why we can no longer query as
+              we used to. Right now this site is implementing experimental
+              crawling. It can be quite slow (&gt;30 minutes) and is not 100%
+              reliable.
             </div>
             <div>
               <strong>
-               This can be used with both, Verified Creator ID as well as CM ID!
+                This can be used with both, Verified Creator ID as well as CM
+                ID!
               </strong>
             </div>
           </div>

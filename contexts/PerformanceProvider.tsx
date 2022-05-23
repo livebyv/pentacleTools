@@ -1,12 +1,15 @@
 import { useConnection } from "@solana/wallet-adapter-react";
 import { createContext, useEffect, useState } from "react";
 
+const INTERVAL_TIMEOUT = 60000;
+const MIN_TPS = 1500;
+
 const PerformanceContext = createContext({
   warning: "",
   tps: 0,
 });
 export function PerformanceProvider({ children }) {
-  const [warning, setWarning] = useState("");
+  const [warning, setWarning] = useState<string>("");
   const [tps, setTps] = useState(0);
   const { connection } = useConnection();
 
@@ -22,19 +25,19 @@ export function PerformanceProvider({ children }) {
 
       const _tps = performance.reduce((a, b) => a + b, 0) / performance.length;
       setTps(_tps);
-      if (_tps < 1500) {
-        setWarning(
-          `Solanas TPS are lower than 1500 (${Math.round(
-            _tps
-          )}). Network peformance might be degraded and transactions might fail.`
-        );
-      }
+      setWarning(
+        _tps < MIN_TPS
+          ? `Solanas TPS are lower than 1500 (${Math.round(
+              _tps
+            )}). Network peformance might be degraded and transactions might fail.`
+          : ""
+      );
     };
     (async () => {
       await getPerf();
       const iv = setInterval(async () => {
         await getPerf();
-      }, 60000);
+      }, INTERVAL_TIMEOUT);
       return () => clearInterval(iv);
     })();
   }, [connection]);

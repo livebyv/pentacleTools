@@ -20,7 +20,7 @@ export function MadeWithLove() {
           </i>
         </span>
         <a
-          href="https://twitter.com/pentaclexyz"
+          href="https://twitter.com/@0xAlice"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -30,7 +30,7 @@ export function MadeWithLove() {
       <a
         target="_blank"
         rel="noopener noreferrer"
-        href="https://twitter.com/pentaclexyz"
+        href="https://twitter.com/@0xAlice"
       >
         <i>
           <TwitterIcon />

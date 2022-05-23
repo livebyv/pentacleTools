@@ -18,25 +18,25 @@ export default class MyDocument extends Document {
             href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>"
           />
           <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:site" content="@pentaclexyz" />
-          <meta name="twitter:creator" content="@pentaclexyz" />
+          <meta name="twitter:site" content="@0xAlice_" />
+          <meta name="twitter:creator" content="@0xAlice_" />
           <meta property="og:site_name" content="Solana NFT Tools" />
           <meta name="twitter:image" content={ImageURI.PentacleBanner} />
           <meta
             name="twitter:image:alt"
-            content="Solana NFT Tools, made by @pentaclexyz"
+            content="Solana NFT Tools, made by @0xAlice_"
           />
           <meta name="twitter:title" content="Pentacle SOL NFT Tools" />
           <meta
             name="twitter:description"
-            content="Solana NFT Tools, made by @pentaclexyz"
+            content="Solana NFT Tools, made by @0xAlice_"
           />
           <meta name="og:url" content="https://pentacle.tools" />
           <meta name="og:title" content="Solana NFT Tools" />
           <meta name="og:image" content={ImageURI.PentacleBanner} />
           <meta
             property="og:description"
-            content="Solana NFT Tools, made by @pentaclexyz"
+            content="Solana NFT Tools, made by @0xAlice"
           />
           <html data-theme="dark" />
           <link

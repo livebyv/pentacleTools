@@ -1,13 +1,22 @@
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 
-export const FileContext = createContext<{ files: File[]; setFiles: any }>({
+export const FileContext = createContext<{
+  files: File[];
+  setFiles: Dispatch<SetStateAction<File[]>>;
+}>({
   files: [],
-  setFiles: () => {},
+  setFiles: (files: File[]) => {},
 });
 
 export const useFiles = () => useContext(FileContext);
 export function FileProvider({ children }: any) {
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<File[]>([]);
 
   return (
     <FileContext.Provider value={{ files, setFiles }}>

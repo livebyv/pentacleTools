@@ -11,30 +11,32 @@ export function PerformanceProvider({ children }) {
   const { connection } = useConnection();
 
   useEffect(() => {
+    const getPerf = async () => {
+      const performance = (
+        await connection.getRecentPerformanceSamples(5)
+      ).reduce((acc, curr) => {
+        const tps = curr.numTransactions / curr.samplePeriodSecs;
+        acc.push(tps);
+        return acc;
+      }, []);
+
+      const _tps = performance.reduce((a, b) => a + b, 0) / performance.length;
+      setTps(_tps);
+      debugger;
+      if (_tps < 1500) {
+        setWarning(
+          `Solanas TPS are lower than 1500 (${Math.round(
+            _tps
+          )}). Network peformance might be degraded and transactions might fail.`
+        );
+      }
+    };
     (async () => {
+      await getPerf();
       const iv = setInterval(async () => {
-        const performance = (
-          await connection.getRecentPerformanceSamples(5)
-        ).reduce((acc, curr) => {
-          const tps = curr.numTransactions / curr.samplePeriodSecs;
-          acc.push(tps);
-          return acc;
-        }, []);
-
-        const _tps =
-          performance.reduce((a, b) => a + b, 0) / performance.length;
-        setTps(_tps);
-        debugger;
-        if (_tps < 1500) {
-          setWarning(
-            `Solanas TPS are lower than 1500 (${Math.round(
-              _tps
-            )}). Network peformance might be degraded and transactions might fail.`
-          );
-        }
-
-        return () => clearInterval(iv);
+        await getPerf();
       }, 60000);
+      return () => clearInterval(iv);
     })();
   }, [connection]);
 

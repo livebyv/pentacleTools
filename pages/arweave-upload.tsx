@@ -12,7 +12,6 @@ import { shortenAddress } from "../util/shorten-address";
 import { useAlert } from "../providers/alert-provider";
 import { ImageURI } from "../util/image-uri";
 import { useFiles } from "../hooks/use-files";
-import { WebBundlr } from "@bundlr-network/client";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 
@@ -66,26 +65,6 @@ export default function GetARLinks() {
     setJwk(jwk);
   }, []);
 
-  const initialiseBundlr = async () => {
-    const selector = document.querySelector(
-      ".wallet-adapter-button-start-icon img"
-    );
-    const provName = selector?.attributes
-      .getNamedItem("alt")
-      .value.split(" ")[0];
-    const getProvider = async (name) => {
-      wallet;
-    };
-
-    const bundlr = new WebBundlr(
-      "https://node1.bundlr.network",
-      "solana",
-      await getProvider(provName)
-    );
-    await bundlr.ready();
-    return bundlr; // done!
-  };
-
   useEffect(() => {
     (async () => {
       const previousKey = localStorage.getItem("arweave-key");
@@ -104,13 +83,6 @@ export default function GetARLinks() {
       }
     })();
   }, [address]);
-  useEffect(() => {
-    (async () => {
-      if (wallet.connected) {
-        await initialiseBundlr();
-      }
-    })();
-  }, [wallet.connected, initialiseBundlr]);
 
   const upload = useCallback(async () => {
     setLoading(true);
@@ -142,9 +114,9 @@ export default function GetARLinks() {
       bundleUploader = arweaveBundleUploadGenerator.next();
     }
 
-    console.log(results);
     setLoading(false);
-    download(`AR-upload-${Date.now()}.json`, jsonFormat(results));
+    const filename = `AR-upload-${Date.now()}.json`;
+    download(filename, jsonFormat(results));
   }, [files, jwk]);
 
   useEffect(() => {

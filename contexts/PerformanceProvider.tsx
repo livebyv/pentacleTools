@@ -1,5 +1,5 @@
 import { useConnection } from "@solana/wallet-adapter-react";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useState } from "react";
 
 const INTERVAL_TIMEOUT = 60000;
 const MIN_TPS = 1500;
@@ -13,30 +13,31 @@ export function PerformanceProvider({ children }) {
   const [tps, setTps] = useState(0);
   const { connection } = useConnection();
 
-  useEffect(() => {
-    const getPerf = async () => {
-      const performance = (
-        await connection.getRecentPerformanceSamples(5)
-      ).reduce((acc, curr) => {
-        const tps = curr.numTransactions / curr.samplePeriodSecs;
-        acc.push(tps);
-        return acc;
-      }, []);
+  const getPerformance = useCallback(async () => {
+    const performance = (
+      await connection.getRecentPerformanceSamples(5)
+    ).reduce((acc, curr) => {
+      const tps = curr.numTransactions / curr.samplePeriodSecs;
+      acc.push(tps);
+      return acc;
+    }, []);
 
-      const _tps = performance.reduce((a, b) => a + b, 0) / performance.length;
-      setTps(_tps);
-      setWarning(
-        _tps < MIN_TPS
-          ? `Solanas TPS are lower than 1500 (${Math.round(
-              _tps
-            )}). Network peformance might be degraded and transactions might fail.`
-          : ""
-      );
-    };
+    const _tps = performance.reduce((a, b) => a + b, 0) / performance.length;
+    setTps(_tps);
+    setWarning(
+      _tps < MIN_TPS
+        ? `Solanas TPS are lower than 1500 (${Math.round(
+            _tps
+          )}). Network peformance might be degraded and transactions might fail.`
+        : ""
+    );
+  }, [connection]);
+
+  useEffect(() => {
     (async () => {
-      await getPerf();
+      await getPerformance();
       const iv = setInterval(async () => {
-        await getPerf();
+        await getPerformance();
       }, INTERVAL_TIMEOUT);
       return () => clearInterval(iv);
     })();

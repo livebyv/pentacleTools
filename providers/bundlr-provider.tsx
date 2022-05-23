@@ -1,7 +1,7 @@
 import { WebBundlr } from "@bundlr-network/client";
 import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
-import React from "react";
+import React, { useContext } from "react";
 import { createContext, useEffect, useState } from "react";
 import { useAlert } from "./alert-provider";
 import { useModal } from "./modal-provider";
@@ -19,6 +19,7 @@ const initialState: {
 } = {};
 
 export const BundlrContext = createContext(initialState);
+export const useBundlr = () => useContext(BundlrContext);
 
 export function BundlrProvider({ children }) {
   const wallet = useWallet();

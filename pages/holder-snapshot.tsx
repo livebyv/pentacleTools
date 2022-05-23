@@ -1,14 +1,15 @@
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { getOwners } from "../util/holder-snapshot";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
-import { useModal } from "../providers/modal-provider";
 import { useForm } from "react-hook-form";
-import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { useAlert } from "../providers/alert-provider";
 import Head from "next/head";
 import { useConnection } from "@solana/wallet-adapter-react";
-export default function GetHolders() {
+
+import { getAddresses, validateSolAddressArray } from "../util/validators";
+import { useModal } from "../providers/modal-provider";
+import { useAlert } from "../providers/alert-provider";
+export default function HolderSnapshot() {
   const {
     register,
     handleSubmit,

@@ -1,10 +1,4 @@
-import React, {
-  useContext,
-  useReducer,
-  useCallback,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { useReducer, useCallback, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";

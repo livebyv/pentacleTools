@@ -1,9 +1,9 @@
-import React, { useContext } from "react";
-import { FileContext } from "../hooks/use-files";
+import React from "react";
+import { useFiles } from "../hooks/use-files";
 import PaginatedFiles from "./paginated-files";
 
 export function FileUpload() {
-  const { setFiles, files } = useContext(FileContext);
+  const { setFiles, files } = useFiles();
 
   const handleAddFiles = (e) => {
     setFiles([...files, ...(e.target as HTMLInputElement).files]);
@@ -24,6 +24,7 @@ export function FileUpload() {
           </div>
           <div className="flex gap-3 items-center justify-center">
             <label className="file-upload w-64" tabIndex={0}>
+            
               <i className="fas fa-cloud-upload-alt fa-3x"></i>
               <span className="mt-2 text-base leading-normal">
                 Select files

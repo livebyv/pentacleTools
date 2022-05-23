@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { fetchMetaForUI } from "../util/token-metadata";
 import { download } from "../util/download";
 import jsonFormat from "json-format";

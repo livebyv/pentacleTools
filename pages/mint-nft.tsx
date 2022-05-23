@@ -1,7 +1,7 @@
 // DISCLAIMER:
 // THIS FILE IS ABSOLUTE CHAOS AND I KNOW IT!
 
-import React, { useCallback, useContext, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
@@ -12,7 +12,7 @@ import FileTile from "../components/file-tile";
 import { Creator, Data } from "../util/mint/schema";
 import { URL_MATCHER } from "../util/url-matcher";
 import ArweaveWallet from "../components/arweave-wallet";
-import { BundlrContext } from "../providers/bundlr-provider";
+import { useBundlr } from "../providers/bundlr-provider";
 import { mintNFT } from "../util/mint";
 import { useAlert } from "../providers/alert-provider";
 import { getRange } from "../util/get-range";
@@ -49,7 +49,7 @@ export default function GibAirdrop() {
   const [numberOfFiles, setNumberOfFiles] = useState(0);
   const [files, setFiles] = useState<File[]>([]);
   const [mint, setMint] = useState("");
-  const { bundler, fund } = useContext(BundlrContext);
+  const { bundler, fund } = useBundlr();
   const { connection } = useConnection();
   const handleRemoveFile = (name: string) => {
     setFiles(files.filter((f) => f.name !== name));

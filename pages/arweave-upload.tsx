@@ -1,5 +1,5 @@
 import { JWKInterface } from "arweave/node/lib/wallet";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FileUpload } from "../components/file-upload";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
@@ -11,7 +11,7 @@ import { getArweave } from "../util/upload-arweave-bundles/reference";
 import { shortenAddress } from "../util/shorten-address";
 import { useAlert } from "../providers/alert-provider";
 import { ImageURI } from "../util/image-uri";
-import { FileContext } from "../hooks/use-files";
+import { useFiles } from "../hooks/use-files";
 import { WebBundlr } from "@bundlr-network/client";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
@@ -51,7 +51,7 @@ export default function GetARLinks() {
   const [jwk, setJwk] = useState<JWKInterface>();
   const [address, setAddress] = useState<string>();
   const [balance, setBalance] = useState("none");
-  const { files } = useContext(FileContext);
+  const { files } = useFiles();
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm();
   const { setAlertState } = useAlert();

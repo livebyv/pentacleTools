@@ -15,7 +15,6 @@ import { ModalProvider } from "../providers/modal-provider";
 import SideMenu from "../components/side-menu";
 import TopMenu from "../components/top-menu";
 import { MenuLink } from "../components/menu-link";
-import { BundlrProvider } from "../providers/bundlr-provider";
 import { ImageURI } from "../util/image-uri";
 import { FileProvider } from "../hooks/use-files";
 import { MadeWithLove } from "../components/made-with-love";
@@ -35,9 +34,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     <FileProvider>
       <WalletProvider>
         <AlertProvider>
-          <ModalProvider>
-            <BundlrProvider>{children}</BundlrProvider>
-          </ModalProvider>
+          <ModalProvider>{children}</ModalProvider>
         </AlertProvider>
       </WalletProvider>
     </FileProvider>

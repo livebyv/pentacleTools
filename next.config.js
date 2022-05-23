@@ -19,8 +19,11 @@ const withTM = require("next-transpile-modules")([
   // "@project-serum/sol-wallet-adapter",
   // "@solana/wallet-adapter-ant-design",
 ]);
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
-module.exports = withTM({
+const config = {
   images: {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -63,4 +66,10 @@ module.exports = withTM({
       },
     ];
   },
-});
+};
+
+
+module.exports = withPlugins(
+  [withTM, withBundleAnalyzer],
+  config
+)

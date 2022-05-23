@@ -9,8 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@bundlr-network/client": "^0.6.1",
+    "@bundlr-network/client": "^0.7.4",
     "@fortawesome/fontawesome-free": "^6.1.1",
+    "@next/bundle-analyzer": "^12.1.6",
     "@shadow-drive/sdk": "^2.0.1",
     "@solana/buffer-layout": "^4.0.0",
     "@solana/spl-token": "^0.2.0",

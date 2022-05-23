@@ -12,7 +12,7 @@ import FileTile from "../components/file-tile";
 import { Creator, Data } from "../util/mint/schema";
 import { URL_MATCHER } from "../util/url-matcher";
 import ArweaveWallet from "../components/arweave-wallet";
-import { useBundlr } from "../providers/bundlr-provider";
+import { BundlrProvider, useBundlr } from "../providers/bundlr-provider";
 import { mintNFT } from "../util/mint";
 import { useAlert } from "../providers/alert-provider";
 import { getRange } from "../util/get-range";
@@ -36,7 +36,11 @@ const fileToBuffer = (
   });
 };
 
-export default function GibAirdrop() {
+const Wrapper = ({ children }) => {
+  return <BundlrProvider>{children}</BundlrProvider>;
+};
+
+function GibAirdrop() {
   const {
     register,
     handleSubmit,
@@ -292,7 +296,6 @@ export default function GibAirdrop() {
                     href={`https://explorer.solana.com/tx/${mintTxId}`}
                     target="_blank"
                     rel="noopener noreferrer"
-
                     className="truncate"
                   >
                     {mintTxId.slice(0, 3)} ...{" "}
@@ -355,7 +358,6 @@ export default function GibAirdrop() {
                   href="https://docs.phantom.app/integrating/tokens/non-fungible-tokens"
                   target="_blank"
                   rel="noopener noreferrer"
-
                   style={{ textDecoration: "underline" }}
                 >
                   here by Phantom
@@ -549,7 +551,6 @@ export default function GibAirdrop() {
               className="link"
               target="_blank"
               rel="noopener noreferrer"
-
               href={`https://solscan.io/token/${mint}`}
             >
               View on SolScan
@@ -578,5 +579,13 @@ export default function GibAirdrop() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function MintNft() {
+  return (
+    <Wrapper>
+      <GibAirdrop />
+    </Wrapper>
   );
 }

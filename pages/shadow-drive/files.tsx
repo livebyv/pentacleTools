@@ -124,7 +124,7 @@ export default function ShadowFiles() {
     return (
       <>
         You have to select a storage account! <br /> <br />
-        <Link href={`/shadow-drive`}>
+        <Link href={`/shadow-drive`} passHref>
           <button className="btn"> Go Back</button>
         </Link>
       </>
@@ -134,7 +134,7 @@ export default function ShadowFiles() {
     return (
       <>
         No files in this storage account! <br /> <br />
-        <Link href={`/shadow-drive`}>
+        <Link href={`/shadow-drive`} passHref>
           <button className="btn"> Go Back</button>
         </Link>
       </>

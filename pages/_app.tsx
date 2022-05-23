@@ -20,6 +20,7 @@ import { ImageURI } from "../util/image-uri";
 import { FileProvider } from "../hooks/use-files";
 import { MadeWithLove } from "../components/made-with-love";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
+import { PerformanceProvider } from "../contexts/PerformanceProvider";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
 const WalletProvider = dynamic(
@@ -233,7 +234,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Providers>
       <Context>
-        <Component {...pageProps} />
+        <PerformanceProvider>
+          <Component {...pageProps} />
+        </PerformanceProvider>
       </Context>
     </Providers>
   );

@@ -1,13 +1,14 @@
 import { Connection, ParsedAccountData, PublicKey } from "@solana/web3.js";
 import { from, lastValueFrom } from "rxjs";
-import { mergeMap, retry } from "rxjs/operators";
+import { mergeMap } from "rxjs/operators";
 
 export async function getOwners(
   mints: string[],
   connection: Connection,
   setCounter
 ) {
-  let all_owners = [];
+  let counter = 1;
+  let all_owners = {};
   const mints_obs = from(mints).pipe(
     mergeMap(async (mint) => {
       const token_account = (
@@ -16,18 +17,27 @@ export async function getOwners(
       const token_account_info = await connection.getParsedAccountInfo(
         token_account
       );
-      return (token_account_info?.value?.data as ParsedAccountData)?.parsed?.info?.owner;
+      return {
+        owner: (token_account_info?.value?.data as ParsedAccountData)?.parsed
+          ?.info?.owner,
+        mint: mint,
+      };
     }, 10),
-    retry(5)
   );
-  mints_obs.subscribe((e) => {
-    if (!(e in all_owners)) {
-      all_owners.push(e);
-      setCounter(all_owners.length);
+  mints_obs.subscribe(({ owner, mint }) => {
+    if (!all_owners[owner]) {
+      all_owners[owner] = {
+        mints: [mint],
+        amount: 1,
+      };
+    } else {
+      all_owners[owner].mints.push(mint);
+      all_owners[owner].amount++;
     }
+    setCounter(counter++);
   });
   if (await lastValueFrom(mints_obs)) {
-    console.log(all_owners.length);
+    console.log(Object.keys(all_owners).length);
     return all_owners;
   }
 }

@@ -55,9 +55,12 @@ function GibAirdrop() {
   const [mint, setMint] = useState("");
   const { bundler, fund } = useBundlr();
   const { connection } = useConnection();
-  const handleRemoveFile = (name: string) => {
-    setFiles(files.filter((f) => f.name !== name));
-  };
+  const handleRemoveFile = useCallback(
+    (name: string) => {
+      setFiles(files.filter((f) => f.name !== name));
+    },
+    [files]
+  );
 
   const FilesForm = useMemo(
     () => (
@@ -141,7 +144,7 @@ function GibAirdrop() {
         <br />
       </>
     ),
-    [files, numberOfFiles, setNumberOfFiles]
+    [files, numberOfFiles, setNumberOfFiles, handleRemoveFile, register]
   );
 
   const upload = useCallback(
@@ -331,7 +334,7 @@ function GibAirdrop() {
         setLoading(false);
       }
     },
-    [wallet?.publicKey, files, bundler?.address]
+    [wallet, files, bundler, connection, fund, setAlertState]
   );
 
   return wallet?.publicKey ? (

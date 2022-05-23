@@ -17,11 +17,13 @@ import { toPublicKey } from "../util/to-publickey";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { sliceIntoChunks } from "../util/slice-into-chunks";
 import { parseAddresses } from "../util/parse-addresses";
+import { useModal } from "../providers/modal-provider";
 
 export default function Snedmaster() {
   const [loading, setLoading] = useState(false);
   const { connection } = useConnection();
   const { setAlertState } = useAlert();
+  const { setModalState } = useModal();
   const [solBalance, setSolBalance] = useState<number | "none">("none");
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const wallet = useWallet();
@@ -73,7 +75,7 @@ export default function Snedmaster() {
               keys: [
                 { pubkey: wallet?.publicKey, isSigner: true, isWritable: true },
               ],
-              data: Buffer.from(`Sent by snedmaster at ${Date.now()}`, "utf-8"),
+              data: Buffer.from(`Sent over pentacle.tools at ${Date.now()}`, "utf-8"),
               programId: MEMO_ID,
             }),
           ];
@@ -141,11 +143,9 @@ export default function Snedmaster() {
         }
         const filename = `Airdrop-${Date.now()}.json`;
         download(filename, jsonFormat(sigs));
-        setAlertState({
-          message: <>Done, downloaded {filename}</>,
-          severity: "success",
+        setModalState({
+            message: `Succesfully downloaded ${filename}`,
           open: true,
-          duration: 10000
         });
       } catch (e) {
         console.error(e);
@@ -157,7 +157,7 @@ export default function Snedmaster() {
         setLoading(false);
       }
     },
-    [connection, isSnackbarOpen, wallet]
+    [connection, isSnackbarOpen, wallet, setAlertState, setModalState]
   );
 
   const clipboardNotification = () =>

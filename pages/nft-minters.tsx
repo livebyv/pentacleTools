@@ -22,7 +22,6 @@ export default function GetHolders() {
   const [loading, setLoading] = useState(false);
   const { setAlertState } = useAlert();
   const { setModalState } = useModal();
-  const endpoint = process.env.NEXT_PUBLIC_RPC!;
   const { connection } = useConnection();
 
   const fetchMinters = useCallback(
@@ -82,13 +81,15 @@ export default function GetHolders() {
           toArray()
         )
         .subscribe(() => {
-          download(
-            `minters-${Date.now()}.json`,
-            jsonFormat({ owners: [...owners], errors })
-          );
+          const filename = `Minters-${Date.now()}.json`;
+          download(filename, jsonFormat({ owners: [...owners], errors }));
+          setModalState({
+            message: `Succesfully downloaded ${filename}`,
+            open: true,
+          });
         });
     },
-    [endpoint, setAlertState, setModalState]
+    [setAlertState, connection, setModalState]
   );
 
   return (

@@ -38,6 +38,7 @@ export default function ArweaveWallet() {
               className="rounded-full w-14 h-14"
               width="56"
               height="56"
+              alt="Arweave"
             />
             <div>
               Address:

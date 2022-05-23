@@ -21,7 +21,6 @@ export default function HolderSnapshot() {
   const [loading, setLoading] = useState(false);
   const { setModalState } = useModal();
   const { setAlertState } = useAlert();
-  const endpoint = process.env.NEXT_PUBLIC_RPC!;
   const { connection } = useConnection();
   const fetchHolders = useCallback(
     async ({ mints }: { mints: string }) => {
@@ -53,7 +52,7 @@ export default function HolderSnapshot() {
       );
       setLoading(false);
     },
-    [endpoint, setAlertState, setModalState]
+    [setAlertState, setModalState, connection]
   );
 
   return (

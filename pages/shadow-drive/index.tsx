@@ -152,7 +152,7 @@ export default function ShdwDrivePage() {
         dispatch({ type: "loading", payload: { loading: false } });
       }
     })();
-  }, [wallet?.publicKey]);
+  }, [wallet?.publicKey, connection, wallet]);
 
   const onSubmit = handleSubmit(
     async ({ storageAccountName, storageAccountSize }) => {

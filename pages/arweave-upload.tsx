@@ -107,11 +107,10 @@ export default function GetARLinks() {
   useEffect(() => {
     (async () => {
       if (wallet.connected) {
-        const bundlr = await initialiseBundlr();
-        console.log(bundlr);
+        await initialiseBundlr();
       }
     })();
-  }, [wallet.connected]);
+  }, [wallet.connected, initialiseBundlr]);
 
   const upload = useCallback(async () => {
     setLoading(true);
@@ -290,7 +289,11 @@ export default function GetARLinks() {
                   </CopyToClipboard>
                   <p>
                     Balance:{" "}
-                    {balance === "none" ? <button className="btn btn-ghost loading"/> : (+balance).toFixed(6)}
+                    {balance === "none" ? (
+                      <button className="btn btn-ghost loading" />
+                    ) : (
+                      (+balance).toFixed(6)
+                    )}
                   </p>
                 </div>
 
@@ -328,7 +331,6 @@ export default function GetARLinks() {
                       target="_blank"
                       className="btn btn-circle btn-sm shadow-lg"
                       rel="noopener noreferrer"
-
                       title="View on explorer"
                     >
                       <i className="fa fa-external-link-alt"></i>

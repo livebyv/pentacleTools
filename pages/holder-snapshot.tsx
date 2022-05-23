@@ -1,6 +1,4 @@
 import React, { useCallback, useState } from "react";
-import { getOwners } from "../util/holder-snapshot";
-import { download } from "../util/download";
 import jsonFormat from "json-format";
 import { useForm } from "react-hook-form";
 import Head from "next/head";
@@ -9,6 +7,9 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
 import { useModal } from "../providers/modal-provider";
 import { useAlert } from "../providers/alert-provider";
+import { getOwners } from "../util/holder-snapshot";
+import { download } from "../util/download";
+
 export default function HolderSnapshot() {
   const {
     register,
@@ -46,11 +47,13 @@ export default function HolderSnapshot() {
         }
       );
 
-      download(
-        "gib-holders.json",
-        jsonFormat(owners, { size: 1, type: "tab" })
-      );
+      const filename = "gib-holders.json";
+      download(filename, jsonFormat(owners, { size: 1, type: "tab" }));
       setLoading(false);
+      setModalState({
+        message: `Successfully downloaded ${filename}`,
+        open: true,
+      });
     },
     [setAlertState, setModalState, connection]
   );

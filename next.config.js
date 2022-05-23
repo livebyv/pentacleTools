@@ -39,11 +39,20 @@ const config = {
   async redirects() {
     return [
       {
+        source: "/get-mints",
+        destination: "/nft-mints",
+        permanent: false,
+      },
+      {
+        source: "/get-nft-mints",
+        destination: "/nft-mints",
+        permanent: false,
+      },
+      {
         source: "/",
         destination: "/nft-mints",
         permanent: false,
       },
-
       {
         source: "/get-meta",
         destination: "/token-metadata",

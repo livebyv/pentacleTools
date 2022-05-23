@@ -33,13 +33,11 @@ export default function GibMints() {
     setLoading(true);
     getMints(val, connection, setCounter)
       .then((mints) => {
-        debugger;
         download(`mints-cmid-${val}.json`, JSON.stringify(mints));
         setLoading(false);
       })
       .catch((e) => {
         try {
-          debugger;
           setModalState({
             message: e?.message || e,
             open: true,

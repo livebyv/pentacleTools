@@ -14,6 +14,8 @@ import IdField from "../components/id-field";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MEMO_ID } from "../util/accounts";
 import { toPublicKey } from "../util/to-publickey";
+import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
+import { sliceIntoChunks } from "../util/slice-into-chunks";
 
 export default function Snedmaster() {
   const [loading, setLoading] = useState(false);
@@ -62,9 +64,9 @@ export default function Snedmaster() {
         }
 
         if (
-          !confirm(`This send a total of ${amt * addresses.length} SOL to ${
-            addresses.length
-          } addresses. 
+          !confirm(`This send a total of ${(amt * addresses.length).toFixed(
+            4
+          )} SOL to ${addresses.length} addresses. 
         Proceed?`)
         ) {
           return;
@@ -80,31 +82,16 @@ export default function Snedmaster() {
           setIsSnackbarOpen(true);
         }
 
-        const transferSol = async ({
+        const getTransferIxs = ({
           amount,
           destination,
         }: {
           amount: number;
           destination: string;
         }) => {
-          let blockhash;
-          while (!blockhash) {
-            try {
-              blockhash = await (
-                await connection.getLatestBlockhash()
-              ).blockhash;
-            } catch (e) {
-              console.log(e);
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-            }
-          }
-
-          const tx = new Transaction({
-            recentBlockhash: blockhash,
-            feePayer: wallet?.publicKey,
-          }).add(
+          const ixs = [
             SystemProgram.transfer({
-              lamports: amount * LAMPORTS_PER_SOL,
+              lamports: Math.round(amount * LAMPORTS_PER_SOL),
               toPubkey: toPublicKey(destination),
               fromPubkey: wallet?.publicKey,
             }),
@@ -114,40 +101,79 @@ export default function Snedmaster() {
               ],
               data: Buffer.from(`Sent by snedmaster at ${Date.now()}`, "utf-8"),
               programId: MEMO_ID,
-            })
-          );
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          return { tx, destination, amount };
+            }),
+          ];
+
+          return { ixs, destination, amount };
         };
 
-        const reduced = (addresses as string[]).reduce((acc, curr) => {
-          const found = acc.find((a) => a.destination === curr);
-          if (found) {
-            found.amount += amt;
-          } else {
-            acc.push({ amount: amt, destination: curr });
-          }
-          return acc;
-        }, []);
+        debugger;
 
-        const txs = (
-          await Promise.allSettled(reduced.map((a) => transferSol(a)))
-        ).map((f) => f.status === "fulfilled" && f.value);
-        await wallet.signAllTransactions(txs.map(({ tx }) => tx));
+        const reduced = (addresses as string[])
+          .reduce((acc, curr) => {
+            const found = acc.find((a) => a.destination === curr);
+            if (found) {
+              found.amount += amt;
+            } else {
+              acc.push({ amount: amt, destination: curr });
+            }
+            return acc;
+          }, [])
+          .map(getTransferIxs);
+        const txs = [];
         const sigs = [];
+
+        for (const slice of sliceIntoChunks(reduced, 5)) {
+          const tx = new Transaction();
+          const ixs = [...slice.map((s) => s.ixs).flat()];
+          debugger;
+          tx.add(...ixs);
+          tx.feePayer = wallet?.publicKey;
+          tx.recentBlockhash = (
+            await getBlockhashWithRetries(connection)
+          ).blockhash;
+          txs.push(tx);
+        }
+
+        await wallet.signAllTransactions(txs);
+
+        let counter = 1;
+
         for (const tx of txs) {
-          sigs.push({
-            txId: await connection
-              .sendRawTransaction(tx.tx.serialize())
+          try {
+            const sig = await connection
+              .sendRawTransaction(tx.serialize())
               .catch((e) => {
                 console.log(e);
                 return "failed";
-              }),
-            amount: tx.amount,
-            destination: tx.destination,
-          });
+              });
+
+            setAlertState({
+              message: (
+                <>
+                  Confirming {counter} of {txs.length} transactions.
+                </>
+              ),
+              open: true,
+            });
+            await connection.confirmTransaction(sig, "confirmed");
+            sigs.push({
+              txId: sig,
+              amount: tx.amount,
+              destination: tx.destination,
+            });
+            counter++;
+          } catch (e) {
+            console.error(e);
+          }
         }
-        download(`Airdrop-${Date.now()}.json`, jsonFormat(sigs));
+        const filename = `Airdrop-${Date.now()}.json`;
+        download(filename, jsonFormat(sigs));
+        setAlertState({
+          message: <>Done, downloaded {filename}</>,
+          severity: "success",
+          open: true,
+        });
       } catch (e) {
         console.error(e);
         setAlertState({
@@ -235,7 +261,6 @@ export default function Snedmaster() {
                       <a
                         className="btn btn-circle btn-sm"
                         rel="noopener noreferrer"
-
                         target="_blank"
                         href={`https://solanabeach.io/address/${wallet?.publicKey}`}
                       >

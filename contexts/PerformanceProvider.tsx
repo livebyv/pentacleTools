@@ -22,7 +22,6 @@ export function PerformanceProvider({ children }) {
 
       const _tps = performance.reduce((a, b) => a + b, 0) / performance.length;
       setTps(_tps);
-      debugger;
       if (_tps < 1500) {
         setWarning(
           `Solanas TPS are lower than 1500 (${Math.round(

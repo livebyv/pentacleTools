@@ -4,6 +4,16 @@ import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { useAlert } from "../providers/alert-provider";
 import { MadeWithLove } from "./made-with-love";
+import {
+  CameraIcon,
+  CoinsIcon,
+  FingerPrintIcon,
+  FireIcon,
+  GetCashIcon,
+  HammerIcon,
+  InfoIcon,
+  UploadIcon,
+} from "./icons";
 
 export default function SideMenu() {
   const { setAlertState } = useAlert();
@@ -29,7 +39,9 @@ export default function SideMenu() {
         </li>
         <MenuLink href="/nft-mints">
           <div>
-            <i className="fa-solid fa-fingerprint mr-3"></i>
+            <i className="mr-3">
+              <FingerPrintIcon />
+            </i>
             Get NFT Mints
           </div>
         </MenuLink>
@@ -39,17 +51,21 @@ export default function SideMenu() {
               style={{ width: 14 }}
               className="inline-flex items-center justify-center mr-3"
             >
-              <i className="fa-solid fa-info"></i>
+              <InfoIcon />
             </div>
             Token Metadata
           </div>
         </MenuLink>
         <MenuLink href="/holder-snapshot">
-          <i className="fa-solid fa-camera mr-3"></i>
+          <i className="mr-3">
+            <CameraIcon width={16} height={16} />
+          </i>
           <span> Holder Snapshot</span>
         </MenuLink>
         <MenuLink href="/nft-minters">
-          <i className="fa-solid fa-coins mr-3"></i>
+          <i className="mr-3">
+            <CoinsIcon width={16} height={16} />
+          </i>
           <span> NFT Minters</span>
         </MenuLink>
         <MenuLink href="/shadow-drive">
@@ -67,25 +83,35 @@ export default function SideMenu() {
           Shadow Drive Viewer
         </MenuLink>
         <MenuLink href="/burn-nfts">
-          <i className="fa-solid fa-fire mr-3"></i>
+          <i className="mr-3">
+            <FireIcon />
+          </i>
           <span>Burn NFTs</span>
         </MenuLink>
         <MenuLink href="/mint-nft">
-          <i className="fa-solid fa-hammer mr-3"></i>
+          <i className="mr-3">
+            <HammerIcon />
+          </i>
           Mint NFT
         </MenuLink>
         {/* <MenuLink href="/find-stuck-sol">Find Stuck SOL</MenuLink> */}
         <MenuLink href="/arweave-upload">
-          <i className="fa-solid fa-file-arrow-up mr-3"></i>
+          <i className="mr-3">
+            <UploadIcon width={16} height={16} />
+          </i>
           <span>Arweave Upload</span>
         </MenuLink>
         <MenuLink href="/snedmaster">
-          <i className="fa-solid fa-hand-holding-dollar mr-3"></i>
+          <i className="mr-3">
+            <GetCashIcon width={16} height={16} />
+          </i>
           <span>SnedMaster</span>
         </MenuLink>
 
         <li className="mt-auto w-full">
-          <div className={`text-center flex items-center justify-center flex-row gap-4`}>
+          <div
+            className={`text-center flex items-center justify-center flex-row gap-4`}
+          >
             <MadeWithLove />
           </div>
           <div>

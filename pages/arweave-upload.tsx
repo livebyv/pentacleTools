@@ -14,6 +14,7 @@ import { ImageURI } from "../util/image-uri";
 import { useFiles } from "../hooks/use-files";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
+import { DownloadIcon, LinkIcon, TrashIcon } from "../components/icons";
 
 export const generateArweaveWallet = async () => {
   const arweave = getArweave();
@@ -287,7 +288,9 @@ export default function GetARLinks() {
                       title="Delete"
                       className="btn btn-circle btn-sm shadow-lg"
                     >
-                      <i className="fa fa-trash"></i>
+                      <i>
+                        <TrashIcon width={16} height={16} />
+                      </i>
                     </button>
                     <button
                       onClick={() =>
@@ -296,7 +299,7 @@ export default function GetARLinks() {
                       className="btn btn-circle btn-sm shadow-lg"
                       title="Download"
                     >
-                      <i className="fa fa-download"></i>
+                      <DownloadIcon width={16} height={16} />
                     </button>
                     <a
                       href={`https://viewblock.io/arweave/address/${address}`}
@@ -305,7 +308,7 @@ export default function GetARLinks() {
                       rel="noopener noreferrer"
                       title="View on explorer"
                     >
-                      <i className="fa fa-external-link-alt"></i>
+                      <LinkIcon width={16} height={16} />
                     </a>
                   </div>
                 </div>

@@ -89,3 +89,7 @@ a {
 .wallet-adapter-button.wallet-adapter-button-trigger {
   @apply px-2;
 }
+
+i svg {
+  display: inline !important;
+}

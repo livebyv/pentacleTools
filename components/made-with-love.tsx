@@ -1,3 +1,5 @@
+import { GithubIcon, HeartIcon, TwitterIcon } from "./icons";
+
 export function MadeWithLove() {
   return (
     <>
@@ -6,14 +8,16 @@ export function MadeWithLove() {
         rel="noopener noreferrer"
         href="https://github.com/penta-fun/sol-nft-tools/"
       >
-        <i
-          className="fab fa-github"
-          style={{ fontStyle: "normal", fontSize: 24 }}
-        ></i>
+        <i>
+          <GithubIcon />
+        </i>
       </a>
       <div className="text-center flex items-center justify-center flex-col">
         <span>
-          Made with <i className="fa-solid fa-heart ml-1"></i>
+          Made with{" "}
+          <i className="ml-1 inline">
+            <HeartIcon width={16} height={16} />
+          </i>
         </span>
         <a
           href="https://twitter.com/pentaclexyz"
@@ -28,10 +32,9 @@ export function MadeWithLove() {
         rel="noopener noreferrer"
         href="https://twitter.com/pentaclexyz"
       >
-        <i
-          className="fab fa-twitter"
-          style={{ fontStyle: "normal", fontSize: 24 }}
-        ></i>
+        <i>
+          <TwitterIcon />
+        </i>
       </a>
     </>
   );

@@ -1,9 +1,9 @@
-
 import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { useRouter } from "next/router";
 import { ImageURI } from "../util/image-uri";
+import { MenuIcon } from "./icons";
 
 export default function TopMenu() {
   const router = useRouter();
@@ -29,7 +29,10 @@ export default function TopMenu() {
         // TODO: create class for this
         className="top-menu-nav"
       >
-        <div className="flex items-center flex-no-shrink text-white mr-4" style={{width: 128}}>
+        <div
+          className="flex items-center flex-no-shrink text-white mr-4"
+          style={{ width: 128 }}
+        >
           <a
             href="https://pentacle.xyz"
             target="_blank"
@@ -46,14 +49,15 @@ export default function TopMenu() {
         </div>
         <div className="xl:hidden w-1/4 flex col-start-4">
           <label htmlFor="my-drawer" id="app" className="btn">
-            <i className="fas fa-bars"></i>
+            <i>
+              <MenuIcon />
+            </i>
           </label>
         </div>
         <ul
           className="menu horizontal justify-center w-full flex-grow lg:items-center lg:w-auto hidden xl:flex"
           id="menu"
-        >
-        </ul>
+        ></ul>
         <div className="w-1/4 hidden xl:block"></div>
       </nav>
     </div>

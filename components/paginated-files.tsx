@@ -1,6 +1,7 @@
 import React from "react";
 import { usePagination } from "react-use-pagination";
 import FileTile from "./file-tile";
+import { TrashIcon, UploadIcon } from "./icons";
 import { Pagination } from "./pagination";
 
 interface PaginateFilesProps {
@@ -28,7 +29,9 @@ export default function PaginatedFiles({
             onClick={handleClear}
             className="btn btn-sm btn-outline btn-error "
           >
-            <i className="fas fa-trash mr-2"></i>
+            <i className="mr-2">
+              <TrashIcon width={16} height={16} />
+            </i>
             Clear all
           </button>
         </div>
@@ -38,7 +41,7 @@ export default function PaginatedFiles({
               <div className="absolute inset-0 opacity-75 bg-black"></div>
               <div className="card-body p-3 z-10  w-full">
                 <label className="file-upload w-full">
-                  <i className="fas fa-cloud-upload-alt fa-3x"></i>
+                <UploadIcon />
                   <span className="mt-2 text-base leading-normal">Add</span>
                   <input
                     type="file"

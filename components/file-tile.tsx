@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { UploadIcon } from "./icons";
 
 export function sizeMB(bytes: number): number {
   return bytes / (1000 * 1000);
@@ -27,11 +28,16 @@ interface FileTileState {
   files?: File[];
 }
 
-export default function FileTile({ file, remove, setFiles, files }: FileTileState) {
+export default function FileTile({
+  file,
+  remove,
+  setFiles,
+  files,
+}: FileTileState) {
   const [base64, setBase64] = useState("");
   useEffect(() => {
     if (!file) {
-      return
+      return;
     }
     if (file.type.startsWith("image") || file.type.startsWith("video")) {
       const b64 = URL.createObjectURL(file);
@@ -89,7 +95,17 @@ export default function FileTile({ file, remove, setFiles, files }: FileTileStat
         onClick={() => remove(file.name)}
         title="Delete Item"
       >
-        <i className="fa fa-times"></i>
+        <i>
+          <svg
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="24px"
+            height="24px"
+          >
+            <path d="M17.35352,7.35352,12.707,12l4.64649,4.64648a.5.5,0,1,1-.707.707L12,12.707,7.35352,17.35352a.5.5,0,0,1-.707-.707L11.293,12,6.64648,7.35352a.5.5,0,0,1,.707-.707L12,11.293l4.64648-4.64649a.5.5,0,0,1,.707.707Z" />
+          </svg>
+        </i>
       </button>
     </article>
   ) : (
@@ -104,7 +120,9 @@ export default function FileTile({ file, remove, setFiles, files }: FileTileStat
       }}
     >
       <input type="file" hidden name="files" />
-      <i className="fas fa-cloud-upload-alt fa-3x pointer-events-none"></i>
+      <i className="pointer-events-none">
+        <UploadIcon />
+      </i>
       <span className="mt-2 text-base leading-normal pointer-events-none">
         Select File
       </span>

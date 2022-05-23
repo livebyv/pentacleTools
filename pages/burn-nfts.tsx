@@ -19,6 +19,7 @@ import {
 import { toPublicKey } from "../util/to-publickey";
 import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
+import { FireIcon, LeftIcon, RightIcon } from "../components/icons";
 
 export default function BurnNFTs() {
   const { setModalState } = useModal();
@@ -435,7 +436,9 @@ export default function BurnNFTs() {
           onClick={handlePrevPage}
           disabled={page < 2}
         >
-          <i className="fa-solid fa-angle-left"></i>
+          <i className="">
+            <LeftIcon />
+            </i>
         </button>
         <div className="text-xl text-white text-center">
           {page} / {/* trying maffs */}
@@ -454,7 +457,9 @@ export default function BurnNFTs() {
               : Math.floor(state.nfts?.length / itemsPerPage) + 1)
           }
         >
-          <i className="fa-solid fa-angle-right"></i>
+          <i className="">
+            <RightIcon />
+          </i>
         </button>
       </div>
     ) : null;
@@ -521,7 +526,9 @@ export default function BurnNFTs() {
           {state.selectedNFTs.length
             ? `burn ${state.selectedNFTs.length} items`
             : "selecc to burn"}{" "}
-          <i className="fa-solid fa-fire ml-3"></i>
+          <i className="ml-3">
+            <FireIcon />
+          </i>
         </button>
         {paginationDisplay}
         {itemsPerPageSelectionDisplay}

@@ -1,5 +1,4 @@
 import "../styles/globals.css";
-import "@fortawesome/fontawesome-free/css/all.css";
 
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -20,6 +19,7 @@ import { FileProvider } from "../hooks/use-files";
 import { MadeWithLove } from "../components/made-with-love";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { PerformanceProvider } from "../contexts/PerformanceProvider";
+import { CameraIcon, CoinsIcon, FingerPrintIcon, FireIcon, GetCashIcon, HammerIcon, InfoIcon, UploadIcon } from "../components/icons";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
 const WalletProvider = dynamic(
@@ -90,29 +90,30 @@ function Context({ children }: { children: React.ReactNode }) {
             </li>
             <MenuLink activatesDrawer={false} href="/nft-mints">
               <div>
-                <i className="fa-solid fa-fingerprint mr-3"></i>
+                <i className="mr-3">
+                  <FingerPrintIcon />
+                </i>
                 Get NFT Mints
               </div>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/token-metadata">
               <div>
-                <div
-                  style={{ width: 14 }}
-                  className="inline-flex items-center justify-center mr-3"
-                >
-                  <i className="fa-solid fa-info"></i>
-                </div>
+                <i className="mr-3">
+                  <InfoIcon />
+                </i>
                 Token Metadata
               </div>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/holder-snapshot">
-              <div>
-                <i className="fa-solid fa-camera mr-3"></i>
-                Holder Snapshot
-              </div>
+              <i className="mr-3 inline-block">
+                <CameraIcon width={16} height={16} />
+              </i>
+              <span> Holder Snapshot</span>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/nft-minters">
-              <i className="fa-solid fa-coins mr-3"></i>
+              <i className="mr-3 inline-block">
+                <CoinsIcon width={16} height={16} />
+              </i>
               NFT Minters
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/shadow-drive">
@@ -127,22 +128,31 @@ function Context({ children }: { children: React.ReactNode }) {
                   display: "inline",
                 }}
               />
-              Shadow Drive Viewer
+              <span> Shadow Drive Viewer</span>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/burn-nfts">
-              <i className="fa-solid fa-fire mr-3"></i>
-              Burn NFTs
+              <i className="mr-3">
+                <FireIcon />
+              </i>
+              <span> Burn NFTs</span>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/mint-nft">
-              <i className="fa-solid fa-hammer mr-3"></i>
-              Mint NFT
+              <i className="mr-3">
+            <HammerIcon />
+              
+              </i>
+              <span> Mint NFT</span>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/arweave-upload">
-              <i className="fa-solid fa-file-arrow-up mr-3"></i>
-              Arweave Upload
+              <i className="mr-3">
+                <UploadIcon width={16} height={16} />
+              </i>
+              <span>Arweave Upload</span>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/snedmaster">
-              <i className="fa-solid fa-hand-holding-dollar mr-3"></i>
+              <i className="mr-3">
+                <GetCashIcon width={16} height={16} />
+              </i>
               <span>SnedMaster 9000</span>
             </MenuLink>
 
@@ -150,7 +160,7 @@ function Context({ children }: { children: React.ReactNode }) {
               <div
                 className={`text-center flex items-center justify-center flex-row gap-4`}
               >
-                <MadeWithLove />
+              <MadeWithLove />
               </div>
               <div>
                 <div className="text-sm text-center">

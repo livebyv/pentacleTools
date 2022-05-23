@@ -31,7 +31,7 @@ export default class MyDocument extends Document {
             name="twitter:description"
             content="Solana NFT Tools, made by @pentaclexyz"
           />
-          <meta name="og:url" content="https://sol-nft.tools" />
+          <meta name="og:url" content="https://pentacle.tools" />
           <meta name="og:title" content="Solana NFT Tools" />
           <meta name="og:image" content={ImageURI.PentacleBanner} />
           <meta

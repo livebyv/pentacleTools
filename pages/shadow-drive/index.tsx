@@ -36,6 +36,8 @@ export default function ShdwDrivePage() {
     shdwBalance: string;
     totalFileSize: number;
     uploading: string;
+    isResizing: string;
+    increaseOrDecrease: "increase" | "decrease";
     uploadInProgress: boolean;
     createStorageLoading: boolean;
     shdwDrive: ShdwDrive;
@@ -47,7 +49,9 @@ export default function ShdwDrivePage() {
     balance: "",
     shdwBalance: "",
     totalFileSize: 0,
+    isResizing: "",
     uploadInProgress: false,
+    increaseOrDecrease: "increase",
     uploading: "",
     createStorageLoading: false,
     shdwDrive: null,
@@ -61,6 +65,11 @@ export default function ShdwDrivePage() {
       state: typeof initState,
       action:
         | { type: "totalFileSize"; payload?: { totalFileSize: number } }
+        | {
+            type: "increaseOrDecrease";
+            payload?: { increaseOrDecrease: "increase" | "decrease" };
+          }
+        | { type: "isResizing"; payload?: { isResizing: string } }
         | { type: "loading"; payload?: { loading: boolean } }
         | { type: "balance"; payload?: { balance: string } }
         | { type: "uploadInProgress"; payload?: { uploadInProgress: boolean } }
@@ -94,6 +103,13 @@ export default function ShdwDrivePage() {
           return { ...state, loading: action.payload.loading };
         case "totalFileSize":
           return { ...state, totalFileSize: action.payload.totalFileSize };
+        case "isResizing":
+          return { ...state, isResizing: action.payload.isResizing };
+        case "increaseOrDecrease":
+          return {
+            ...state,
+            increaseOrDecrease: action.payload.increaseOrDecrease,
+          };
         case "uploading":
           return { ...state, uploading: action.payload.uploading };
         case "uploadInProgress":
@@ -172,8 +188,12 @@ export default function ShdwDrivePage() {
           },
         });
       } catch (e) {
-        setAlertState({
-          message: "An error occured. Check console for details.",
+        setModalState({
+          message: (
+            <div>
+              <h3>An error occured. Check Console for more info!</h3>
+            </div>
+          ),
           open: true,
         });
         dispatch({
@@ -412,7 +432,11 @@ export default function ShdwDrivePage() {
       });
     } catch (e) {
       setModalState({
-        message: "An error occured. Check Console for more info...",
+        message: (
+          <div>
+            <h3>An error occured. Check Console for more info!</h3>
+          </div>
+        ),
         open: true,
       });
       console.log(e);
@@ -427,6 +451,51 @@ export default function ShdwDrivePage() {
         },
       },
     });
+  };
+
+  const onStorageSizeSubmit = async ({ size, unit, publicKey }) => {
+    const finalStr = `${size}${unit}`;
+    try {
+      setAlertState({
+        message: (
+          <div>
+            <button className="btn btn-ghost loading mr-3"></button>
+            Sending and confirming transaction...
+          </div>
+        ),
+        open: true,
+      });
+      if (state.increaseOrDecrease === "decrease") {
+        await state.shdwDrive.reduceStorage(publicKey, finalStr);
+        setAlertState({
+          message: `Storage succssfully decreased by ${finalStr}!`,
+          open: true,
+          severity: "success",
+        });
+      }
+      if (state.increaseOrDecrease === "increase") {
+        await state.shdwDrive.addStorage(publicKey, finalStr);
+        setAlertState({
+          message: `Storage succssfully increased by ${finalStr}!`,
+          open: true,
+          severity: "success",
+        });
+      }
+    } catch (e) {
+      setAlertState({
+        message: <></>,
+        open: false,
+      });
+      console.error(e);
+      setModalState({
+        message: (
+          <div>
+            <h3>An error occured. Check Console for more info!</h3>
+          </div>
+        ),
+        open: true,
+      });
+    }
   };
   return (
     <>
@@ -637,6 +706,29 @@ export default function ShdwDrivePage() {
                                       : "Upload files"}
                                   </button>
 
+                                  <button
+                                    className={`btn btn-primary btn-sm my-2 ${
+                                      state.isResizing === pubKeyString
+                                        ? "btn-outline"
+                                        : ""
+                                    }`}
+                                    onClick={() =>
+                                      dispatch({
+                                        type: "isResizing",
+                                        payload: {
+                                          isResizing:
+                                            state.isResizing === pubKeyString
+                                              ? ""
+                                              : pubKeyString,
+                                        },
+                                      })
+                                    }
+                                  >
+                                    {state.isResizing !== pubKeyString
+                                      ? "Resize"
+                                      : "Cancel"}
+                                  </button>
+
                                   {!account.deleteRequestEpoch &&
                                     !(state.uploading === pubKeyString) && (
                                       <button
@@ -719,6 +811,84 @@ export default function ShdwDrivePage() {
                               </div>
                             </div>
                           </div>
+                          {state.isResizing === pubKeyString && (
+                            <form
+                              className="my-3"
+                              onSubmit={handleSubmit(({ size, unit }) =>
+                                onStorageSizeSubmit({ publicKey, size, unit })
+                              )}
+                            >
+                              <h3 className="text-xl mb-2">Storage Resize</h3>
+                              <div className="flex flex-row gap-3">
+                                <div className="btn-group">
+                                  <button
+                                    className={`btn btn-sm ${
+                                      state.increaseOrDecrease === "increase"
+                                        ? "btn-active"
+                                        : ""
+                                    }`}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      dispatch({
+                                        type: "increaseOrDecrease",
+                                        payload: {
+                                          increaseOrDecrease: "increase",
+                                        },
+                                      });
+                                    }}
+                                  >
+                                    Increase
+                                  </button>
+                                  <button
+                                    className={`btn btn-sm ${
+                                      state.increaseOrDecrease === "decrease"
+                                        ? "btn-active"
+                                        : ""
+                                    }`}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      dispatch({
+                                        type: "increaseOrDecrease",
+                                        payload: {
+                                          increaseOrDecrease: "decrease",
+                                        },
+                                      });
+                                    }}
+                                  >
+                                    Decrease
+                                  </button>
+                                </div>
+                                <div className="form-control">
+                                  <label className="input-group input-group-sm">
+                                    <input
+                                      {...register("size")}
+                                      className="input input-sm"
+                                      type="number"
+                                      min={0}
+                                    />
+                                    <select
+                                      {...register("unit")}
+                                      className="select select-sm select-bordered"
+                                    >
+                                      <option disabled selected>
+                                        Pick a unit
+                                      </option>
+                                      <option>KB</option>
+                                      <option>MB</option>
+                                      <option>GB</option>
+                                    </select>
+                                  </label>
+                                </div>
+
+                                <button
+                                  className={`btn btn-sm  btn-success btn-outline`}
+                                  type="submit"
+                                >
+                                  Ok
+                                </button>
+                              </div>
+                            </form>
+                          )}
                           <progress
                             className="progress progress-primary"
                             value={account.storageAvailable / account.storage}

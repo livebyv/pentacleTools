@@ -1,6 +1,6 @@
 export enum ImageURI {
-  ArweaveLogo = 'https://arweave.net/eFp_2l3aNmSnMrrCLTe_7ZDkzcVEdAqMLJj9tiPhs2s',
-  PentacleLogo='/pentacle.svg',
-  PentacleBanner = 'https://arweave.net/wEL_2xrc-tZRKvnd2I8DvFdL3q_Yw69ORZ4CeRfxwtk',
-  GenesysGo = "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y/logo.png"
+  ArweaveLogo = "https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png",
+  PentacleLogo = "/pentacle.svg",
+  PentacleBanner = "https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/pentabanner.jpeg",
+  GenesysGo = "https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/ggo.png",
 }

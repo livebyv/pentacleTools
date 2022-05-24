@@ -158,6 +158,7 @@ export default function ShdwDrivePage() {
             open: true,
           });
           await state.shdwDrive.uploadMultipleFiles(account, chunk);
+          counter ++;
         }
 
         const storageAccounts = await state.shdwDrive.getStorageAccounts();

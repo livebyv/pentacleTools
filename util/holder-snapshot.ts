@@ -13,28 +13,33 @@ export async function getOwners(
     mergeMap(async (mint) => {
       const token_account = (
         await connection.getTokenLargestAccounts(new PublicKey(mint))
-      ).value[0].address;
-      const token_account_info = await connection.getParsedAccountInfo(
-        token_account
-      );
-      return {
-        owner: (token_account_info?.value?.data as ParsedAccountData)?.parsed
-          ?.info?.owner,
-        mint: mint,
-      };
+      )?.value[0]?.address;
+      if (token_account) {
+        const token_account_info = await connection.getParsedAccountInfo(
+          token_account
+        );
+        return {
+          owner: (token_account_info?.value?.data as ParsedAccountData)?.parsed
+            ?.info?.owner,
+          mint: mint,
+        };
+      }
     }, 10),
   );
-  mints_obs.subscribe(({ owner, mint }) => {
-    if (!all_owners[owner]) {
-      all_owners[owner] = {
-        mints: [mint],
-        amount: 1,
-      };
-    } else {
-      all_owners[owner].mints.push(mint);
-      all_owners[owner].amount++;
+  mints_obs.subscribe((res) => {
+    if (res) {
+      const { owner, mint } = res;
+      if (!all_owners[owner]) {
+        all_owners[owner] = {
+          mints: [mint],
+          amount: 1,
+        };
+      } else {
+        all_owners[owner].mints.push(mint);
+        all_owners[owner].amount++;
+      }
+      setCounter(counter++);
     }
-    setCounter(counter++);
   });
   if (await lastValueFrom(mints_obs)) {
     console.log(Object.keys(all_owners).length);

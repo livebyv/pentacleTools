@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SOL_ADDRESS_REGEXP } from "../util/validators";
-import { useModal } from "../providers/modal-provider";
-import { useAlert } from "../providers/alert-provider";
+import { useModal } from "../contexts/ModalProvider";
+import { useAlert } from "../contexts/AlertProvider";
 import { getMints } from "../util/get-mints";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";

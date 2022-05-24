@@ -9,7 +9,7 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useAlert } from "../providers/alert-provider";
+import { useAlert } from "../contexts/AlertProvider";
 import IdField from "../components/id-field";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MEMO_ID } from "../util/accounts";
@@ -17,7 +17,7 @@ import { toPublicKey } from "../util/to-publickey";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { sliceIntoChunks } from "../util/slice-into-chunks";
 import { parseAddresses } from "../util/parse-addresses";
-import { useModal } from "../providers/modal-provider";
+import { useModal } from "../contexts/ModalProvider";
 import { LinkIcon } from "../components/icons";
 
 export default function Snedmaster() {

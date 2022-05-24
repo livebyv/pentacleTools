@@ -1,10 +1,10 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import React, { useContext, useEffect, useState } from "react";
-import { useAlert } from "../providers/alert-provider";
+import { useAlert } from "../contexts/AlertProvider";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { shortenAddress } from "../util/shorten-address";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { BundlrContext } from "../providers/bundlr-provider";
+import { BundlrContext } from "../contexts/BundlrProvider";
 import Image from "next/image";
 import { ImageURI } from "../util/image-uri";
 

@@ -12,9 +12,9 @@ import FileTile from "../components/file-tile";
 import { Creator, Data } from "../util/mint/schema";
 import { URL_MATCHER } from "../util/url-matcher";
 import ArweaveWallet from "../components/arweave-wallet";
-import { BundlrProvider, useBundlr } from "../providers/bundlr-provider";
+import { BundlrProvider, useBundlr } from "../contexts/BundlrProvider";
 import { mintNFT } from "../util/mint";
-import { useAlert } from "../providers/alert-provider";
+import { useAlert } from "../contexts/AlertProvider";
 import { getRange } from "../util/get-range";
 
 const fileToBuffer = (

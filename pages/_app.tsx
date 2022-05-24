@@ -9,13 +9,13 @@ import Image from "next/image";
 import Head from "next/head";
 import React from "react";
 
-import { AlertProvider, useAlert } from "../providers/alert-provider";
-import { ModalProvider } from "../providers/modal-provider";
+import { AlertProvider, useAlert } from "../contexts/AlertProvider";
+import { ModalProvider } from "../contexts/ModalProvider";
 import SideMenu from "../components/side-menu";
 import TopMenu from "../components/top-menu";
 import { MenuLink } from "../components/menu-link";
 import { ImageURI } from "../util/image-uri";
-import { FileProvider } from "../hooks/use-files";
+import { FileProvider } from "../contexts/FileProvider";
 import { MadeWithLove } from "../components/made-with-love";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { PerformanceProvider } from "../contexts/PerformanceProvider";

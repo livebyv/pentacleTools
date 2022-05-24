@@ -56,7 +56,7 @@ export function PerformanceProvider({ children }) {
   return (
     <PerformanceContext.Provider value={{ warning, tps }}>
       {warning && (
-        <div className="bg-red-800 fixed left-0 lg:left-64 p-1 right-0 text-center bottom-0 lg:bottom-auto lg:top-0 z-50">
+        <div className="bg-red-800 text-white fixed left-0 lg:left-64 p-1 right-0 text-center bottom-0 lg:bottom-auto lg:top-0 z-50">
           {warning}
         </div>
       )}

@@ -3,8 +3,8 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import BigNumber from "bignumber.js";
 import React, { useContext } from "react";
 import { createContext, useEffect, useState } from "react";
-import { useAlert } from "./alert-provider";
-import { useModal } from "./modal-provider";
+import { useAlert } from "./AlertProvider";
+import { useModal } from "./ModalProvider";
 
 const initialState: {
   updateFundAmount?: Function;

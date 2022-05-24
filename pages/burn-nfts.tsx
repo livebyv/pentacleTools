@@ -6,8 +6,8 @@ import { useRouter } from "next/router";
 import { ParsedAccountData, PublicKey, Transaction } from "@solana/web3.js";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 
-import { useModal } from "../providers/modal-provider";
-import { useAlert } from "../providers/alert-provider";
+import { useModal } from "../contexts/ModalProvider";
+import { useAlert } from "../contexts/AlertProvider";
 import Head from "next/head";
 import { fetchMetaForUI } from "../util/token-metadata";
 import {

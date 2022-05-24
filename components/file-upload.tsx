@@ -1,5 +1,5 @@
 import React from "react";
-import { useFiles } from "../hooks/use-files";
+import { useFiles } from "../contexts/FileProvider";
 import { UploadIcon } from "./icons";
 import PaginatedFiles from "./paginated-files";
 

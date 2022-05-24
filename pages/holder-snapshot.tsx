@@ -5,8 +5,8 @@ import Head from "next/head";
 import { useConnection } from "@solana/wallet-adapter-react";
 
 import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { useModal } from "../providers/modal-provider";
-import { useAlert } from "../providers/alert-provider";
+import { useModal } from "../contexts/ModalProvider";
+import { useAlert } from "../contexts/AlertProvider";
 import { getOwners } from "../util/holder-snapshot";
 import { download } from "../util/download";
 

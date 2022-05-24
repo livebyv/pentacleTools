@@ -8,14 +8,14 @@ import { StorageAccount } from "@shadow-drive/sdk/dist/types";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 
-import { useAlert } from "../../providers/alert-provider";
+import { useAlert } from "../../contexts/AlertProvider";
 import { sizeMB } from "../../components/file-tile";
-import { useModal } from "../../providers/modal-provider";
+import { useModal } from "../../contexts/ModalProvider";
 import { ImageURI } from "../../util/image-uri";
 import { SHDW_TOKEN } from "../../util/accounts";
 import { ExplorerLink } from "../../components/explorer-link";
 import { FileUpload } from "../../components/file-upload";
-import { useFiles } from "../../hooks/use-files";
+import { useFiles } from "../../contexts/FileProvider";
 import { sliceIntoChunks } from "../../util/slice-into-chunks";
 import createFileList from "../../util/create-file-list";
 

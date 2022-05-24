@@ -1,10 +1,10 @@
 import React, { useCallback, useState } from "react";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
-import { useModal } from "../providers/modal-provider";
+import { useModal } from "../contexts/ModalProvider";
 import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { useAlert } from "../providers/alert-provider";
+import { useAlert } from "../contexts/AlertProvider";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { from, mergeMap, tap, toArray } from "rxjs";
 import Head from "next/head";

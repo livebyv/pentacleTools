@@ -2,7 +2,7 @@ import Image from "next/image";
 import { ImageURI } from "../util/image-uri";
 import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
-import { useAlert } from "../providers/alert-provider";
+import { useAlert } from "../contexts/AlertProvider";
 import { MadeWithLove } from "./made-with-love";
 import {
   CameraIcon,

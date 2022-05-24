@@ -9,9 +9,9 @@ import { makeArweaveBundleUploadGenerator } from "../util/upload-arweave-bundles
 import { useForm } from "react-hook-form";
 import { getArweave } from "../util/upload-arweave-bundles/reference";
 import { shortenAddress } from "../util/shorten-address";
-import { useAlert } from "../providers/alert-provider";
+import { useAlert } from "../contexts/AlertProvider";
 import { ImageURI } from "../util/image-uri";
-import { useFiles } from "../hooks/use-files";
+import { useFiles } from "../contexts/FileProvider";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 import { DownloadIcon, LinkIcon, TrashIcon } from "../components/icons";

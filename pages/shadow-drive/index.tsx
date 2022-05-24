@@ -687,6 +687,12 @@ export default function ShdwDrivePage() {
                                       if (state.uploading === pubKeyString) {
                                         setFiles([]);
                                         dispatch({
+                                          type: "isResizing",
+                                          payload: {
+                                            isResizing: "",
+                                          },
+                                        });
+                                        dispatch({
                                           type: "uploading",
                                           payload: {
                                             uploading: "",
@@ -746,9 +752,15 @@ export default function ShdwDrivePage() {
                                           })
                                         }
                                       >
-                                        {!!state.buttonsLoading[pubKeyString]
-                                          ? ""
-                                          : <><TrashIcon width={16}/> delet</>}
+                                        {!!state.buttonsLoading[
+                                          pubKeyString
+                                        ] ? (
+                                          ""
+                                        ) : (
+                                          <>
+                                            <TrashIcon width={16} /> delet
+                                          </>
+                                        )}
                                       </button>
                                     )}
                                   {!!account.deleteRequestEpoch && (

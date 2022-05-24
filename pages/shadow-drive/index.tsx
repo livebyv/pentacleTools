@@ -478,7 +478,7 @@ export default function ShdwDrivePage() {
                     <div className="flex flex-1 gap-3 justify-end">
                       {state.isCreatingStorageAccount && (
                         <input
-                          className="btn btn-success w-24 btn-outline"
+                          className="btn btn-success btn-sm w-24 btn-outline"
                           type="submit"
                           value={"Add"}
                           disabled={state.createStorageLoading}

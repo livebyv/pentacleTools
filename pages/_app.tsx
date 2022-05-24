@@ -164,7 +164,7 @@ function Context({ children }: { children: React.ReactNode }) {
               <span>SnedMaster 9000</span>
             </MenuLink>
 
-            <li className="absolute bottom-4 left-0 w-full">
+            <div className="absolute bottom-4 left-0 w-full">
               <div
                 className={`text-center flex items-center justify-center flex-row gap-4`}
               >
@@ -188,7 +188,7 @@ function Context({ children }: { children: React.ReactNode }) {
                   </CopyToClipboard>
                 </div>
               </div>
-            </li>
+            </div>
           </ul>
 
           <main

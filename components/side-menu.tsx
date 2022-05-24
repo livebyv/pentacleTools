@@ -108,7 +108,7 @@ export default function SideMenu() {
           <span>SnedMaster</span>
         </MenuLink>
 
-        <li className="mt-auto w-full">
+        <div className="mt-auto w-full">
           <div
             className={`text-center flex items-center justify-center flex-row gap-4`}
           >
@@ -132,7 +132,7 @@ export default function SideMenu() {
               </CopyToClipboard>
             </div>
           </div>
-        </li>
+        </div>
       </ul>
     </div>
   );

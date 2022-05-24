@@ -187,7 +187,7 @@ export default function ShdwDrivePage() {
         message: "Files successfully uploaded",
         open: true,
         duration: 10000,
-        severity:'success'
+        severity: "success",
       });
       setFiles([]);
       dispatch({
@@ -688,7 +688,11 @@ export default function ShdwDrivePage() {
                                   pubKeyString === state.uploading && (
                                     <div className="mb-2 flex flex-col">
                                       <button
-                                        className={`btn btn-primary btn-sm ml-auto ${state.uploadInProgress ? 'loading' : ''}`}
+                                        className={`btn btn-primary btn-sm ml-auto ${
+                                          state.uploadInProgress
+                                            ? "loading"
+                                            : ""
+                                        }`}
                                         onClick={() => uploadFiles(publicKey)}
                                       >
                                         {/* @TODO */}

@@ -10,7 +10,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import FileTile from "../components/file-tile";
 import { Creator, Data } from "../util/mint/schema";
-import { URL_MATCHER } from "../util/url-matcher";
+import { URL_MATCHER } from "../util/validators";
 import ArweaveWallet from "../components/arweave-wallet";
 import { BundlrProvider, useBundlr } from "../contexts/BundlrProvider";
 import { mintNFT } from "../util/mint";

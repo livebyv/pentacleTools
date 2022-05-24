@@ -1,15 +1,11 @@
 let getDataTransfer = () => new DataTransfer();
-const { concat } = Array.prototype;
-
 try {
   getDataTransfer();
 } catch {
   getDataTransfer = () => new ClipboardEvent("").clipboardData;
 }
 
-function createFileList(files) {
-  // eslint-disable-next-line prefer-rest-params
-  // const files = concat.apply([], arguments);
+function createFileList(files: File[]) {
   let index = 0;
   const { length } = files;
 

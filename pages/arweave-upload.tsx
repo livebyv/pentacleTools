@@ -244,7 +244,7 @@ export default function GetARLinks() {
             <div className="card-body p-4">
               <div className="flex flex-row gap-5 items-center">
                 <Image
-                  src={ImageURI.ArweaveLogo}
+                  src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
                   className="rounded-full w-14 h-14 shadow-lg"
                   width="56"
                   height="56"
@@ -301,15 +301,16 @@ export default function GetARLinks() {
                     >
                       <DownloadIcon width={16} height={16} />
                     </button>
-                    <a
-                      href={`https://viewblock.io/arweave/address/${address}`}
-                      target="_blank"
-                      className="btn btn-circle btn-sm shadow-lg"
-                      rel="noopener noreferrer"
-                      title="View on explorer"
-                    >
-                      <LinkIcon width={16} height={16} />
-                    </a>
+                    <button className="btn btn-circle btn-sm shadow-lg">
+                      <a
+                        href={`https://viewblock.io/arweave/address/${address}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="View on explorer"
+                      >
+                        <LinkIcon width={16} height={16} />
+                      </a>
+                    </button>
                   </div>
                 </div>
               </div>

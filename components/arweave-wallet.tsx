@@ -34,7 +34,7 @@ export default function ArweaveWallet() {
         <div className="card-body p-4">
           <div className="flex flex-row gap-5 items-center">
             <Image
-              src={ImageURI.ArweaveLogo}
+              src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
               className="rounded-full w-14 h-14"
               width="56"
               height="56"

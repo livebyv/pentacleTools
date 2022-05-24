@@ -153,7 +153,11 @@ function Context({ children }: { children: React.ReactNode }) {
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/arweave-upload">
               <i className="mr-3">
-                <UploadIcon width={16} height={16} />
+                <img
+                  src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
+                  width={"16px"}
+                  height={"16px"}
+                />
               </i>
               <span>Arweave Upload</span>
             </MenuLink>

@@ -488,7 +488,7 @@ export default function ShdwDrivePage() {
                         />
                       )}
                       <button
-                        className={`btn btn-primary ${
+                        className={`btn btn-primary btn-sm ${
                           state.isCreatingStorageAccount ? "w-24" : ""
                         }`}
                         onClick={async () => {
@@ -628,7 +628,7 @@ export default function ShdwDrivePage() {
                                         )
                                       }
                                     >
-                                      cancel storage deletion
+                                      cancel deletion
                                     </button>
                                   )}
                                 </div>

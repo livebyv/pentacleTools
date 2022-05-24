@@ -97,8 +97,8 @@ export default function GetHolders() {
       <Head>
         <title>🛠️ Pentacle Tools - 👛 NFT Minters</title>
       </Head>
-      <div className="prose max-w-full text-center mb-3">
-        <h1 className="text-4xl  text-white">NFT Minters</h1>
+      <div className="w-full max-w-full text-center mb-3">
+        <h1 className="text-3xl  text-white">NFT Minters</h1>
         <hr className="opacity-10 my-4" />
       </div>
       <p className="px-2 text-center">

@@ -172,8 +172,8 @@ export default function GetARLinks() {
       <Head>
         <title>🛠️ Pentacle Tools - ⬆️ Arweave Upload</title>
       </Head>
-      <div className="prose max-w-full text-center mb-3">
-        <h1 className="text-4xl text-white">Arweave Upload</h1>
+      <div className="max-w-full text-center mb-3">
+        <h2 className="text-3xl text-white">Arweave Upload</h2>
         <hr className="opacity-10 my-4" />
       </div>
       <div className="flex flex-col">

@@ -20,9 +20,7 @@ export function FileUpload() {
     <>
       {!files?.length && (
         <>
-          <div className="prose max-w-full">
-            <h2 className="text-center mb-6">Upload</h2>
-          </div>
+          <h2 className="text-3xl text-center mb-6">Upload</h2>
           <div className="flex gap-3 items-center justify-center">
             <label className="file-upload w-64" tabIndex={0}>
               <i>

@@ -62,8 +62,8 @@ export default function GetMeta() {
       <Head>
         <title>🛠️ Pentacle Tools - ℹ️ NFT Metadata</title>
       </Head>
-      <div className="prose max-w-full text-center mb-3">
-        <h1 className="text-4xl text-white">Token Metadata</h1>
+      <div className="w-full max-w-full text-center mb-3">
+        <h1 className="text-3xl text-white">Token Metadata</h1>
         <hr className="opacity-10 my-4" />
       </div>
       <p className="px-2 text-center">

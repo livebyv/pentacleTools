@@ -28,8 +28,8 @@ export default function PaginatedFiles({
   return (
     !!files.length && (
       <>
-        <div className="prose max-w-full flex flex-row justify-between items-center mt-2 mb-6">
-          <h2 className="m-0 text-white">
+        <div className="w-full max-w-full flex flex-row justify-between items-center mt-2 mb-6">
+          <h2 className=" text-3xl m-0 text-white">
             File List | {files.length} files | {""}
             <span>{fileSizeInMb.toFixed(2)} MB</span>
           </h2>

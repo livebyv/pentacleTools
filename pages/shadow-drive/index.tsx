@@ -632,7 +632,7 @@ export default function ShdwDrivePage() {
                                     </button>
                                   )}
                                 </div>
-                                <div>{state.uploading && <FileUpload />}</div>
+                                <div>{state.uploading === pubKeyString && <FileUpload />}</div>
 
                                 {!!files.length && (
                                   <div className="mb-2">

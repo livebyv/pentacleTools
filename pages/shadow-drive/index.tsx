@@ -409,18 +409,18 @@ export default function ShdwDrivePage() {
           <img
             src={ImageURI.GenesysGo}
             alt=""
-            className="mr-2"
+            className="mr-3"
             style={{
               width: 48,
               height: 48,
               display: "inline",
             }}
           />
-          SHDW Drive
+          SHDW Drive Console
           <img
             src={ImageURI.GenesysGo}
             alt=""
-            className="ml-2"
+            className="ml-3"
             style={{
               width: 48,
               height: 48,
@@ -428,11 +428,15 @@ export default function ShdwDrivePage() {
             }}
           />
         </h1>
-        <span>In no affiliation with GenesysGo</span> <br />
         {!!state.shdwBalance && (
-          <span className="badge badge-primary mt-3">
-            Balance: {state.shdwBalance} SHDW \ {state.balance} SOL
-          </span>
+          <div className=" mt-3">
+            <span className="badge badge-success">
+              {state.shdwBalance} SHDW
+            </span>
+            <span className="badge badge-primary ml-3">
+              {state.balance} SOL
+            </span>
+          </div>
         )}
         <hr className="opacity-10 my-4" />
       </div>
@@ -685,7 +689,7 @@ export default function ShdwDrivePage() {
                             value={account.storageAvailable / account.storage}
                           ></progress>
 
-                          <hr className="opacity-10 my-3" />
+                          {i !== state.storageAccounts.length - 1 && <hr className="opacity-10 my-3" />}
                         </li>
                       );
                     }

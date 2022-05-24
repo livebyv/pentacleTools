@@ -36,7 +36,7 @@ export default class MyDocument extends Document {
           <meta name="og:image" content={ImageURI.PentacleBanner} />
           <meta
             property="og:description"
-            content="Solana NFT Tools, made by @0xAlice"
+            content="Solana NFT Tools, made by @0xAlice_"
           />
           <html data-theme="dark" />
           <link

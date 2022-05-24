@@ -18,6 +18,8 @@ import { FileUpload } from "../../components/file-upload";
 import { useFiles } from "../../hooks/use-files";
 import { sliceIntoChunks } from "../../util/slice-into-chunks";
 import createFileList from "../../util/create-file-list";
+
+
 const isValidUnit = (str: string) => {
   const num = parseFloat(str);
   if (isNaN(num)) {
@@ -659,41 +661,6 @@ export default function ShdwDrivePage() {
                                 </div>
                               </div>
                             </div>
-
-                            {/* <div className="flex gap-3">
-                              <label
-                                className={`btn btn-primary btn-sm w-32`}
-                                htmlFor="file"
-                              >
-                                {isUploadingFile ? "" : "Upload file"}
-                              </label>
-                              <input
-                                disabled={isUploadingFile}
-                                type="file"
-                                id="file"
-                                name="file"
-                                className="hidden"
-                                onChange={async (e) => {
-                                  console.log(e);
-                                  if (e.target.files[0]) {
-                                    const fd = new NodeFormData();
-                                    const buff = await file2Buffer(
-                                      e.target.files[0]
-                                    );
-                                    Object.assign(fd, {
-                                      getBuffer: () => ({ buffer: buff }),
-                                    });
-                                    fd.append("file", e.target.files[0]);
-                                    const response = await drive.uploadFile(
-                                      publicKey,
-                                      fd
-                                    );
-                                    debugger;
-                                  }
-                                }}
-                              ></input>
-
-                            </div> */}
                           </div>
                           <progress
                             className="progress progress-primary"
@@ -707,28 +674,6 @@ export default function ShdwDrivePage() {
                   )}
               </ul>
             </div>
-            {/* <div className="card bg-gray-900 max-w-full">
-              <div className="card-body">
-                <div className="mt-4">
-                  <FileUpload />
-                </div>
-
-                {!!files.length && (
-                  <div className="text-center mt-6">
-                    <button
-                      className={`btn btn-primary rounded-box shadow-lg ${
-                        loading ? "loading" : ""
-                      }`}
-                      disabled={!files.length}
-                      onClick={onSubmit}
-                    >
-                      {loading ? "Uploading..." : "Upload"}
-                    </button>
-                    <br />
-                  </div>
-                )}
-              </div>
-            </div> */}
           </>
         )}
       </div>

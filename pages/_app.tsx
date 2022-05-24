@@ -19,7 +19,16 @@ import { FileProvider } from "../hooks/use-files";
 import { MadeWithLove } from "../components/made-with-love";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { PerformanceProvider } from "../contexts/PerformanceProvider";
-import { CameraIcon, CoinsIcon, FingerPrintIcon, FireIcon, GetCashIcon, HammerIcon, InfoIcon, UploadIcon } from "../components/icons";
+import {
+  CameraIcon,
+  CoinsIcon,
+  FingerPrintIcon,
+  FireIcon,
+  GetCashIcon,
+  HammerIcon,
+  InfoIcon,
+  UploadIcon,
+} from "../components/icons";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
 const WalletProvider = dynamic(
@@ -138,8 +147,7 @@ function Context({ children }: { children: React.ReactNode }) {
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/mint-nft">
               <i className="mr-3">
-            <HammerIcon />
-              
+                <HammerIcon />
               </i>
               <span> Mint NFT</span>
             </MenuLink>
@@ -160,7 +168,7 @@ function Context({ children }: { children: React.ReactNode }) {
               <div
                 className={`text-center flex items-center justify-center flex-row gap-4`}
               >
-              <MadeWithLove />
+                <MadeWithLove />
               </div>
               <div>
                 <div className="text-sm text-center">

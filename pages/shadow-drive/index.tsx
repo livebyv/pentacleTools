@@ -36,6 +36,7 @@ export default function ShdwDrivePage() {
     shdwBalance: string;
     totalFileSize: number;
     uploading: string;
+    uploadInProgress: boolean;
     createStorageLoading: boolean;
     shdwDrive: ShdwDrive;
     storageAccounts: { account: StorageAccount; publicKey: PublicKey }[];
@@ -46,6 +47,7 @@ export default function ShdwDrivePage() {
     balance: "",
     shdwBalance: "",
     totalFileSize: 0,
+    uploadInProgress: false,
     uploading: "",
     createStorageLoading: false,
     shdwDrive: null,
@@ -61,6 +63,7 @@ export default function ShdwDrivePage() {
         | { type: "totalFileSize"; payload?: { totalFileSize: number } }
         | { type: "loading"; payload?: { loading: boolean } }
         | { type: "balance"; payload?: { balance: string } }
+        | { type: "uploadInProgress"; payload?: { uploadInProgress: boolean } }
         | { type: "uploading"; payload?: { uploading: string } }
         | { type: "shdwBalance"; payload?: { shdwBalance: string } }
         | {
@@ -93,6 +96,11 @@ export default function ShdwDrivePage() {
           return { ...state, totalFileSize: action.payload.totalFileSize };
         case "uploading":
           return { ...state, uploading: action.payload.uploading };
+        case "uploadInProgress":
+          return {
+            ...state,
+            uploadInProgress: action.payload.uploadInProgress,
+          };
         case "balance":
           return { ...state, balance: action.payload.balance };
         case "storageAccounts":
@@ -132,6 +140,10 @@ export default function ShdwDrivePage() {
 
   const uploadFiles = useCallback(
     async (account: PublicKey) => {
+      dispatch({
+        type: "uploadInProgress",
+        payload: { uploadInProgress: true },
+      });
       try {
         const chunked = sliceIntoChunks(files, 5).map(createFileList);
         let counter = 1;
@@ -163,6 +175,10 @@ export default function ShdwDrivePage() {
           message: "An error occured. Check console for details.",
           open: true,
         });
+        dispatch({
+          type: "uploadInProgress",
+          payload: { uploadInProgress: false },
+        });
         return;
       }
 
@@ -171,6 +187,10 @@ export default function ShdwDrivePage() {
         open: true,
       });
       setFiles([]);
+      dispatch({
+        type: "uploadInProgress",
+        payload: { uploadInProgress: false },
+      });
     },
     [state.shdwDrive, files]
   );
@@ -664,6 +684,7 @@ export default function ShdwDrivePage() {
                                         className="btn btn-primary btn-sm"
                                         onClick={() => uploadFiles(publicKey)}
                                       >
+                                        {/* @TODO */}
                                         Upload
                                       </button>
                                     </div>

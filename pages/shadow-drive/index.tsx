@@ -688,7 +688,7 @@ export default function ShdwDrivePage() {
                                   pubKeyString === state.uploading && (
                                     <div className="mb-2 flex flex-col">
                                       <button
-                                        className={`btn btn-primary btn-sm ml-auto ${pubKeyString === state.uploading ? 'loading' : ''}`}
+                                        className={`btn btn-primary btn-sm ml-auto ${state.uploadInProgress ? 'loading' : ''}`}
                                         onClick={() => uploadFiles(publicKey)}
                                       >
                                         {/* @TODO */}

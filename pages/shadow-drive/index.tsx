@@ -132,36 +132,43 @@ export default function ShdwDrivePage() {
 
   const uploadFiles = useCallback(
     async (account: PublicKey) => {
-      const chunked = sliceIntoChunks(files, 5).map(createFileList);
-      let counter = 1;
-      for (const chunk of chunked) {
+      try {
+        const chunked = sliceIntoChunks(files, 5).map(createFileList);
+        let counter = 1;
+        for (const chunk of chunked) {
+          setAlertState({
+            message: (
+              <div className="flex items-center">
+                <button className="btn btn-ghost loading"></button> Sending{" "}
+                {counter} of {chunked.length} transactions
+              </div>
+            ),
+            open: true,
+          });
+          await state.shdwDrive.uploadMultipleFiles(account, chunk);
+        }
+
+        const storageAccounts = await state.shdwDrive.getStorageAccounts();
+        dispatch({
+          type: "storageAccounts",
+          payload: {
+            storageAccounts: storageAccounts as any as {
+              account: StorageAccount;
+              publicKey: PublicKey;
+            }[],
+          },
+        });
         setAlertState({
-          message: (
-            <div className="flex items-center">
-              <button className="btn btn-ghost loading"></button> Sending{" "}
-              {counter} of {chunked.length} transactions
-            </div>
-          ),
+          message: "Files successfully uploaded",
           open: true,
         });
-        await state.shdwDrive.uploadMultipleFiles(account, chunk);
+        setFiles([]);
+      } catch (e) {
+        setAlertState({
+          message: "An error occured. Check console for details.",
+          open: true,
+        });
       }
-
-      const storageAccounts = await state.shdwDrive.getStorageAccounts();
-      dispatch({
-        type: "storageAccounts",
-        payload: {
-          storageAccounts: storageAccounts as any as {
-            account: StorageAccount;
-            publicKey: PublicKey;
-          }[],
-        },
-      });
-      setAlertState({
-        message: "Files successfully uploaded",
-        open: true,
-      });
-      setFiles([]);
     },
     [state.shdwDrive, files]
   );

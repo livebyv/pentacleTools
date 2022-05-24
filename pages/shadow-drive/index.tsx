@@ -651,16 +651,17 @@ export default function ShdwDrivePage() {
                                   )}
                                 </div>
 
-                                {!!files.length && (
-                                  <div className="mb-2">
-                                    <button
-                                      className="btn btn-primary"
-                                      onClick={() => uploadFiles(publicKey)}
-                                    >
-                                      Upload
-                                    </button>
-                                  </div>
-                                )}
+                                {!!files.length &&
+                                  pubKeyString === state.uploading && (
+                                    <div className="mb-2">
+                                      <button
+                                        className="btn btn-primary btn-sm"
+                                        onClick={() => uploadFiles(publicKey)}
+                                      >
+                                        Upload
+                                      </button>
+                                    </div>
+                                  )}
                                 <div className="badge badge-ghost">
                                   Free:{" "}
                                   {sizeMB(

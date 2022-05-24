@@ -18,6 +18,7 @@ import { FileUpload } from "../../components/file-upload";
 import { useFiles } from "../../contexts/FileProvider";
 import { sliceIntoChunks } from "../../util/slice-into-chunks";
 import createFileList from "../../util/create-file-list";
+import { TrashIcon } from "../../components/icons";
 
 const isValidUnit = (str: string) => {
   const num = parseFloat(str);
@@ -732,7 +733,7 @@ export default function ShdwDrivePage() {
                                   {!account.deleteRequestEpoch &&
                                     !(state.uploading === pubKeyString) && (
                                       <button
-                                        className={`btn btn-error btn-sm ml-auto w-32 ${
+                                        className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${
                                           !!state.buttonsLoading[pubKeyString]
                                             ? "loading"
                                             : ""
@@ -747,7 +748,7 @@ export default function ShdwDrivePage() {
                                       >
                                         {!!state.buttonsLoading[pubKeyString]
                                           ? ""
-                                          : "storage delet"}
+                                          : <><TrashIcon width={16}/> delet</>}
                                       </button>
                                     )}
                                   {!!account.deleteRequestEpoch && (

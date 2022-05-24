@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { usePagination } from "react-use-pagination";
+import { sizeMB } from "../util/upload-arweave-bundles/upload-generator";
 import FileTile from "./file-tile";
 import { TrashIcon, UploadIcon } from "./icons";
 import { Pagination } from "./pagination";
@@ -19,11 +20,19 @@ export default function PaginatedFiles({
 }: PaginateFilesProps) {
   const { currentPage, totalPages, startIndex, endIndex, setPage, pageSize } =
     usePagination({ totalItems: files.length, initialPageSize: 15 });
+
+  const fileSizeInMb = useMemo(
+    () => sizeMB(files.reduce((acc, curr) => acc + curr.size, 0)),
+    [files]
+  );
   return (
     !!files.length && (
       <>
         <div className="prose max-w-full flex flex-row justify-between items-center mt-2 mb-6">
-          <h2 className="m-0">File List ({files.length})</h2>
+          <h2 className="m-0 text-white">
+            File List | {files.length} files | {""}
+            <span>{fileSizeInMb.toFixed(2)} MB</span>
+          </h2>
 
           <button
             onClick={handleClear}
@@ -41,7 +50,7 @@ export default function PaginatedFiles({
               <div className="absolute inset-0 opacity-75 bg-black"></div>
               <div className="card-body p-3 z-10  w-full">
                 <label className="file-upload w-full">
-                <UploadIcon />
+                  <UploadIcon />
                   <span className="mt-2 text-base leading-normal">Add</span>
                   <input
                     type="file"

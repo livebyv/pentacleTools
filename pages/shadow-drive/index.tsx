@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer } from "react";
 import { useForm } from "react-hook-form";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
@@ -14,6 +14,10 @@ import { useModal } from "../../providers/modal-provider";
 import { ImageURI } from "../../util/image-uri";
 import { SHDW_TOKEN } from "../../util/accounts";
 import { ExplorerLink } from "../../components/explorer-link";
+import { FileUpload } from "../../components/file-upload";
+import { useFiles } from "../../hooks/use-files";
+import { sliceIntoChunks } from "../../util/slice-into-chunks";
+import createFileList from "../../util/create-file-list";
 const isValidUnit = (str: string) => {
   const num = parseFloat(str);
   if (isNaN(num)) {
@@ -29,6 +33,8 @@ export default function ShdwDrivePage() {
   const initState: {
     balance: string;
     shdwBalance: string;
+    totalFileSize: number;
+    isUploading: boolean;
     createStorageLoading: boolean;
     shdwDrive: ShdwDrive;
     storageAccounts: { account: StorageAccount; publicKey: PublicKey }[];
@@ -38,6 +44,8 @@ export default function ShdwDrivePage() {
   } = {
     balance: "",
     shdwBalance: "",
+    totalFileSize: 0,
+    isUploading: false,
     createStorageLoading: false,
     shdwDrive: null,
     storageAccounts: [],
@@ -49,8 +57,10 @@ export default function ShdwDrivePage() {
     (
       state: typeof initState,
       action:
+        | { type: "totalFileSize"; payload?: { totalFileSize: number } }
         | { type: "loading"; payload?: { loading: boolean } }
         | { type: "balance"; payload?: { balance: string } }
+        | { type: "isUploading"; payload?: { isUploading: boolean } }
         | { type: "shdwBalance"; payload?: { shdwBalance: string } }
         | {
             type: "createStorageLoading";
@@ -78,6 +88,10 @@ export default function ShdwDrivePage() {
       switch (action.type) {
         case "loading":
           return { ...state, loading: action.payload.loading };
+        case "totalFileSize":
+          return { ...state, totalFileSize: action.payload.totalFileSize };
+        case "isUploading":
+          return { ...state, isUploading: action.payload.isUploading };
         case "balance":
           return { ...state, balance: action.payload.balance };
         case "storageAccounts":
@@ -112,7 +126,44 @@ export default function ShdwDrivePage() {
   const { register, handleSubmit, getValues, reset } = useForm();
   const { setAlertState } = useAlert();
   const { connection } = useConnection();
+  const { files, setFiles } = useFiles();
   const wallet = useWallet();
+
+  const uploadFiles = useCallback(
+    async (account: PublicKey) => {
+      const chunked = sliceIntoChunks(files, 5).map(createFileList);
+      let counter = 1;
+      for (const chunk of chunked) {
+        setAlertState({
+          message: (
+            <div className="flex items-center">
+              <button className="btn btn-ghost loading"></button> Sending{" "}
+              {counter} of {chunked.length} transactions
+            </div>
+          ),
+          open: true,
+        });
+        await state.shdwDrive.uploadMultipleFiles(account, chunk);
+      }
+
+      const storageAccounts = await state.shdwDrive.getStorageAccounts();
+      dispatch({
+        type: "storageAccounts",
+        payload: {
+          storageAccounts: storageAccounts as any as {
+            account: StorageAccount;
+            publicKey: PublicKey;
+          }[],
+        },
+      });
+      setAlertState({
+        message: "Files successfully uploaded",
+        open: true,
+      });
+      setFiles([]);
+    },
+    [state.shdwDrive, files]
+  );
 
   useEffect(() => {
     (async () => {
@@ -140,9 +191,7 @@ export default function ShdwDrivePage() {
         dispatch({
           type: "shdwBalance",
           payload: {
-            shdwBalance: (
-              shdwBalance.value.uiAmount / LAMPORTS_PER_SOL
-            ).toFixed(2),
+            shdwBalance: shdwBalance.value.uiAmount.toFixed(2),
           },
         });
         dispatch({
@@ -184,7 +233,7 @@ export default function ShdwDrivePage() {
         setModalState({
           message: (
             <div>
-              <h3>Storage Account created!</h3>
+              <h3>Storage Account created.</h3>
               <p>
                 <ExplorerLink txId={response.transaction_signature} />
               </p>
@@ -218,7 +267,7 @@ export default function ShdwDrivePage() {
         setModalState({
           message: (
             <div>
-              <h3>An error occured. Check Console for more info...!</h3>
+              <h3>An error occured. Check Console for more info!</h3>
             </div>
           ),
           open: true,
@@ -241,7 +290,7 @@ export default function ShdwDrivePage() {
       setModalState({
         message: (
           <div>
-            <h3>Storage Account will be deleted</h3>
+            <h3>Storage Account is marked for deletion.</h3>
             <p>
               <ExplorerLink txId={response.txid} />
             </p>
@@ -272,6 +321,18 @@ export default function ShdwDrivePage() {
       },
     });
   };
+
+  useEffect(() => {
+    dispatch({
+      type: "totalFileSize",
+      payload: {
+        totalFileSize: files.reduce((acc, curr) => {
+          acc = acc + curr.size;
+          return acc;
+        }, 0),
+      },
+    });
+  }, [files]);
 
   const handleCancelDeleteStorageAccountRequest = async ({
     publicKey,
@@ -383,9 +444,10 @@ export default function ShdwDrivePage() {
         {wallet.connected && (
           <>
             <div className="card bg-gray-900 max-w-full p-6">
-              {!state.storageAccounts.length && (
-                <div>No storage accounts yet.</div>
-              )}
+              {!state.storageAccounts.length &&
+                !state.isCreatingStorageAccount && (
+                  <div>No storage accounts yet.</div>
+                )}
 
               <ul>
                 <li>
@@ -463,10 +525,10 @@ export default function ShdwDrivePage() {
                       const pubKeyString = publicKey.toBase58();
 
                       return (
-                        <li key={pubKeyString}>
-                          <div className="flex flex-row justify-between items-center">
-                            <div className="flex flex-row gap-6">
-                              <div>
+                        <li id={pubKeyString} key={pubKeyString}>
+                          <div className="flex flex-row items-center justify-between w-full">
+                            <div className="flex flex-row gap-6 w-full">
+                              <div className="w-full">
                                 <span
                                   className={`${
                                     !!account.deleteRequestEpoch &&
@@ -488,22 +550,98 @@ export default function ShdwDrivePage() {
                                   href={`https://solscan.io/account/${pubKeyString}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-
                                 >
                                   {pubKeyString}
                                 </a>
                                 <br />
-                                <div>
-                                  <a
-                                    target="_blank"
-                                    href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
-                                    rel="noopener noreferrer"
+                                <div className="flex w-full">
+                                  {!state.isUploading && (
+                                    <a
+                                      target="_blank"
+                                      href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
+                                      rel="noopener noreferrer"
+                                    >
+                                      <button className="btn btn-sm btn-primary my-2">
+                                        See files
+                                      </button>
+                                    </a>
+                                  )}
+                                  <button
+                                    className={`btn btn-sm m-2 ${
+                                      state.isUploading
+                                        ? "btn-error btn-outline"
+                                        : "btn-primary"
+                                    }`}
+                                    onClick={() => {
+                                      if (state.isUploading) {
+                                        setFiles([]);
+                                      }
+                                      dispatch({
+                                        type: "isUploading",
+                                        payload: {
+                                          isUploading: !state.isUploading,
+                                        },
+                                      });
+                                    }}
                                   >
-                                    <button className="btn btn-sm btn-primary my-2">
-                                      See files
+                                    {state.isUploading
+                                      ? "Cancel Upload"
+                                      : "Upload files"}
+                                  </button>
+
+                                  {!account.deleteRequestEpoch &&
+                                    !state.isUploading && (
+                                      <button
+                                        className={`btn btn-error btn-sm ml-auto w-32 ${
+                                          !!state.buttonsLoading[pubKeyString]
+                                            ? "loading"
+                                            : ""
+                                        } `}
+                                        onClick={() =>
+                                          handleDeleteStorageAccount({
+                                            pubKeyString,
+                                            publicKey,
+                                            i,
+                                          })
+                                        }
+                                      >
+                                        {!!state.buttonsLoading[pubKeyString]
+                                          ? ""
+                                          : "storage delet"}
+                                      </button>
+                                    )}
+                                  {!!account.deleteRequestEpoch && (
+                                    <button
+                                      className={`btn btn-error btn-sm w-32 btn-outline ml-auto ${
+                                        state.buttonsLoading[pubKeyString] &&
+                                        " loading"
+                                      }`}
+                                      onClick={() =>
+                                        handleCancelDeleteStorageAccountRequest(
+                                          {
+                                            pubKeyString,
+                                            publicKey,
+                                            i,
+                                          }
+                                        )
+                                      }
+                                    >
+                                      cancel storage deletion
                                     </button>
-                                  </a>
+                                  )}
                                 </div>
+                                <div>{state.isUploading && <FileUpload />}</div>
+
+                                {!!files.length && (
+                                  <div className="mb-2">
+                                    <button
+                                      className="btn btn-primary"
+                                      onClick={() => uploadFiles(publicKey)}
+                                    >
+                                      Upload
+                                    </button>
+                                  </div>
+                                )}
                                 <div className="badge badge-ghost">
                                   Free:{" "}
                                   {sizeMB(
@@ -521,23 +659,6 @@ export default function ShdwDrivePage() {
                                 </div>
                               </div>
                             </div>
-                            {!!account.deleteRequestEpoch && (
-                              <button
-                                className={`btn btn-error btn-sm w-32 btn-outline ${
-                                  state.buttonsLoading[pubKeyString] &&
-                                  " loading"
-                                }`}
-                                onClick={() =>
-                                  handleCancelDeleteStorageAccountRequest({
-                                    pubKeyString,
-                                    publicKey,
-                                    i,
-                                  })
-                                }
-                              >
-                                undelet
-                              </button>
-                            )}
 
                             {/* <div className="flex gap-3">
                               <label
@@ -573,26 +694,6 @@ export default function ShdwDrivePage() {
                               ></input>
 
                             </div> */}
-                            {!account.deleteRequestEpoch && (
-                              <button
-                                className={`btn btn-error btn-sm w-32 ${
-                                  !!state.buttonsLoading[pubKeyString]
-                                    ? "loading"
-                                    : ""
-                                } `}
-                                onClick={() =>
-                                  handleDeleteStorageAccount({
-                                    pubKeyString,
-                                    publicKey,
-                                    i,
-                                  })
-                                }
-                              >
-                                {!!state.buttonsLoading[pubKeyString]
-                                  ? ""
-                                  : "delet"}
-                              </button>
-                            )}
                           </div>
                           <progress
                             className="progress progress-primary"

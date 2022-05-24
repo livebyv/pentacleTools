@@ -80,7 +80,7 @@ export default function SideMenu() {
               display: "inline",
             }}
           />
-          Shadow Drive Viewer
+          Shadow Drive Console
         </MenuLink>
         <MenuLink href="/burn-nfts">
           <i className="mr-3">

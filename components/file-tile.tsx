@@ -59,7 +59,7 @@ export default function FileTile({
         tabIndex={0}
       >
         {file.type.startsWith("video") && (
-          <video autoPlay muted loop className="bg-video">
+          <video muted loop className="bg-video">
             <source src={base64} type={file.type} />
           </video>
         )}

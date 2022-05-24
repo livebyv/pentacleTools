@@ -158,17 +158,18 @@ export default function ShdwDrivePage() {
             }[],
           },
         });
-        setAlertState({
-          message: "Files successfully uploaded",
-          open: true,
-        });
-        setFiles([]);
       } catch (e) {
         setAlertState({
           message: "An error occured. Check console for details.",
           open: true,
         });
       }
+
+              setAlertState({
+          message: "Files successfully uploaded",
+          open: true,
+        });
+        setFiles([]);
     },
     [state.shdwDrive, files]
   );

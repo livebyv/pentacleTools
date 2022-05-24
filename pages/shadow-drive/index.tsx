@@ -576,6 +576,13 @@ export default function ShdwDrivePage() {
                                     onClick={() => {
                                       if (state.uploading === pubKeyString) {
                                         setFiles([]);
+                                        dispatch({
+                                          type: "uploading",
+                                          payload: {
+                                            uploading: "",
+                                          },
+                                        });
+                                        return;
                                       }
                                       dispatch({
                                         type: "uploading",

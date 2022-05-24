@@ -2,6 +2,9 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { useEffect, useReducer, useRef } from "react";
 import { useDebounce } from "../../hooks/use-debounce";
+import { DownloadIcon } from "../../components/icons";
+import { download } from "../../util/download";
+import jsonFormat from "json-format";
 
 export default function ShadowFiles() {
   const { query } = useRouter();
@@ -161,6 +164,28 @@ export default function ShadowFiles() {
         />
       </div>
       <div>
+        <button
+          className="btn btn-sm btn-primary"
+          onClick={() => {
+            download(
+              `shdw-files-${query.storageAccount}-${Date.now()}.json`,
+              jsonFormat(
+                state.filteredData
+                  .map((i) => i.items)
+                  .flat()
+                  .map(
+                    (l) =>
+                      `https://shdw-drive.genesysgo.net/${query.storageAccount}/${l}`
+                  )
+              )
+            );
+          }}
+        >
+          Download File List
+          <DownloadIcon width={16} />{" "}
+        </button>
+      </div>
+      <div>
         {!!state.filteredData?.length &&
           state.filteredData.map((item) => (
             <div key={item.storageAccount}>
@@ -176,7 +201,6 @@ export default function ShadowFiles() {
                     key={it}
                     href={`https://shdw-drive.genesysgo.net/${query.storageAccount}/${it}`}
                     rel="noopener noreferrer"
-
                     target={"_blank"}
                   >
                     <span className="badge badge-outline">{it}</span>

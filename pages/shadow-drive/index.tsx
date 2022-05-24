@@ -19,7 +19,6 @@ import { useFiles } from "../../contexts/FileProvider";
 import { sliceIntoChunks } from "../../util/slice-into-chunks";
 import createFileList from "../../util/create-file-list";
 
-
 const isValidUnit = (str: string) => {
   const num = parseFloat(str);
   if (isNaN(num)) {
@@ -47,7 +46,7 @@ export default function ShdwDrivePage() {
     balance: "",
     shdwBalance: "",
     totalFileSize: 0,
-    uploading: '',
+    uploading: "",
     createStorageLoading: false,
     shdwDrive: null,
     storageAccounts: [],
@@ -557,7 +556,7 @@ export default function ShdwDrivePage() {
                                 </a>
                                 <br />
                                 <div className="flex w-full">
-                                  {!state.uploading && (
+                                  {!(state.uploading === pubKeyString) && (
                                     <a
                                       target="_blank"
                                       href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
@@ -570,12 +569,12 @@ export default function ShdwDrivePage() {
                                   )}
                                   <button
                                     className={`btn btn-sm m-2 ${
-                                      state.uploading
+                                      state.uploading === pubKeyString
                                         ? "btn-error btn-outline"
                                         : "btn-primary"
                                     }`}
                                     onClick={() => {
-                                      if (state.uploading) {
+                                      if (state.uploading === pubKeyString) {
                                         setFiles([]);
                                       }
                                       dispatch({
@@ -586,13 +585,13 @@ export default function ShdwDrivePage() {
                                       });
                                     }}
                                   >
-                                    {state.uploading
+                                    {state.uploading === pubKeyString
                                       ? "Cancel Upload"
                                       : "Upload files"}
                                   </button>
 
                                   {!account.deleteRequestEpoch &&
-                                    !state.uploading && (
+                                    !(state.uploading === pubKeyString) && (
                                       <button
                                         className={`btn btn-error btn-sm ml-auto w-32 ${
                                           !!state.buttonsLoading[pubKeyString]
@@ -632,7 +631,11 @@ export default function ShdwDrivePage() {
                                     </button>
                                   )}
                                 </div>
-                                <div>{state.uploading === pubKeyString && <FileUpload />}</div>
+                                <div>
+                                  {state.uploading === pubKeyString && (
+                                    <FileUpload />
+                                  )}
+                                </div>
 
                                 {!!files.length && (
                                   <div className="mb-2">

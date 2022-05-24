@@ -158,7 +158,7 @@ export default function ShdwDrivePage() {
             open: true,
           });
           await state.shdwDrive.uploadMultipleFiles(account, chunk);
-          counter ++;
+          counter++;
         }
 
         const storageAccounts = await state.shdwDrive.getStorageAccounts();
@@ -186,8 +186,13 @@ export default function ShdwDrivePage() {
       setAlertState({
         message: "Files successfully uploaded",
         open: true,
+        duration: 10000,
       });
       setFiles([]);
+      dispatch({
+        type: "uploading",
+        payload: { uploading: "" },
+      });
       dispatch({
         type: "uploadInProgress",
         payload: { uploadInProgress: false },

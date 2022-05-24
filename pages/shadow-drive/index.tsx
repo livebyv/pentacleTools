@@ -36,7 +36,7 @@ export default function ShdwDrivePage() {
     balance: string;
     shdwBalance: string;
     totalFileSize: number;
-    isUploading: boolean;
+    uploading: string;
     createStorageLoading: boolean;
     shdwDrive: ShdwDrive;
     storageAccounts: { account: StorageAccount; publicKey: PublicKey }[];
@@ -47,7 +47,7 @@ export default function ShdwDrivePage() {
     balance: "",
     shdwBalance: "",
     totalFileSize: 0,
-    isUploading: false,
+    uploading: '',
     createStorageLoading: false,
     shdwDrive: null,
     storageAccounts: [],
@@ -62,7 +62,7 @@ export default function ShdwDrivePage() {
         | { type: "totalFileSize"; payload?: { totalFileSize: number } }
         | { type: "loading"; payload?: { loading: boolean } }
         | { type: "balance"; payload?: { balance: string } }
-        | { type: "isUploading"; payload?: { isUploading: boolean } }
+        | { type: "uploading"; payload?: { uploading: string } }
         | { type: "shdwBalance"; payload?: { shdwBalance: string } }
         | {
             type: "createStorageLoading";
@@ -92,8 +92,8 @@ export default function ShdwDrivePage() {
           return { ...state, loading: action.payload.loading };
         case "totalFileSize":
           return { ...state, totalFileSize: action.payload.totalFileSize };
-        case "isUploading":
-          return { ...state, isUploading: action.payload.isUploading };
+        case "uploading":
+          return { ...state, uploading: action.payload.uploading };
         case "balance":
           return { ...state, balance: action.payload.balance };
         case "storageAccounts":
@@ -557,7 +557,7 @@ export default function ShdwDrivePage() {
                                 </a>
                                 <br />
                                 <div className="flex w-full">
-                                  {!state.isUploading && (
+                                  {!state.uploading && (
                                     <a
                                       target="_blank"
                                       href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
@@ -570,29 +570,29 @@ export default function ShdwDrivePage() {
                                   )}
                                   <button
                                     className={`btn btn-sm m-2 ${
-                                      state.isUploading
+                                      state.uploading
                                         ? "btn-error btn-outline"
                                         : "btn-primary"
                                     }`}
                                     onClick={() => {
-                                      if (state.isUploading) {
+                                      if (state.uploading) {
                                         setFiles([]);
                                       }
                                       dispatch({
-                                        type: "isUploading",
+                                        type: "uploading",
                                         payload: {
-                                          isUploading: !state.isUploading,
+                                          uploading: pubKeyString,
                                         },
                                       });
                                     }}
                                   >
-                                    {state.isUploading
+                                    {state.uploading
                                       ? "Cancel Upload"
                                       : "Upload files"}
                                   </button>
 
                                   {!account.deleteRequestEpoch &&
-                                    !state.isUploading && (
+                                    !state.uploading && (
                                       <button
                                         className={`btn btn-error btn-sm ml-auto w-32 ${
                                           !!state.buttonsLoading[pubKeyString]
@@ -632,7 +632,7 @@ export default function ShdwDrivePage() {
                                     </button>
                                   )}
                                 </div>
-                                <div>{state.isUploading && <FileUpload />}</div>
+                                <div>{state.uploading && <FileUpload />}</div>
 
                                 {!!files.length && (
                                   <div className="mb-2">

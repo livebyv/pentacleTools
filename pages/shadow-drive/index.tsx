@@ -187,6 +187,7 @@ export default function ShdwDrivePage() {
         message: "Files successfully uploaded",
         open: true,
         duration: 10000,
+        severity:'success'
       });
       setFiles([]);
       dispatch({

@@ -163,13 +163,14 @@ export default function ShdwDrivePage() {
           message: "An error occured. Check console for details.",
           open: true,
         });
+        return;
       }
 
-              setAlertState({
-          message: "Files successfully uploaded",
-          open: true,
-        });
-        setFiles([]);
+      setAlertState({
+        message: "Files successfully uploaded",
+        open: true,
+      });
+      setFiles([]);
     },
     [state.shdwDrive, files]
   );
@@ -690,7 +691,9 @@ export default function ShdwDrivePage() {
                             value={account.storageAvailable / account.storage}
                           ></progress>
 
-                          {i !== state.storageAccounts.length - 1 && <hr className="opacity-10 my-3" />}
+                          {i !== state.storageAccounts.length - 1 && (
+                            <hr className="opacity-10 my-3" />
+                          )}
                         </li>
                       );
                     }

@@ -64,7 +64,7 @@ export default function FileTile({
           </video>
         )}
         <div className="absolute inset-0 opacity-30 bg-black"></div>
-        <div className="card-body p-3 z-10">
+        <div className="card-body p-3 z-10 absolute inset-0">
           <span className="card-title text-base truncate bg-gray-800 text-white px-2 inline rounded-box">
             {file.name}
           </span>

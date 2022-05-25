@@ -94,6 +94,8 @@ export default function BurnNFTs() {
     initState
   );
 
+  const pubKeyString = useMemo(() => publicKey?.toBase58(), [publicKey]);
+
   const handleNFTs = useCallback(async () => {
     if (!publicKey) {
       return;
@@ -103,7 +105,7 @@ export default function BurnNFTs() {
       dispatch({ type: "started" });
       dispatch({
         type: "publicAddress",
-        payload: { publicAddress: publicKey.toBase58() },
+        payload: { publicAddress: pubKeyString },
       });
       const accounts = await connection.getParsedProgramAccounts(
         TOKEN_PROGRAM_ID, // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
@@ -115,7 +117,7 @@ export default function BurnNFTs() {
             {
               memcmp: {
                 offset: 32, // number of bytes
-                bytes: publicKey.toBase58(), // base58 encoded string
+                bytes: pubKeyString, // base58 encoded string
               },
             },
           ],
@@ -425,7 +427,7 @@ export default function BurnNFTs() {
         </div>
       </div>
     );
-  }, [itemsPerPage, handleItemsPerPageSelection,]);
+  }, [itemsPerPage, handleItemsPerPageSelection]);
 
   const paginationDisplay = useMemo(() => {
     return state.nfts.length > itemsPerPage ? (
@@ -438,7 +440,7 @@ export default function BurnNFTs() {
         >
           <i className="">
             <LeftIcon />
-            </i>
+          </i>
         </button>
         <div className="text-xl text-white text-center">
           {page} / {/* trying maffs */}

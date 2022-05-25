@@ -1,7 +1,7 @@
 // DISCLAIMER:
 // THIS FILE IS ABSOLUTE CHAOS AND I KNOW IT!
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
 import jsonFormat from "json-format";
 import { Controller, useForm } from "react-hook-form";
@@ -19,6 +19,8 @@ import { useModal } from "../contexts/ModalProvider";
 import { Creator } from "../util/metadata-schema";
 import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js-next";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { SHDW_TOKEN } from "../util/accounts";
 
 export default function GibAirdrop() {
   const {
@@ -328,6 +330,26 @@ export default function GibAirdrop() {
     [wallet, files, connection, setAlertState]
   );
 
+  const [balances, setBalances] = useState({
+    shdw: "0",
+    sol: "0",
+  });
+
+  useEffect(() => {
+    (async () => {
+      if (wallet.publicKey) {
+        const shdwBalance = await connection.getTokenAccountBalance(
+          await getAssociatedTokenAddress(SHDW_TOKEN, wallet.publicKey)
+        );
+        const solBalance = await connection.getBalance(wallet.publicKey);
+        setBalances({
+          shdw: shdwBalance.value.uiAmount.toFixed(2),
+          sol: (solBalance / LAMPORTS_PER_SOL).toFixed(2),
+        });
+      }
+    })();
+  }, [wallet?.publicKey]);
+
   return wallet?.publicKey ? (
     <div>
       <br />
@@ -335,6 +357,15 @@ export default function GibAirdrop() {
       <h2 className="text-3xl text-center">
         NFT Minting - powered by SHDW Drive - BETA
       </h2>
+
+      <div>
+        {!!balances.shdw && (
+          <div className="w-full text-center mt-3">
+            <span className="badge badge-success">{balances.shdw} SHDW</span>
+            <span className="badge badge-primary ml-3">{balances.sol} SOL</span>
+          </div>
+        )}
+      </div>
 
       <hr className="opacity-10 my-3" />
 

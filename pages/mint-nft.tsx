@@ -183,12 +183,30 @@ export default function GibAirdrop() {
           `${Math.round((bytes * 1.2) / 1000)}kb`
         );
 
-        // const shdw_bucket = '8xB6KFXJwgEHWTfAjK1fLaSioPtoTQyGwpqhq3rcjJBF';
+        const vidFile = files.find((_m) => _m.type.startsWith("video"));
+        const imgFile = files.find((_m) => _m.type.startsWith("image"));
 
+        m.animation_url = formData.animationUrlFileName
+          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.animationUrlFileName}`
+          : !!vidFile?.name
+          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${vidFile?.name}`
+          : null;
+        m.image = formData.imageUrlFileName
+          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.imageUrlFileName}`
+          : !!imgFile?.name
+          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${imgFile.name}`
+          : null;
+
+        m.properties.files = files.map((f) => {
+          return {
+            type: f.type,
+            uri: `https://shdw-drive.genesysgo.net/${shdw_bucket}/${f.name}`,
+          };
+        });
         setAlertState!({
           message: (
             <button className="loading btn btn-ghost">
-              Uploading {files.length} files
+              Uploading {files.length + 1} files
             </button>
           ),
           open: true,
@@ -197,48 +215,17 @@ export default function GibAirdrop() {
         const res = (
           await shdwDrive.uploadMultipleFiles(
             toPublicKey(shdw_bucket),
-            createFileList(files)
+            createFileList([
+              ...files,
+              new File([jsonFormat(m)], "manifest.json", {
+                type: "application/json",
+              }),
+            ])
           )
         ).map((file) => ({
           file: files.find((f) => f.name === file.fileName),
           ...file,
         }));
-
-        m.properties.files = res.map(({ location, file }) => ({
-          uri: location,
-          type: file.type,
-        }));
-
-        let selectedAnimation = res.find(
-          (_m) => _m.file.name === formData.animationUrlFileName
-        );
-
-        m.animation_url = selectedAnimation
-          ? `${selectedAnimation.location}`
-          : res.find((_m) => _m.file.type.startsWith("video"))?.location || "";
-
-        let selectedImage = res.find(
-          (_m) => _m.file.name === formData?.imageUrlFileName
-        );
-        m.image = selectedImage
-          ? `${selectedImage.location}`
-          : m.properties.files[0].uri || "";
-        setAlertState!({
-          message: (
-            <button className="loading btn btn-ghost">
-              Uploading manifest
-            </button>
-          ),
-          open: true,
-        });
-        const [metaRes] = await shdwDrive.uploadMultipleFiles(
-          toPublicKey(shdw_bucket),
-          createFileList([
-            new File([jsonFormat(m)], "manifest.json", {
-              type: "application/json",
-            }),
-          ])
-        );
 
         const creators = [
           new Creator({
@@ -261,11 +248,12 @@ export default function GibAirdrop() {
         const { transactionId } = await metaplex.nfts().create({
           symbol: m.symbol || "",
           name: m.name || "",
-          uri: metaRes.location,
+          uri: `https://shdw-drive.genesysgo.net/${shdw_bucket}/manifest.json`,
           sellerFeeBasisPoints: !Number.isNaN(+m.seller_fee_basis_points)
             ? +m.seller_fee_basis_points
             : 0,
           creators,
+          isMutable: true
         });
 
         debugger;

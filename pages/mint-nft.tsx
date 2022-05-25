@@ -146,7 +146,15 @@ export default function GibAirdrop() {
 
       const shdwDrive = await new ShdwDrive(connection, wallet).init();
 
-      const m = Object.assign({
+      const creators = [
+        new Creator({
+          address: wallet?.publicKey,
+          share: 100,
+          verified: true,
+        }),
+      ];
+
+      const meta = Object.assign({
         name: formData.name,
         symbol: formData.symbol || null,
         description: formData.description || null,
@@ -157,13 +165,7 @@ export default function GibAirdrop() {
         external_url: formData.external_url || null,
         properties: {
           category: formData?.properties?.category || "image",
-          creators: [
-            new Creator({
-              address: wallet?.publicKey,
-              share: 100,
-              verified: true,
-            }),
-          ],
+          creators,
         },
       });
 
@@ -186,54 +188,41 @@ export default function GibAirdrop() {
         const vidFile = files.find((_m) => _m.type.startsWith("video"));
         const imgFile = files.find((_m) => _m.type.startsWith("image"));
 
-        m.animation_url = formData.animationUrlFileName
+        meta.animation_url = formData.animationUrlFileName
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.animationUrlFileName}`
           : !!vidFile?.name
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${vidFile?.name}`
           : null;
-        m.image = formData.imageUrlFileName
+        meta.image = formData.imageUrlFileName
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.imageUrlFileName}`
           : !!imgFile?.name
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${imgFile.name}`
           : null;
 
-        m.properties.files = files.map((f) => {
+        meta.properties.files = files.map((f) => {
           return {
             type: f.type,
             uri: `https://shdw-drive.genesysgo.net/${shdw_bucket}/${f.name}`,
           };
         });
+
         setAlertState!({
           message: (
             <button className="loading btn btn-ghost">
-              Uploading {files.length + 1} files
+              Uploading {files.length + 1 /** manifest */} files
             </button>
           ),
           open: true,
         });
 
-        const res = (
-          await shdwDrive.uploadMultipleFiles(
-            toPublicKey(shdw_bucket),
-            createFileList([
-              ...files,
-              new File([jsonFormat(m)], "manifest.json", {
-                type: "application/json",
-              }),
-            ])
-          )
-        ).map((file) => ({
-          file: files.find((f) => f.name === file.fileName),
-          ...file,
-        }));
+        const manifest = new File([jsonFormat(meta)], "manifest.json", {
+          type: "application/json",
+        });
 
-        const creators = [
-          new Creator({
-            address: wallet?.publicKey,
-            share: 100,
-            verified: true,
-          }),
-        ];
+        await shdwDrive.uploadMultipleFiles(
+          toPublicKey(shdw_bucket),
+          createFileList([...files, manifest])
+        );
 
         setAlertState!({
           message: (
@@ -246,17 +235,15 @@ export default function GibAirdrop() {
         );
 
         const { transactionId } = await metaplex.nfts().create({
-          symbol: m.symbol || "",
-          name: m.name || "",
+          symbol: meta.symbol || "",
+          name: meta.name || "",
           uri: `https://shdw-drive.genesysgo.net/${shdw_bucket}/manifest.json`,
-          sellerFeeBasisPoints: !Number.isNaN(+m.seller_fee_basis_points)
-            ? +m.seller_fee_basis_points
+          sellerFeeBasisPoints: !Number.isNaN(+meta.seller_fee_basis_points)
+            ? +meta.seller_fee_basis_points
             : 0,
           creators,
-          isMutable: true
+          isMutable: true,
         });
-
-        debugger;
 
         if (transactionId === "failed") {
           alert(transactionId);

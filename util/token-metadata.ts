@@ -277,7 +277,6 @@ export const fetchMetaForUI = (
           return parsedAAddress.localeCompare(parsedBAddress);
         } catch (e) {
           console.log(e);
-          debugger;
         }
       })
     ),

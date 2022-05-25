@@ -104,7 +104,6 @@ export default function Snedmaster() {
         for (const slice of sliceIntoChunks(reduced, 5)) {
           const tx = new Transaction();
           const ixs = [...slice.map((s) => s.ixs).flat()];
-          debugger;
           tx.add(...ixs);
           tx.feePayer = wallet?.publicKey;
           tx.recentBlockhash = (

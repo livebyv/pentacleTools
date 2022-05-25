@@ -20,6 +20,9 @@ import { sliceIntoChunks } from "../../util/slice-into-chunks";
 import createFileList from "../../util/create-file-list";
 import { TrashIcon } from "../../components/icons";
 
+const sortStorageAccounts = (a, b) =>
+  a.account.identifier.localeCompare(b.account.identifier);
+
 const isValidUnit = (str: string) => {
   const num = parseFloat(str);
   if (isNaN(num)) {
@@ -182,7 +185,7 @@ export default function ShdwDrivePage() {
         dispatch({
           type: "storageAccounts",
           payload: {
-            storageAccounts: storageAccounts as any as {
+            storageAccounts: storageAccounts.sort(sortStorageAccounts) as {
               account: StorageAccount;
               publicKey: PublicKey;
             }[],
@@ -235,7 +238,7 @@ export default function ShdwDrivePage() {
         dispatch({
           type: "storageAccounts",
           payload: {
-            storageAccounts: storageAccounts as any as {
+            storageAccounts: storageAccounts.sort(sortStorageAccounts) as {
               account: StorageAccount;
               publicKey: PublicKey;
             }[],
@@ -310,7 +313,7 @@ export default function ShdwDrivePage() {
           dispatch({
             type: "storageAccounts",
             payload: {
-              storageAccounts: storageAccounts as any as {
+              storageAccounts: storageAccounts.sort(sortStorageAccounts) as {
                 account: StorageAccount;
                 publicKey: PublicKey;
               }[],
@@ -498,6 +501,18 @@ export default function ShdwDrivePage() {
       });
     }
   };
+
+  const handleResize = useCallback(
+    (pubKeyString: string) =>
+      dispatch({
+        type: "isResizing",
+        payload: {
+          isResizing: state.isResizing === pubKeyString ? "" : pubKeyString,
+        },
+      }),
+    [state.isResizing]
+  );
+
   return (
     <>
       <Head>
@@ -618,302 +633,281 @@ export default function ShdwDrivePage() {
                     </div>
                   </div>
                 </li>
-                {state.storageAccounts
-                  .sort((a, b) =>
-                    a.account.identifier.localeCompare(b.account.identifier)
-                  )
-                  .map(
-                    (
-                      {
-                        account,
-                        publicKey,
-                      }: {
-                        account: StorageAccount;
-                        publicKey: PublicKey;
-                      },
-                      i
-                    ) => {
-                      const pubKeyString = publicKey.toBase58();
+                {state.storageAccounts.map(
+                  (
+                    {
+                      account,
+                      publicKey,
+                    }: {
+                      account: StorageAccount;
+                      publicKey: PublicKey;
+                    },
+                    i
+                  ) => {
+                    const pubKeyString = publicKey.toBase58();
 
-                      return (
-                        <li id={pubKeyString} key={pubKeyString}>
-                          <div className="flex flex-row items-center justify-between w-full">
-                            <div className="flex flex-row gap-6 w-full">
-                              <div className="w-full">
-                                <span
-                                  className={`${
-                                    !!account.deleteRequestEpoch &&
-                                    "text-red-500"
-                                  }`}
-                                >
+                    return (
+                      <li id={pubKeyString} key={pubKeyString}>
+                        <div className="flex flex-row items-center justify-between w-full">
+                          <div className="flex flex-row gap-6 w-full">
+                            <div className="w-full">
+                              <span
+                                className={`${
+                                  !!account.deleteRequestEpoch && "text-red-500"
+                                }`}
+                              >
+                                {" "}
+                                <strong>{account.identifier}</strong>
+                              </span>
+                              {!!account.deleteRequestEpoch && (
+                                <span className="text-red-500">
                                   {" "}
-                                  <strong>{account.identifier}</strong>
+                                  - Will be deleted in epoch{" "}
+                                  {account.deleteRequestEpoch}!
                                 </span>
-                                {!!account.deleteRequestEpoch && (
-                                  <span className="text-red-500">
-                                    {" "}
-                                    - Will be deleted in epoch{" "}
-                                    {account.deleteRequestEpoch}!
-                                  </span>
-                                )}
-                                <br />
-                                <a
-                                  href={`https://solscan.io/account/${pubKeyString}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  {pubKeyString}
-                                </a>
-                                <br />
-                                <div className="flex w-full">
-                                  {!(state.uploading === pubKeyString) && (
-                                    <a
-                                      target="_blank"
-                                      href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
-                                      rel="noopener noreferrer"
-                                    >
-                                      <button className="btn btn-sm btn-primary my-2">
-                                        See files
-                                      </button>
-                                    </a>
-                                  )}
-                                  <button
-                                    className={`btn btn-sm m-2 ${
-                                      state.uploading === pubKeyString
-                                        ? "btn-error btn-outline"
-                                        : "btn-primary"
-                                    }`}
-                                    onClick={() => {
-                                      if (state.uploading === pubKeyString) {
-                                        setFiles([]);
-                                        dispatch({
-                                          type: "isResizing",
-                                          payload: {
-                                            isResizing: "",
-                                          },
-                                        });
-                                        dispatch({
-                                          type: "uploading",
-                                          payload: {
-                                            uploading: "",
-                                          },
-                                        });
-                                        return;
-                                      }
-                                      dispatch({
-                                        type: "uploading",
-                                        payload: {
-                                          uploading: pubKeyString,
-                                        },
-                                      });
-                                    }}
+                              )}
+                              <br />
+                              <a
+                                href={`https://solscan.io/account/${pubKeyString}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {pubKeyString}
+                              </a>
+                              <br />
+                              <div className="flex w-full">
+                                {!(state.uploading === pubKeyString) && (
+                                  <a
+                                    target="_blank"
+                                    href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
+                                    rel="noopener noreferrer"
                                   >
-                                    {state.uploading === pubKeyString
-                                      ? "Cancel Upload"
-                                      : "Upload files"}
-                                  </button>
-
-                                  <button
-                                    className={`btn btn-primary btn-sm my-2 ${
-                                      state.isResizing === pubKeyString
-                                        ? "btn-outline"
-                                        : ""
-                                    }`}
-                                    onClick={() =>
+                                    <button className="btn btn-sm btn-primary my-2">
+                                      See files
+                                    </button>
+                                  </a>
+                                )}
+                                <button
+                                  className={`btn btn-sm m-2 ${
+                                    state.uploading === pubKeyString
+                                      ? "btn-error btn-outline"
+                                      : "btn-primary"
+                                  }`}
+                                  onClick={() => {
+                                    if (state.uploading === pubKeyString) {
+                                      setFiles([]);
                                       dispatch({
                                         type: "isResizing",
                                         payload: {
-                                          isResizing:
-                                            state.isResizing === pubKeyString
-                                              ? ""
-                                              : pubKeyString,
+                                          isResizing: "",
                                         },
+                                      });
+                                      dispatch({
+                                        type: "uploading",
+                                        payload: {
+                                          uploading: "",
+                                        },
+                                      });
+                                      return;
+                                    }
+                                    dispatch({
+                                      type: "uploading",
+                                      payload: {
+                                        uploading: pubKeyString,
+                                      },
+                                    });
+                                  }}
+                                >
+                                  {state.uploading === pubKeyString
+                                    ? "Cancel Upload"
+                                    : "Upload files"}
+                                </button>
+
+                                <button
+                                  className={`btn btn-primary btn-sm my-2 ${
+                                    state.isResizing === pubKeyString
+                                      ? "btn-outline"
+                                      : ""
+                                  }`}
+                                  onClick={() => handleResize(pubKeyString)}
+                                >
+                                  {state.isResizing !== pubKeyString
+                                    ? "Resize"
+                                    : "Cancel"}
+                                </button>
+
+                                {!account.deleteRequestEpoch &&
+                                  !(state.uploading === pubKeyString) && (
+                                    <button
+                                      className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${
+                                        !!state.buttonsLoading[pubKeyString]
+                                          ? "loading"
+                                          : ""
+                                      } `}
+                                      onClick={() =>
+                                        handleDeleteStorageAccount({
+                                          pubKeyString,
+                                          publicKey,
+                                          i,
+                                        })
+                                      }
+                                    >
+                                      {!!state.buttonsLoading[pubKeyString] ? (
+                                        ""
+                                      ) : (
+                                        <>
+                                          <TrashIcon width={16} /> delet
+                                        </>
+                                      )}
+                                    </button>
+                                  )}
+                                {!!account.deleteRequestEpoch && (
+                                  <button
+                                    className={`btn btn-error btn-sm w-32 btn-outline ml-auto ${
+                                      state.buttonsLoading[pubKeyString] &&
+                                      " loading"
+                                    }`}
+                                    onClick={() =>
+                                      handleCancelDeleteStorageAccountRequest({
+                                        pubKeyString,
+                                        publicKey,
+                                        i,
                                       })
                                     }
                                   >
-                                    {state.isResizing !== pubKeyString
-                                      ? "Resize"
-                                      : "Cancel"}
+                                    cancel deletion
                                   </button>
+                                )}
+                              </div>
+                              <div>
+                                {state.uploading === pubKeyString && (
+                                  <FileUpload />
+                                )}
+                              </div>
 
-                                  {!account.deleteRequestEpoch &&
-                                    !(state.uploading === pubKeyString) && (
-                                      <button
-                                        className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${
-                                          !!state.buttonsLoading[pubKeyString]
-                                            ? "loading"
-                                            : ""
-                                        } `}
-                                        onClick={() =>
-                                          handleDeleteStorageAccount({
-                                            pubKeyString,
-                                            publicKey,
-                                            i,
-                                          })
-                                        }
-                                      >
-                                        {!!state.buttonsLoading[
-                                          pubKeyString
-                                        ] ? (
-                                          ""
-                                        ) : (
-                                          <>
-                                            <TrashIcon width={16} /> delet
-                                          </>
-                                        )}
-                                      </button>
-                                    )}
-                                  {!!account.deleteRequestEpoch && (
+                              {!!files.length &&
+                                pubKeyString === state.uploading && (
+                                  <div className="mb-2 flex flex-col">
                                     <button
-                                      className={`btn btn-error btn-sm w-32 btn-outline ml-auto ${
-                                        state.buttonsLoading[pubKeyString] &&
-                                        " loading"
+                                      className={`btn btn-primary btn-sm ml-auto ${
+                                        state.uploadInProgress ? "loading" : ""
                                       }`}
-                                      onClick={() =>
-                                        handleCancelDeleteStorageAccountRequest(
-                                          {
-                                            pubKeyString,
-                                            publicKey,
-                                            i,
-                                          }
-                                        )
-                                      }
+                                      onClick={() => uploadFiles(publicKey)}
                                     >
-                                      cancel deletion
+                                      {/* @TODO */}
+                                      Upload {files.length} files
                                     </button>
-                                  )}
-                                </div>
-                                <div>
-                                  {state.uploading === pubKeyString && (
-                                    <FileUpload />
-                                  )}
-                                </div>
-
-                                {!!files.length &&
-                                  pubKeyString === state.uploading && (
-                                    <div className="mb-2 flex flex-col">
-                                      <button
-                                        className={`btn btn-primary btn-sm ml-auto ${
-                                          state.uploadInProgress
-                                            ? "loading"
-                                            : ""
-                                        }`}
-                                        onClick={() => uploadFiles(publicKey)}
-                                      >
-                                        {/* @TODO */}
-                                        Upload {files.length} files
-                                      </button>
-                                      <hr className="opacity-10 my-2 w-full" />
-                                    </div>
-                                  )}
-                                <div className="badge badge-ghost">
-                                  Free:{" "}
-                                  {sizeMB(
-                                    +(account.storageAvailable as any)
-                                      ?.toNumber()
-                                      ?.toFixed(2)
-                                  ).toFixed(2)}{" "}
-                                  MB /
-                                  {sizeMB(
-                                    +(account.storage as any)
-                                      ?.toNumber()
-                                      ?.toFixed(2)
-                                  ).toFixed(2)}{" "}
-                                  MB
-                                </div>
+                                    <hr className="opacity-10 my-2 w-full" />
+                                  </div>
+                                )}
+                              <div className="badge badge-ghost">
+                                Free:{" "}
+                                {sizeMB(
+                                  +(account.storageAvailable as any)
+                                    ?.toNumber()
+                                    ?.toFixed(2)
+                                ).toFixed(2)}{" "}
+                                MB /
+                                {sizeMB(
+                                  +(account.storage as any)
+                                    ?.toNumber()
+                                    ?.toFixed(2)
+                                ).toFixed(2)}{" "}
+                                MB
                               </div>
                             </div>
                           </div>
-                          {state.isResizing === pubKeyString && (
-                            <form
-                              className="my-3"
-                              onSubmit={handleSubmit(({ size, unit }) =>
-                                onStorageSizeSubmit({ publicKey, size, unit })
-                              )}
-                            >
-                              <h3 className="text-xl mb-2">Storage Resize</h3>
-                              <div className="flex flex-row gap-3">
-                                <div className="btn-group">
-                                  <button
-                                    className={`btn btn-sm ${
-                                      state.increaseOrDecrease === "increase"
-                                        ? "btn-active"
-                                        : ""
-                                    }`}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      dispatch({
-                                        type: "increaseOrDecrease",
-                                        payload: {
-                                          increaseOrDecrease: "increase",
-                                        },
-                                      });
-                                    }}
-                                  >
-                                    Increase
-                                  </button>
-                                  <button
-                                    className={`btn btn-sm ${
-                                      state.increaseOrDecrease === "decrease"
-                                        ? "btn-active"
-                                        : ""
-                                    }`}
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      dispatch({
-                                        type: "increaseOrDecrease",
-                                        payload: {
-                                          increaseOrDecrease: "decrease",
-                                        },
-                                      });
-                                    }}
-                                  >
-                                    Decrease
-                                  </button>
-                                </div>
-                                <div className="form-control">
-                                  <label className="input-group input-group-sm">
-                                    <input
-                                      {...register("size")}
-                                      className="input input-sm"
-                                      type="number"
-                                      min={0}
-                                    />
-                                    <select
-                                      {...register("unit")}
-                                      className="select select-sm select-bordered"
-                                    >
-                                      <option disabled selected>
-                                        Pick a unit
-                                      </option>
-                                      <option>KB</option>
-                                      <option>MB</option>
-                                      <option>GB</option>
-                                    </select>
-                                  </label>
-                                </div>
-
+                        </div>
+                        {state.isResizing === pubKeyString && (
+                          <form
+                            className="my-3"
+                            onSubmit={handleSubmit(({ size, unit }) =>
+                              onStorageSizeSubmit({ publicKey, size, unit })
+                            )}
+                          >
+                            <h3 className="text-xl mb-2">Storage Resize</h3>
+                            <div className="flex flex-row gap-3">
+                              <div className="btn-group">
                                 <button
-                                  className={`btn btn-sm  btn-success btn-outline`}
-                                  type="submit"
+                                  className={`btn btn-sm ${
+                                    state.increaseOrDecrease === "increase"
+                                      ? "btn-active"
+                                      : ""
+                                  }`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    dispatch({
+                                      type: "increaseOrDecrease",
+                                      payload: {
+                                        increaseOrDecrease: "increase",
+                                      },
+                                    });
+                                  }}
                                 >
-                                  Ok
+                                  Increase
+                                </button>
+                                <button
+                                  className={`btn btn-sm ${
+                                    state.increaseOrDecrease === "decrease"
+                                      ? "btn-active"
+                                      : ""
+                                  }`}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    dispatch({
+                                      type: "increaseOrDecrease",
+                                      payload: {
+                                        increaseOrDecrease: "decrease",
+                                      },
+                                    });
+                                  }}
+                                >
+                                  Decrease
                                 </button>
                               </div>
-                            </form>
-                          )}
-                          <progress
-                            className="progress progress-primary"
-                            value={account.storageAvailable / account.storage}
-                          ></progress>
+                              <div className="form-control">
+                                <label className="input-group input-group-sm">
+                                  <input
+                                    {...register("size")}
+                                    className="input input-sm"
+                                    type="number"
+                                    min={0}
+                                  />
+                                  <select
+                                    {...register("unit")}
+                                    className="select select-sm select-bordered"
+                                  >
+                                    <option disabled selected>
+                                      Pick a unit
+                                    </option>
+                                    <option>KB</option>
+                                    <option>MB</option>
+                                    <option>GB</option>
+                                  </select>
+                                </label>
+                              </div>
 
-                          {i !== state.storageAccounts.length - 1 && (
-                            <hr className="opacity-10 my-3" />
-                          )}
-                        </li>
-                      );
-                    }
-                  )}
+                              <button
+                                className={`btn btn-sm  btn-success btn-outline`}
+                                type="submit"
+                              >
+                                Ok
+                              </button>
+                            </div>
+                          </form>
+                        )}
+                        <progress
+                          className="progress progress-primary"
+                          value={account.storageAvailable / account.storage}
+                        ></progress>
+
+                        {i !== state.storageAccounts.length - 1 && (
+                          <hr className="opacity-10 my-3" />
+                        )}
+                      </li>
+                    );
+                  }
+                )}
               </ul>
             </div>
           </>

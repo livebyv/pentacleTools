@@ -3,57 +3,37 @@
 
 import React, { useCallback, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-
+import jsonFormat from "json-format";
 import { Controller, useForm } from "react-hook-form";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import FileTile from "../components/file-tile";
-import { Creator, Data } from "../util/mint/schema";
 import { URL_MATCHER } from "../util/validators";
-import ArweaveWallet from "../components/arweave-wallet";
-import { BundlrProvider, useBundlr } from "../contexts/BundlrProvider";
-import { mintNFT } from "../util/mint";
 import { useAlert } from "../contexts/AlertProvider";
 import { getRange } from "../util/get-range";
+import { fileToBuffer } from "../util/file-to-buffer";
+import { ShdwDrive } from "@shadow-drive/sdk";
+import { toPublicKey } from "../util/to-publickey";
+import createFileList from "../util/create-file-list";
+import { useModal } from "../contexts/ModalProvider";
+import { Creator } from "../util/metadata-schema";
+import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js-next";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-const fileToBuffer = (
-  file: File
-): Promise<{ buffer: ArrayBuffer; file: File }> => {
-  return new Promise((resolve) => {
-    var reader = new FileReader();
-
-    reader.onload = function (readerEvt) {
-      var buffer = readerEvt.target.result;
-
-      resolve({
-        buffer: buffer as ArrayBuffer,
-        file,
-      });
-    };
-
-    reader.readAsArrayBuffer(file);
-  });
-};
-
-const Wrapper = ({ children }) => {
-  return <BundlrProvider>{children}</BundlrProvider>;
-};
-
-function GibAirdrop() {
+export default function GibAirdrop() {
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
   } = useForm();
+  const { setModalState } = useModal();
   const { setAlertState } = useAlert();
   const [loading, setLoading] = useState(false);
   const wallet = useWallet();
-  const [numberOfFiles, setNumberOfFiles] = useState(0);
+  const [numberOfFiles, setNumberOfFiles] = useState(1);
   const [files, setFiles] = useState<File[]>([]);
   const [mint, setMint] = useState("");
-  const { bundler, fund } = useBundlr();
   const { connection } = useConnection();
   const handleRemoveFile = useCallback(
     (name: string) => {
@@ -147,6 +127,11 @@ function GibAirdrop() {
     [files, numberOfFiles, setNumberOfFiles, handleRemoveFile, register]
   );
 
+  const pubKeyString = useMemo(
+    () => wallet?.publicKey?.toBase58(),
+    [wallet?.publicKey]
+  );
+
   const upload = useCallback(
     async (formData) => {
       setLoading(true);
@@ -157,6 +142,8 @@ function GibAirdrop() {
         open: true,
       });
 
+      const shdwDrive = await new ShdwDrive(connection, wallet).init();
+
       const m = Object.assign({
         name: formData.name,
         symbol: formData.symbol || null,
@@ -164,86 +151,75 @@ function GibAirdrop() {
         seller_fee_basis_points: +formData.seller_fee_basis_points || 0,
         image: formData.image || null,
         animation_url: formData.animation_url || null,
-        attributes: formData.attributes || null,
+        attributes: formData.attributes || [],
         external_url: formData.external_url || null,
         properties: {
           category: formData?.properties?.category || "image",
-          creators: new Creator({
-            address: wallet?.publicKey.toBase58(),
-            share: 100,
-            verified: 1,
-          }),
+          creators: [
+            new Creator({
+              address: wallet?.publicKey,
+              share: 100,
+              verified: true,
+            }),
+          ],
         },
       });
 
       try {
-        const priceApprox = await files.reduce(async (acc, curr) => {
-          const bytes = (await fileToBuffer(curr)).buffer.byteLength;
-          const price = await bundler?.utils.getPrice("solana", bytes);
-          const nr = price.toNumber();
-          return (await acc) + nr;
+        // TODO: Upload all files at once, use determinstic file name
+        const bytes = await files.reduce(async (acc, curr) => {
+          return (await acc) + (await fileToBuffer(curr)).buffer.byteLength;
         }, Promise.resolve(0));
 
-        const balance = await bundler
-          ?.getLoadedBalance()
-          .then((r) => r.toNumber());
+        alert(
+          `You will need circa ${((bytes * 1.2) / LAMPORTS_PER_SOL).toFixed(
+            6
+          )} SHDW`
+        );
+        const { shdw_bucket } = await shdwDrive.createStorageAccount(
+          `NFT-${Date.now()}`,
+          `${Math.round((bytes * 1.2) / 1000)}kb`
+        );
 
-        if (priceApprox * 1.1 > balance) {
-          setAlertState!({
-            message: (
-              <button className="loading btn btn-ghost">
-                Funding Arweave...
-              </button>
-            ),
-            open: true,
-          });
-          await fund(Math.round(priceApprox * 1.1) / LAMPORTS_PER_SOL);
-        }
+        // const shdw_bucket = '8xB6KFXJwgEHWTfAjK1fLaSioPtoTQyGwpqhq3rcjJBF';
 
-        const mapping = [];
-        let i = 1;
-        for (const file of files) {
-          setAlertState!({
-            message: (
-              <button className="loading btn btn-ghost">
-                Uploading file {i} of {files.length}
-              </button>
-            ),
-            open: true,
-          });
-          bundler.uploader.contentType = "";
-          const buff = (await fileToBuffer(file)).buffer;
-          const res = (
-            await bundler.uploader.upload(Buffer.from(buff), [
-              { name: "Content-Type", value: file.type },
-            ])
-          ).data;
-          mapping.push({
-            file: file,
-            link: `https://arweave.net/${res.id}`,
-          });
-          i++;
-        }
-        m.properties.files = mapping.map(({ link, file }) => ({
-          uri: link + `?ext=${file.type.split("/")[1]}`,
+        setAlertState!({
+          message: (
+            <button className="loading btn btn-ghost">
+              Uploading {files.length} files
+            </button>
+          ),
+          open: true,
+        });
+
+        const res = (
+          await shdwDrive.uploadMultipleFiles(
+            toPublicKey(shdw_bucket),
+            createFileList(files)
+          )
+        ).map((file) => ({
+          file: files.find((f) => f.name === file.fileName),
+          ...file,
+        }));
+
+        m.properties.files = res.map(({ location, file }) => ({
+          uri: location,
           type: file.type,
         }));
 
-        let selectedAnimation = mapping.find(
+        let selectedAnimation = res.find(
           (_m) => _m.file.name === formData.animationUrlFileName
         );
 
         m.animation_url = selectedAnimation
-          ? `${selectedAnimation.link}?ext=${
-              selectedAnimation.file.type.split("/")[1]
-            }`
-          : mapping.find((_m) => _m.file.type.startsWith("video"))?.link || "";
+          ? `${selectedAnimation.location}`
+          : res.find((_m) => _m.file.type.startsWith("video"))?.location || "";
 
-        let selectedImage = mapping.find(
+        let selectedImage = res.find(
           (_m) => _m.file.name === formData?.imageUrlFileName
         );
         m.image = selectedImage
-          ? `${selectedImage.link}?ext=${selectedImage.file.type.split("/")[1]}`
+          ? `${selectedImage.location}`
           : m.properties.files[0].uri || "";
         setAlertState!({
           message: (
@@ -253,29 +229,22 @@ function GibAirdrop() {
           ),
           open: true,
         });
-        const metaTx = (
-          await bundler.uploader.upload(Buffer.from(JSON.stringify(m)), [
-            { name: "Content-Type", value: "application/json" },
+        const [metaRes] = await shdwDrive.uploadMultipleFiles(
+          toPublicKey(shdw_bucket),
+          createFileList([
+            new File([jsonFormat(m)], "manifest.json", {
+              type: "application/json",
+            }),
           ])
-        ).data;
+        );
 
         const creators = [
           new Creator({
-            address: wallet.publicKey.toBase58(),
+            address: wallet?.publicKey,
             share: 100,
-            verified: 1,
+            verified: true,
           }),
         ];
-
-        const data = new Data({
-          symbol: m.symbol || "",
-          name: m.name || "",
-          uri: `https://arweave.net/${metaTx.id}`,
-          sellerFeeBasisPoints: !Number.isNaN(+m.seller_fee_basis_points)
-            ? +m.seller_fee_basis_points
-            : 0,
-          creators,
-        });
 
         setAlertState!({
           message: (
@@ -283,9 +252,24 @@ function GibAirdrop() {
           ),
           open: true,
         });
-        const mintTxId = await mintNFT(connection, wallet, data);
-        if (mintTxId === "failed") {
-          alert(mintTxId);
+        const metaplex = new Metaplex(connection).use(
+          walletAdapterIdentity(wallet.wallet.adapter)
+        );
+
+        const { transactionId } = await metaplex.nfts().create({
+          symbol: m.symbol || "",
+          name: m.name || "",
+          uri: metaRes.location,
+          sellerFeeBasisPoints: !Number.isNaN(+m.seller_fee_basis_points)
+            ? +m.seller_fee_basis_points
+            : 0,
+          creators,
+        });
+
+        debugger;
+
+        if (transactionId === "failed") {
+          alert(transactionId);
           setLoading(false);
         } else {
           let confirmed = false;
@@ -296,20 +280,20 @@ function GibAirdrop() {
                   <button className="loading btn btn-ghost"></button> Confirming
                   transaction{" "}
                   <a
-                    href={`https://explorer.solana.com/tx/${mintTxId}`}
+                    href={`https://explorer.solana.com/tx/${transactionId}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="truncate"
                   >
-                    {mintTxId.slice(0, 3)} ...{" "}
-                    {mintTxId.slice(mintTxId.length - 3)}
+                    {transactionId.slice(0, 3)} ...{" "}
+                    {transactionId.slice(transactionId.length - 3)}
                   </a>
                 </div>
               ),
               open: true,
             });
             const tx = await connection
-              .getTransaction(mintTxId, { commitment: "confirmed" })
+              .getTransaction(transactionId, { commitment: "confirmed" })
               .catch((e) => {
                 alert(e);
               });
@@ -332,15 +316,25 @@ function GibAirdrop() {
       } catch (e) {
         console.error(e);
         setLoading(false);
+        setAlertState({
+          open: false,
+        });
+        setModalState({
+          message: "An error occured! For info check console!",
+          open: true,
+        });
       }
     },
-    [wallet, files, bundler, connection, fund, setAlertState]
+    [wallet, files, connection, setAlertState]
   );
 
   return wallet?.publicKey ? (
     <div>
-      <ArweaveWallet />
       <br />
+
+      <h2 className="text-3xl text-center">
+        NFT Minting - powered by SHDW Drive - BETA
+      </h2>
 
       <hr className="opacity-10 my-3" />
 
@@ -352,9 +346,7 @@ function GibAirdrop() {
               className={`w-full flex flex-col`}
               onSubmit={handleSubmit((e) => upload(e))}
             >
-              <h2 className="text-3xl font-bold text-center">
-                1. Create Metadata
-              </h2>
+              <h2 className="text-3xl font-bold text-center">Metadata</h2>
               <div className="text-center">
                 The metadata standard is defined{" "}
                 <a
@@ -560,12 +552,7 @@ function GibAirdrop() {
             </a>
           </p>
           <div className="modal-action">
-            <a
-              onClick={() => {
-                setMint(undefined);
-              }}
-              className="btn"
-            >
+            <a onClick={() => setMint(undefined)} className="btn">
               Close
             </a>
           </div>
@@ -582,13 +569,5 @@ function GibAirdrop() {
         </div>
       </div>
     </>
-  );
-}
-
-export default function MintNft() {
-  return (
-    <Wrapper>
-      <GibAirdrop />
-    </Wrapper>
   );
 }

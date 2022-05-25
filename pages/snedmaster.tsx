@@ -76,10 +76,7 @@ export default function Snedmaster() {
               keys: [
                 { pubkey: wallet?.publicKey, isSigner: true, isWritable: true },
               ],
-              data: Buffer.from(
-                `Sent over pentacle.tools at ${Date.now()}`,
-                "utf-8"
-              ),
+              data: Buffer.from(`Sent over pentacle.tools`, "utf-8"),
               programId: MEMO_ID,
             }),
           ];
@@ -167,12 +164,12 @@ export default function Snedmaster() {
     setAlertState({ message: "Copied to clipboard!", duration: 2000 });
 
   useEffect(() => {
-    const itv = setInterval(async () => {
-      if (wallet?.publicKey) {
+    if (wallet?.publicKey) {
+      const itv = setInterval(async () => {
         setSolBalance(await connection.getBalance(wallet?.publicKey).catch());
-      }
-    }, 1000);
-    return () => clearInterval(itv);
+      }, 1000);
+      return () => clearInterval(itv);
+    }
   }, [connection, wallet?.publicKey]);
   return (
     <>

@@ -26,6 +26,7 @@ import {
   GetCashIcon,
   HammerIcon,
   InfoIcon,
+  SendIcon,
 } from "../components/icons";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
@@ -140,6 +141,13 @@ function Context({ children }: { children: React.ReactNode }) {
                 <HammerIcon />
               </i>
               <span> Mint NFT</span>
+            </MenuLink>
+
+            <MenuLink activatesDrawer={false} href="/send-nfts">
+              <i className="mr-3">
+                <SendIcon />
+              </i>
+              Send Multiple NFTs
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/arweave-upload">
               <i className="mr-3">

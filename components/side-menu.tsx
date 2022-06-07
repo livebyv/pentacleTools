@@ -12,7 +12,7 @@ import {
   GetCashIcon,
   HammerIcon,
   InfoIcon,
-  UploadIcon,
+  SendIcon,
 } from "./icons";
 
 export default function SideMenu() {
@@ -94,14 +94,16 @@ export default function SideMenu() {
           </i>
           Mint NFT
         </MenuLink>
+        <MenuLink href="/send-nfts">
+          <i className="mr-3">
+            <SendIcon />
+          </i>
+          Send Multiple NFTs
+        </MenuLink>
         {/* <MenuLink href="/find-stuck-sol">Find Stuck SOL</MenuLink> */}
         <MenuLink href="/arweave-upload">
           <i className="mr-3">
-            <img
-              src={ImageURI.ArweaveLogo}
-              width={'16px'}
-              height={'16px'}
-            />
+            <img src={ImageURI.ArweaveLogo} width={"16px"} height={"16px"} />
           </i>
           <span>Arweave Upload</span>
         </MenuLink>

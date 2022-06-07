@@ -239,7 +239,7 @@ export function HeartIcon({ width = 32, height = 32 }) {
   );
 }
 
-export function SendIcon({ width = 24, height = 24 }) {
+export function SendIcon({ width = 16, height = 16 }) {
   return (
     <svg
       fill="currentColor"

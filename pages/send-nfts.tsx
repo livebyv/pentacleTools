@@ -142,7 +142,7 @@ export default function SendNFTs() {
         )
         .map((a) => (a.account.data as ParsedAccountData).parsed.info.mint);
       const data = (
-        await fetchMetaForUI(mints, () => {}, connection).toPromise()
+        await fetchMetaForUI(mints, () => { }, connection).toPromise()
       ).filter((e) => !e.failed);
 
       const nftsWithImages = data.map((nft) => {
@@ -336,7 +336,7 @@ export default function SendNFTs() {
 
     try {
       const txs = [];
-      for (const slice of sliceIntoChunks(state.selectedNFTs, 5)) {
+      for (const slice of sliceIntoChunks(state.selectedNFTs, 3)) {
         txs.push(
           ...(await Promise.all(
             slice.map(async (mint) => {
@@ -384,20 +384,20 @@ export default function SendNFTs() {
 
       await signAllTransactions(txs);
 
+      setAlertState({
+        message: (
+          <>
+            <button className="btn btn-ghost loading mr-2" />
+            <div className="flex-1">
+              {" "}
+              Sending {txs.length} transactions...
+            </div>
+          </>
+        ),
+        open: true,
+      });
       const sliced = sliceIntoChunks(
         txs.map(async (tx, i) => {
-          setAlertState({
-            message: (
-              <>
-                <button className="btn btn-ghost loading mr-2" />
-                <div className="flex-1">
-                  {" "}
-                  Sending {i + 1} of {txs.length} transactions...
-                </div>
-              </>
-            ),
-            open: true,
-          });
           const id = await connection.sendRawTransaction(tx.serialize());
           await connection.confirmTransaction(id, "finalized").catch(() => {
             setModalState({
@@ -446,58 +446,56 @@ export default function SendNFTs() {
   const confirmationModal = useMemo(() => {
     return state.isModalOpen && document.body
       ? createPortal(
-          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
-            <div className="bg-gray-800 rounded-lg shadow-lg p-4 max-w-sm w-full">
-              <p className="text-2xl text-white text-center">
-                Are you sure you want send thse NFTs to{" "}
-                {getValues().destination}
-                {`${
-                  state.selectedNFTs.length === 1
-                    ? "this NFT"
-                    : ` these ${state.selectedNFTs.length} NFTs?`
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-4 max-w-sm w-full">
+            <p className="text-2xl text-white text-center">
+              Are you sure you want send thse NFTs to{" "}
+              {getValues().destination}
+              {`${state.selectedNFTs.length === 1
+                  ? "this NFT"
+                  : ` these ${state.selectedNFTs.length} NFTs?`
                 }`}
-                ?
-                <br />
-                <br />
-                <strong>
-                  It cannot be undone and they will be destroyed!!! Make sure
-                  you know what you are doing!
-                </strong>
-              </p>
+              ?
+              <br />
+              <br />
+              <strong>
+                It cannot be undone and they will be destroyed!!! Make sure
+                you know what you are doing!
+              </strong>
+            </p>
 
-              <div className="flex items-center justify-center p-4 w-full mt-8">
-                <button
-                  type="button"
-                  className="btn rounded-box mr-4"
-                  onClick={() => {
-                    dispatch({
-                      type: "isModalOpen",
-                      payload: { isModalOpen: false },
-                    });
-                  }}
-                >
-                  nope
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    dispatch({
-                      type: "isModalOpen",
-                      payload: { isModalOpen: false },
-                    });
-                    handleMultiSned();
-                  }}
-                  className={`btn rounded-box btn-primary ${
-                    state.isSending ? "loading" : ""
+            <div className="flex items-center justify-center p-4 w-full mt-8">
+              <button
+                type="button"
+                className="btn rounded-box mr-4"
+                onClick={() => {
+                  dispatch({
+                    type: "isModalOpen",
+                    payload: { isModalOpen: false },
+                  });
+                }}
+              >
+                nope
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  dispatch({
+                    type: "isModalOpen",
+                    payload: { isModalOpen: false },
+                  });
+                  handleMultiSned();
+                }}
+                className={`btn rounded-box btn-primary ${state.isSending ? "loading" : ""
                   }`}
-                >
-                  {state.isSending ? "sending!!" : "yup"}
-                </button>
-              </div>
+              >
+                {state.isSending ? "sending!!" : "yup"}
+              </button>
             </div>
-          </div>,
-          document.querySelector("body")
-        )
+          </div>
+        </div>,
+        document.querySelector("body")
+      )
       : null;
   }, [state, handleNFTUnselect, handleMultiSned]);
 
@@ -660,9 +658,8 @@ export default function SendNFTs() {
               type="submit"
               value={
                 state.selectedNFTs.length
-                  ? `sned ${state.selectedNFTs.length} ${
-                      state.selectedNFTs.length === 1 ? "item" : "items"
-                    }`
+                  ? `sned ${state.selectedNFTs.length} ${state.selectedNFTs.length === 1 ? "item" : "items"
+                  }`
                   : "selecc to sned"
               }
               className="btn btn-primary mt-2 rounded-full shadow"

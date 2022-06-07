@@ -2,7 +2,6 @@ import "../styles/globals.css";
 
 import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { tokenAuthFetchMiddleware } from "@strata-foundation/web3-token-auth";
 import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -27,7 +26,6 @@ import {
   GetCashIcon,
   HammerIcon,
   InfoIcon,
-  UploadIcon,
 } from "../components/icons";
 const endpoint = process.env.NEXT_PUBLIC_RPC!;
 
@@ -41,6 +39,7 @@ const WalletProvider = dynamic(
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <FileProvider>
+      {/* @ts-ignore */}
       <WalletProvider>
         <AlertProvider>
           <ModalProvider>{children}</ModalProvider>
@@ -53,20 +52,11 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
 function Context({ children }: { children: React.ReactNode }) {
   const { setAlertState } = useAlert();
 
-  const fetchMiddleware = tokenAuthFetchMiddleware({
-    getToken: async () => {
-      const req = await fetch("/api/get-token");
-      const { access_token }: { access_token: string } = await req.json();
-      return access_token;
-    },
-  });
-
   return (
     <ConnectionProvider
       endpoint={endpoint}
       config={{
         confirmTransactionInitialTimeout: 120000,
-        fetchMiddleware,
       }}
     >
       <Head>
@@ -254,6 +244,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <Providers>
       <Context>
         <PerformanceProvider>
+          {/* @ts-ignore */}
           <Component {...pageProps} />
         </PerformanceProvider>
       </Context>

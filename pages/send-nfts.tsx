@@ -336,7 +336,7 @@ export default function SendNFTs() {
 
     try {
       const txs = [];
-      for (const slice of sliceIntoChunks(state.selectedNFTs, 3)) {
+      for (const slice of sliceIntoChunks(state.selectedNFTs, 5)) {
         txs.push(
           ...(await Promise.all(
             slice.map(async (mint) => {

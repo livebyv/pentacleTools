@@ -37,17 +37,17 @@ export async function getMints(
     from(chunks)
       .pipe(
         mergeMap(async (chunk) => {
+          let retries = 0;
           let parsedTxs = await connection.getParsedTransactions(
             chunk.map((tx) => tx.signature)
           );
-          // GBT errors can cause empty returns, we try a 'few' times
-          while (parsedTxs?.every((tx) => !tx)) {
-            parsedTxs = await connection.getParsedTransactions(
-              chunk.map((tx) => tx.signature)
-            );
+          while (retries < 5) {
+            if (!parsedTxs?.every((tx) => !!tx)) {
+              retries++;
+            }
           }
-          return parsedTxs;
-        }, 8),
+          return parsedTxs.filter(tx => !!tx);
+        }, 4),
         map((chunk) => {
           return chunk
             .map((h) => {

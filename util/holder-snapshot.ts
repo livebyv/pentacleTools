@@ -1,6 +1,7 @@
 import { Connection, ParsedAccountData, PublicKey } from "@solana/web3.js";
 import { from, lastValueFrom } from "rxjs";
 import { mergeMap } from "rxjs/operators";
+import { CONCURRENCY } from "./concurrency";
 
 export async function getOwners(
   mints: string[],
@@ -24,7 +25,7 @@ export async function getOwners(
           mint: mint,
         };
       }
-    }, 10),
+    }, CONCURRENCY),
   );
   mints_obs.subscribe((res) => {
     if (res) {

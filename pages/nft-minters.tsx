@@ -45,7 +45,9 @@ export default function GetHolders() {
         let firstSig;
         let txContent;
         let owner;
-        while (!owner) {
+
+        let retries = 0;
+        while (retries < 5) {
           try {
             tx = await connection.getConfirmedSignaturesForAddress2(
               toPublicKey(addy)
@@ -62,6 +64,7 @@ export default function GetHolders() {
           } catch (e) {
             console.error(e?.message || e);
             errors.push({ address: addy, error: e?.message || e });
+            retries++;
           }
         }
       };
@@ -76,7 +79,7 @@ export default function GetHolders() {
                   setCounter(i);
                 })
               ),
-            12
+            6
           ),
           toArray()
         )
@@ -97,9 +100,9 @@ export default function GetHolders() {
       <Head>
         <title>🛠️ Pentacle Tools - 👛 NFT Minters</title>
       </Head>
-      <div className="w-full max-w-full text-center mb-3">
-        <h1 className="text-3xl  text-white">NFT Minters</h1>
-        <hr className="opacity-10 my-4" />
+      <div className="mb-3 w-full max-w-full text-center">
+        <h1 className="text-3xl text-white">NFT Minters</h1>
+        <hr className="my-4 opacity-10" />
       </div>
       <p className="px-2 text-center">
         This tool gives you a list of first minters for a list of Solana NFTs.
@@ -107,13 +110,13 @@ export default function GetHolders() {
         collection.
       </p>
       <hr className="my-4 opacity-10" />
-      <div className="card bg-gray-900 max-w-full">
+      <div className="max-w-full bg-gray-900 card">
         <form
           onSubmit={handleSubmit(fetchMinters)}
-          className={`w-full flex flex-col`}
+          className={`flex flex-col w-full`}
         >
           <div className="card-body">
-            <label className="mb-4 justify-center label">
+            <label className="justify-center mb-4 label">
               Please enter SOL mint IDs as JSON array to get their minters.
             </label>
 
@@ -123,20 +126,19 @@ export default function GetHolders() {
                 required: "Field is required",
               })}
               rows={4}
-              className={`textarea w-full shadow-lg`}
+              className={`w-full shadow-lg textarea`}
             />
             {!!errors?.mints?.message && (
               <label className="label text-error">
                 {errors?.mints?.message}
               </label>
             )}
-            <div className="text-center mt-6">
+            <div className="mt-6 text-center">
               <button
                 type="submit"
                 disabled={!!errors?.mints}
                 className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""
-                }`}
+                  loading ? "loading" : ""}`}
               >
                 {loading ? `${counter} / ${len}` : "Get Minters"}
               </button>

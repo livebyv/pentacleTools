@@ -44,9 +44,10 @@ export async function getMints(
           while (retries < 5) {
             if (!parsedTxs?.every((tx) => !!tx)) {
               retries++;
+            } else {
+              return parsedTxs.filter(tx => !!tx);
             }
           }
-          return parsedTxs.filter(tx => !!tx);
         }, 4),
         map((chunk) => {
           return chunk

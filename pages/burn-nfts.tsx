@@ -253,7 +253,7 @@ export default function BurnNFTs() {
         setAlertState({
           message: (
             <>
-              <button className="btn btn-ghost loading mr-2" />
+              <button className="mr-2 btn btn-ghost loading" />
               <div className="flex-1">
                 {" "}
                 Burning {counter} of {state.selectedNFTs.length} NFTs
@@ -348,9 +348,9 @@ export default function BurnNFTs() {
   const confirmationModal = useMemo(() => {
     return state.isModalOpen && document.body
       ? createPortal(
-          <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
-            <div className="bg-gray-800 rounded-lg shadow-lg p-4 max-w-sm w-full">
-              <p className="text-2xl text-white text-center">
+          <div className="flex fixed inset-0 justify-center items-center p-4 bg-black bg-opacity-75">
+            <div className="p-4 w-full max-w-sm bg-gray-800 rounded-lg shadow-lg">
+              <p className="text-2xl text-center text-white">
                 Are you sure you want to permanently destroy{" "}
                 {`${
                   state.selectedNFTs.length === 1
@@ -366,10 +366,10 @@ export default function BurnNFTs() {
                 </strong>
               </p>
 
-              <div className="flex items-center justify-center p-4 w-full mt-8">
+              <div className="flex justify-center items-center p-4 mt-8 w-full">
                 <button
                   type="button"
-                  className="btn rounded-box mr-4"
+                  className="mr-4 btn rounded-box"
                   onClick={() => {
                     dispatch({
                       type: "isModalOpen",
@@ -406,7 +406,7 @@ export default function BurnNFTs() {
     const options = [12, 24, 120];
 
     return (
-      <div className="w-full mt-8 flex items-center justify-center">
+      <div className="flex justify-center items-center mt-8 w-full">
         <p className="mr-2">Items per page:</p>
         <div className="flex">
           {options.map((opt, index) => (
@@ -431,10 +431,10 @@ export default function BurnNFTs() {
 
   const paginationDisplay = useMemo(() => {
     return state.nfts.length > itemsPerPage ? (
-      <div className="flex m-auto items-center justify-between w-full max-w-md mt-8">
+      <div className="flex justify-between items-center m-auto mt-8 w-full max-w-md">
         <button
           type="button"
-          className="btn shadow rounded-box"
+          className="shadow btn rounded-box"
           onClick={handlePrevPage}
           disabled={page < 2}
         >
@@ -442,7 +442,7 @@ export default function BurnNFTs() {
             <LeftIcon />
           </i>
         </button>
-        <div className="text-xl text-white text-center">
+        <div className="text-xl text-center text-white">
           {page} / {/* trying maffs */}
           {state.nfts?.length % itemsPerPage === 0
             ? state.nfts?.length / itemsPerPage
@@ -450,7 +450,7 @@ export default function BurnNFTs() {
         </div>
         <button
           type="button"
-          className="btn shadow rounded-box"
+          className="shadow btn rounded-box"
           onClick={handleNextPage}
           disabled={
             page >=
@@ -476,7 +476,7 @@ export default function BurnNFTs() {
   const nftDisplay = useMemo(() => {
     if (["idle", "pending"].includes(state.status)) {
       return (
-        <p className="text-center text-lg text-white">
+        <p className="text-lg text-center text-white">
           <button className="btn btn-ghost loading"></button>
           fetching NFTs...
         </p>
@@ -484,21 +484,21 @@ export default function BurnNFTs() {
     }
 
     return state.status === "rejected" ? (
-      <p className="text-center text-lg text-white">
+      <p className="text-lg text-center text-white">
         There was an error fetching your NFTS :(
       </p>
     ) : (
       <>
         <div>
           {state.nfts.length === 0 ? (
-            <p className="text-center text-lg text-white">
+            <p className="text-lg text-center text-white">
               You have no NFTs :(
             </p>
           ) : (
-            <div className="flex items-center flex-wrap">
+            <div className="flex flex-wrap items-center">
               {nftsToRender?.map((nft) => (
                 <div
-                  className="w-1/2 sm:w-1/3 md:w-1/4 p-2"
+                  className="p-2 w-1/2 sm:w-1/3 md:w-1/4"
                   id={nft.mint}
                   key={nft.mint}
                 >
@@ -519,7 +519,7 @@ export default function BurnNFTs() {
         </div>
         <button
           type="button"
-          className="btn btn-primary mt-2 rounded-full shadow"
+          className="mt-2 rounded-full shadow btn btn-primary"
           disabled={!state.selectedNFTs.length}
           onClick={() => {
             dispatch({ type: "isModalOpen", payload: { isModalOpen: true } });
@@ -549,17 +549,17 @@ export default function BurnNFTs() {
       <Head>
         <title>🛠️ Pentacle Tools - 🔥 Burn NFTs</title>
       </Head>
-      <div className="w-full max-w-full text-center mb-3">
+      <div className="mb-3 w-full max-w-full text-center">
         <h2 className="text-3xl text-white">Burn NFTs</h2>
-        <hr className="opacity-10 my-4" />
+        <hr className="my-4 opacity-10" />
       </div>
       <p className="px-2 text-center">
         This tool facilitates the destruction of NFTs that the connected wallet
         owns. It also releases the rent (ca 0.002 SOL per NFT)
       </p>
-      <div className="flex flex-col items-center justify-center my-4 text-sm">
+      <div className="flex flex-col justify-center items-center my-4 text-sm">
         {publicKey ? (
-          <p className="text-center break-all text-white">
+          <p className="text-center text-white break-all">
             <span>Connected Address:</span>
             <br />
 
@@ -585,9 +585,9 @@ export default function BurnNFTs() {
           />
         )}
       </div>
-      <hr className="opacity-10 my-4" />
+      <hr className="my-4 opacity-10" />
       {publicKey ? (
-        <div className="card bg-gray-900 p-4 shadow">{nftDisplay}</div>
+        <div className="p-4 bg-gray-900 shadow card">{nftDisplay}</div>
       ) : null}
       {confirmationModal}
     </>

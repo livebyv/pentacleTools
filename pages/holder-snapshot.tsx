@@ -28,7 +28,7 @@ export default function HolderSnapshot() {
       const parsed = getAddresses(mints);
       setAlertState({
         message: (
-          <button className="btn btn-disabled btn-ghost loading">
+          <button className="btn btn-ghost loading">
             Downloading your data.
           </button>
         ),
@@ -63,9 +63,9 @@ export default function HolderSnapshot() {
       <Head>
         <title>🛠️ Pentacle Tools - 📷 NFT Holders</title>
       </Head>
-      <div className="w-full max-w-full text-center mb-3">
+      <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Holder Snapshot</h1>
-        <hr className="opacity-10 my-4" />
+        <hr className="my-4 opacity-10" />
       </div>
       <p className="px-2 text-center">
         This tool gives you a snapshot of holders from Solana Mint IDs. It will
@@ -74,13 +74,13 @@ export default function HolderSnapshot() {
         <strong>Works with SPLs as well as NFTs</strong>
       </p>
       <hr className="my-4 opacity-10" />
-      <div className="card bg-gray-900 max-w-full">
+      <div className="max-w-full bg-gray-900 card">
         <form
           onSubmit={handleSubmit(fetchHolders)}
-          className={`w-full flex flex-col`}
+          className={`flex flex-col w-full`}
         >
           <div className="card-body">
-            <label className="mb-4 justify-center label">
+            <label className="justify-center mb-4 label">
               Please enter SOL mint IDs as JSON array to get their holders.
             </label>
 
@@ -90,20 +90,19 @@ export default function HolderSnapshot() {
                 required: "Field is required",
               })}
               rows={4}
-              className={`textarea w-full shadow-lg`}
+              className={`w-full shadow-lg textarea`}
             />
             {!!errors?.mints?.message && (
               <label className="label text-error">
                 {errors?.mints?.message}
               </label>
             )}
-            <div className="text-center mt-6">
+            <div className="mt-6 text-center">
               <button
                 type="submit"
                 disabled={!!errors?.mints}
                 className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""
-                }`}
+                  loading ? "loading" : ""}`}
               >
                 {loading ? `${counter} / ${len}` : "Get Holders"}
               </button>

@@ -29,7 +29,7 @@ export default function GetHolders() {
       const parsed = getAddresses(mints);
       setAlertState({
         message: (
-          <button className="btn btn-disabled btn-ghost loading">
+          <button className="btn btn-ghost loading">
             Downloading your data.
           </button>
         ),

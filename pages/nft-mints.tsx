@@ -24,7 +24,7 @@ export default function GibMints() {
   const fetchMints = async (val = "") => {
     setAlertState({
       message: (
-        <button className="btn btn-disabled btn-ghost loading">
+        <button className="btn btn-ghost loading">
           Downloading your data.
         </button>
       ),
@@ -62,14 +62,14 @@ export default function GibMints() {
       <Head>
         <title>🛠️ Pentacle Tools - 🆔 NFT Minters</title>
       </Head>
-      <div className="w-full max-w-full text-center mb-3">
+      <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Get NFT Mints</h1>
-        <hr className="opacity-10 my-4" />
+        <hr className="my-4 opacity-10" />
       </div>
       {/* <div className="alert">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="stroke-current flex-shrink-0 h-6 w-6"
+          className="flex-shrink-0 w-6 h-6 stroke-current"
           fill="none"
           viewBox="0 0 24 24"
         >
@@ -94,12 +94,12 @@ export default function GibMints() {
       <p className="px-2 text-center">
         This tool gets all mint IDs associated with the given address.
       </p>
-      <hr className="opacity-10 my-4" />
+      <hr className="my-4 opacity-10" />
       <div className="px-2 text-center">
         <div className="alert">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="stroke-current flex-shrink-0 h-6 w-6"
+            className="flex-shrink-0 w-6 h-6 stroke-current"
             fill="none"
             viewBox="0 0 24 24"
           >
@@ -127,16 +127,16 @@ export default function GibMints() {
           </div>
         </div>
       </div>
-      <hr className="opacity-10 my-4" />
-      <div className="card bg-gray-900">
+      <hr className="my-4 opacity-10" />
+      <div className="bg-gray-900 card">
         <form
           onSubmit={handleSubmit(({ address }) => fetchMints(address))}
-          className={`w-full flex flex-col`}
+          className={`flex flex-col w-full`}
         >
           <div className="card-body">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
               <div className="md:col-start-2 md:col-span-3">
-                <label className="mb-4 justify-center label">
+                <label className="justify-center mb-4 label">
                   Please enter CM ID or Verified Creator
                 </label>
                 <input
@@ -162,11 +162,10 @@ export default function GibMints() {
                 )}
               </div>
             </div>
-            <div className="flex items-center justify-center gap-4 mt-6">
+            <div className="flex gap-4 justify-center items-center mt-6">
               <button
                 className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""
-                }`}
+                  loading ? "loading" : ""}`}
                 disabled={errors?.address}
                 type="submit"
               >

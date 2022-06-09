@@ -27,7 +27,7 @@ export default function GetMeta() {
 
     setAlertState({
       message: (
-        <button className="btn btn-disabled btn-ghost loading">
+        <button className="btn btn-ghost loading">
           Downloading your data.
         </button>
       ),
@@ -62,22 +62,22 @@ export default function GetMeta() {
       <Head>
         <title>🛠️ Pentacle Tools - ℹ️ NFT Metadata</title>
       </Head>
-      <div className="w-full max-w-full text-center mb-3">
+      <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Token Metadata</h1>
-        <hr className="opacity-10 my-4" />
+        <hr className="my-4 opacity-10" />
       </div>
       <p className="px-2 text-center">
         This tool gives you onchain an arweave/ipfs metadata from Solana Mint
         IDs.
       </p>
-      <hr className="opacity-10 my-4" />
-      <div className="card bg-gray-900 max-w-full">
+      <hr className="my-4 opacity-10" />
+      <div className="max-w-full bg-gray-900 card">
         <form
           onSubmit={handleSubmit(fetchMeta)}
-          className="w-full flex flex-col"
+          className="flex flex-col w-full"
         >
           <div className="card-body">
-            <label htmlFor="mints" className="label mb-4 justify-center">
+            <label htmlFor="mints" className="justify-center mb-4 label">
               Please enter SOL mint IDs to get their metadata
             </label>
             <textarea
@@ -97,11 +97,10 @@ export default function GetMeta() {
                 {errors?.mints?.message}
               </label>
             )}
-            <div className="text-center mt-6">
+            <div className="mt-6 text-center">
               <button
                 className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""
-                }`}
+                  loading ? "loading" : ""}`}
                 type="submit"
               >
                 {loading ? `${counter} / ${len}` : "Get Meta"}

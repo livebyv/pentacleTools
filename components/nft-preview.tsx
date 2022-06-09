@@ -17,31 +17,31 @@ export function NFTPreview({
       }`}
       onClick={() => selectable && handleNFTSelect(nft.mint)}
     >
-      <strong className={`text-center truncate max-w-full`}>
+      <strong className={`max-w-full text-center truncate`}>
         {nft.metadata?.name || nft?.tokenData?.name}
       </strong>
       <div
-        className={`w-full bg-black flex items-center justify-center rounded-lg`}
+        className={`flex justify-center items-center w-full bg-black rounded-lg`}
       >
         {nft?.metadata?.properties?.category !== "video" ? (
           // eslint-disable-next-line
           <img
-            src={nft?.metadata?.image}
+            src={`${nft?.metadata?.image}`}
             alt={nft?.metadata?.name}
-            className="w-full block h-32 object-contain "
+            className="block object-contain w-full h-32"
           />
         ) : (
           <></>
         )}
         {nft?.metadata?.properties?.category === "video" ? (
-          <video className="h-32 w-full" autoPlay loop>
+          <video className="w-full h-32" autoPlay loop>
             <source src={nft?.metadata?.animation_url} />
           </video>
         ) : (
           <></>
         )}
         {!nft?.metadata?.image && !nft?.metadata?.animation_url ? (
-          <div className="flex items-center justify-center h-32">
+          <div className="flex justify-center items-center h-32">
             <svg
               fill="currentColor"
               xmlns="http://www.w3.org/2000/svg"

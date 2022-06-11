@@ -350,7 +350,7 @@ export default function ShdwDrivePage() {
       const response = await state.shdwDrive.deleteStorageAccount(publicKey);
       setAlertState({
         message: (
-          <div>
+          <div className="p-3">
             <h3>Storage Account is marked for deletion.</h3>
             <p>
               <ExplorerLink txId={response.txid} />
@@ -358,6 +358,7 @@ export default function ShdwDrivePage() {
           </div>
         ),
         open: true,
+        duration: 3000
       });
       const updatedArr = [...state.storageAccounts];
       updatedArr[i].account.deleteRequestEpoch =

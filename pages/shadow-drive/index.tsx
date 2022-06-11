@@ -634,7 +634,7 @@ export default function ShdwDrivePage() {
                               {!!account.deleteRequestEpoch && (
                                 <span className="text-red-500">
                                   {" "}
-                                  - Will be deleted in epoch{" "}
+                                  - Will be deleted after epoch{" "}
                                   {account.deleteRequestEpoch}!
                                 </span>
                               )}

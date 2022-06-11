@@ -10,7 +10,6 @@ import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 import { useAlert } from "../../contexts/AlertProvider";
 import { sizeMB } from "../../components/file-tile";
-import { useModal } from "../../contexts/ModalProvider";
 import { ImageURI } from "../../util/image-uri";
 import { SHDW_TOKEN } from "../../util/accounts";
 import { FileUpload } from "../../components/file-upload";
@@ -150,7 +149,6 @@ export default function ShdwDrivePage() {
     },
     initState
   );
-  const { setModalState } = useModal();
   const { register, handleSubmit, getValues, reset } = useForm();
   const { setAlertState } = useAlert();
   const { connection } = useConnection();
@@ -191,13 +189,11 @@ export default function ShdwDrivePage() {
           },
         });
       } catch (e) {
-        setModalState({
-          message: (
-            <div>
-              <h3>An error occured. Check Console for more info!</h3>
-            </div>
-          ),
+        setAlertState({
+          message: 'An error occured. Check Console for more info!',
           open: true,
+          duration: 10000,
+          severity: 'error'
         });
         dispatch({
           type: "uploadInProgress",
@@ -290,9 +286,11 @@ export default function ShdwDrivePage() {
           open: false,
           message: <></>,
         });
-        setModalState({
-          message: 'Storage Account created.',
+        setAlertState({
+          message: 'Storage account created at ' + response.shdw_bucket,
           open: true,
+          duration: 3000,
+          severity: 'success'
         });
 
         reset();
@@ -317,12 +315,10 @@ export default function ShdwDrivePage() {
           open: false,
           message: <></>,
         });
-        setModalState({
-          message: (
-            <div>
-              <h3>An error occured. Check Console for more info!</h3>
-            </div>
-          ),
+        setAlertState({
+          message: 'An error occured. Check Console for more info!',
+          duration: 10000,
+          severity: 'error',
           open: true,
         });
       }
@@ -468,13 +464,11 @@ export default function ShdwDrivePage() {
         open: false,
       });
       console.error(e);
-      setModalState({
-        message: (
-          <div>
-            <h3>An error occured. Check Console for more info!</h3>
-          </div>
-        ),
+      setAlertState({
+        message: 'An error occured. Check Console for more info!',
         open: true,
+        duration: 10000,
+        severity: 'error'
       });
     }
   };

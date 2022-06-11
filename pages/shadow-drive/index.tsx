@@ -13,7 +13,6 @@ import { sizeMB } from "../../components/file-tile";
 import { useModal } from "../../contexts/ModalProvider";
 import { ImageURI } from "../../util/image-uri";
 import { SHDW_TOKEN } from "../../util/accounts";
-import { ExplorerLink } from "../../components/explorer-link";
 import { FileUpload } from "../../components/file-upload";
 import { useFiles } from "../../contexts/FileProvider";
 import { sliceIntoChunks } from "../../util/slice-into-chunks";
@@ -292,14 +291,7 @@ export default function ShdwDrivePage() {
           message: <></>,
         });
         setModalState({
-          message: (
-            <div>
-              <h3>Storage Account created.</h3>
-              <p>
-                <ExplorerLink txId={response.transaction_signature} />
-              </p>
-            </div>
-          ),
+          message: 'Storage Account created.',
           open: true,
         });
 
@@ -348,28 +340,23 @@ export default function ShdwDrivePage() {
     });
     try {
       const response = await state.shdwDrive.deleteStorageAccount(publicKey);
-      setAlertState({
-        message: (
-          <div className="flex flex-col p-3">
-            <h3>Storage Account is marked for deletion.</h3>
-            <p>
-              <ExplorerLink txId={response.txid} />
-            </p>
-          </div>
-        ),
-        open: true,
-        duration: 3000
-      });
-      const updatedArr = [...state.storageAccounts];
-      updatedArr[i].account.deleteRequestEpoch =
-        (await connection.getEpochInfo()).epoch + 1;
+      if (response.txid) {
+        setAlertState({
+          message: 'Storage Account is marked for deletion',
+          open: true,
+          duration: 3000
+        });
+        const updatedArr = [...state.storageAccounts];
+        updatedArr[i].account.deleteRequestEpoch =
+          (await connection.getEpochInfo()).epoch + 1;
 
-      dispatch({
-        type: "storageAccounts",
-        payload: {
-          storageAccounts: updatedArr,
-        },
-      });
+        dispatch({
+          type: "storageAccounts",
+          payload: {
+            storageAccounts: updatedArr,
+          },
+        });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -388,10 +375,7 @@ export default function ShdwDrivePage() {
     dispatch({
       type: "totalFileSize",
       payload: {
-        totalFileSize: files.reduce((acc, curr) => {
-          acc = acc + curr.size;
-          return acc;
-        }, 0),
+        totalFileSize: files.reduce((acc, curr) => acc + curr.size, 0),
       },
     });
   }, [files]);
@@ -414,15 +398,9 @@ export default function ShdwDrivePage() {
       const response = await state.shdwDrive.cancelDeleteStorageAccount(
         publicKey
       );
-      setModalState({
-        message: (
-          <div>
-            <h3>Storage Account delete request will be cancelled</h3>
-            <p>
-              <ExplorerLink txId={response.txid} />
-            </p>
-          </div>
-        ),
+      setAlertState({
+        message: 'Storage Account delete request will be cancelled',
+        duration: 3000,
         open: true,
       });
 
@@ -436,13 +414,11 @@ export default function ShdwDrivePage() {
         },
       });
     } catch (e) {
-      setModalState({
-        message: (
-          <div>
-            <h3>An error occured. Check Console for more info!</h3>
-          </div>
-        ),
+      setAlertState({
+        message: 'An error occured. Check Console for more info!',
         open: true,
+        duration: 10000,
+        severity: 'error'
       });
       console.log(e);
     }
@@ -688,8 +664,8 @@ export default function ShdwDrivePage() {
                                 )}
                                 <button
                                   className={`btn btn-sm m-2 ${state.uploading === pubKeyString
-                                      ? "btn-error btn-outline"
-                                      : "btn-primary"
+                                    ? "btn-error btn-outline"
+                                    : "btn-primary"
                                     }`}
                                   onClick={() => {
                                     if (state.uploading === pubKeyString) {
@@ -723,8 +699,8 @@ export default function ShdwDrivePage() {
 
                                 <button
                                   className={`btn btn-primary btn-sm my-2 ${state.isResizing === pubKeyString
-                                      ? "btn-outline"
-                                      : ""
+                                    ? "btn-outline"
+                                    : ""
                                     }`}
                                   onClick={() => handleResize(pubKeyString)}
                                 >
@@ -737,8 +713,8 @@ export default function ShdwDrivePage() {
                                   !(state.uploading === pubKeyString) && (
                                     <button
                                       className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${!!state.buttonsLoading[pubKeyString]
-                                          ? "loading"
-                                          : ""
+                                        ? "loading"
+                                        : ""
                                         } `}
                                       onClick={() =>
                                         handleDeleteStorageAccount({
@@ -824,8 +800,8 @@ export default function ShdwDrivePage() {
                               <div className="btn-group">
                                 <button
                                   className={`btn btn-sm ${state.increaseOrDecrease === "increase"
-                                      ? "btn-active"
-                                      : ""
+                                    ? "btn-active"
+                                    : ""
                                     }`}
                                   onClick={(e) => {
                                     e.preventDefault();
@@ -841,8 +817,8 @@ export default function ShdwDrivePage() {
                                 </button>
                                 <button
                                   className={`btn btn-sm ${state.increaseOrDecrease === "decrease"
-                                      ? "btn-active"
-                                      : ""
+                                    ? "btn-active"
+                                    : ""
                                     }`}
                                   onClick={(e) => {
                                     e.preventDefault();

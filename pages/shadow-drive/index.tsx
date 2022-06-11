@@ -350,7 +350,7 @@ export default function ShdwDrivePage() {
       const response = await state.shdwDrive.deleteStorageAccount(publicKey);
       setAlertState({
         message: (
-          <div className="p-3">
+          <div className="flex flex-col p-3">
             <h3>Storage Account is marked for deletion.</h3>
             <p>
               <ExplorerLink txId={response.txid} />

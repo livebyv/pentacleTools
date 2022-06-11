@@ -349,7 +349,7 @@ export default function ShdwDrivePage() {
         dispatch({
           type: "storageAccounts",
           payload: {
-            storageAccounts: updatedArr,
+            storageAccounts: updatedArr.sort(sortStorageAccounts),
           },
         });
       }
@@ -406,7 +406,7 @@ export default function ShdwDrivePage() {
       dispatch({
         type: "storageAccounts",
         payload: {
-          storageAccounts: updatedArr,
+          storageAccounts: updatedArr.sort(sortStorageAccounts),
         },
       });
     } catch (e) {

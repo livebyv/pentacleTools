@@ -19,7 +19,7 @@ import createFileList from "../../util/create-file-list";
 import { TrashIcon } from "../../components/icons";
 
 const sortStorageAccounts = (a, b) =>
-  a.account.identifier.localeCompare(b.account.identifier);
+  b.account.creationTime - a.account.creationTime;
 
 const isValidUnit = (str: string) => {
   const num = parseFloat(str);
@@ -230,6 +230,8 @@ export default function ShdwDrivePage() {
           payload: { shdwDrive },
         });
         const storageAccounts = await shdwDrive.getStorageAccounts();
+        debugger
+
         dispatch({
           type: "storageAccounts",
           payload: {
@@ -628,6 +630,7 @@ export default function ShdwDrivePage() {
                                 {" "}
                                 <strong>{account.identifier}</strong>
                               </span>
+
                               {!!account.deleteRequestEpoch && (
                                 <span className="text-red-500">
                                   {" "}
@@ -636,6 +639,9 @@ export default function ShdwDrivePage() {
                                 </span>
                               )}
                               <br />
+                              <span className="my-2">Created:  {new Date(account.creationTime * 1000).toLocaleString()}</span>
+                              <br />
+
                               <a
                                 href={`https://solscan.io/account/${pubKeyString}`}
                                 target="_blank"

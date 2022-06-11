@@ -20,17 +20,17 @@ export const AttributesForm: React.FC<{ register: any }> = ({ register }) => {
 
       {attributes.map((attr, i) => {
         return (
-          <label key={attr.id} className="input-group my-2">
+          <label key={attr.id} className="my-2 input-group">
             <input
               type="text"
               placeholder="Trait Name"
-              className="input input-bordered flex-1"
+              className="flex-1 input input-bordered"
               {...register(`attributes.${i}.trait_type`)}
             />
             <input
               type="text"
               placeholder="Value"
-              className="input input-bordered flex-1"
+              className="flex-1 input input-bordered"
               {...register(`attributes.${i}.value`)}
             />
 
@@ -49,7 +49,7 @@ export const AttributesForm: React.FC<{ register: any }> = ({ register }) => {
       })}
 
       <button
-        className={`btn mt-5`}
+        className={`mt-5 btn`}
         onClick={(e) => {
           e.preventDefault();
           setAttributes([

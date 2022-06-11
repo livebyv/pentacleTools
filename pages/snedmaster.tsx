@@ -173,26 +173,26 @@ export default function Snedmaster() {
   }, [connection, wallet?.publicKey]);
   return (
     <>
-      <div className="w-full max-w-full text-center mb-3">
+      <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Snedmaster 9000</h1>
-        <hr className="opacity-10 my-4" />
+        <hr className="my-4 opacity-10" />
       </div>
       <p className="px-2 text-center">
         This tool sends out a certain amount of Solana to different addresses.
         <br />
         <strong>Warning</strong>: always check the json for errors!
       </p>
-      <hr className="opacity-10 my-4" />
+      <hr className="my-4 opacity-10" />
 
-      <div className={`grid gap-4 grid-cols-1`}>
+      <div className={`grid grid-cols-1 gap-4`}>
         {wallet && (
           <div className="card bg-primary">
-            <div className="card-body p-4">
+            <div className="p-4 card-body">
               <div className="flex flex-row gap-5 items-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/solana-logo.jpeg"
-                  className="rounded-full w-14 h-14"
+                  className="w-14 h-14 rounded-full"
                   width="56"
                   height="56"
                   alt=""
@@ -204,7 +204,7 @@ export default function Snedmaster() {
                       text={wallet?.publicKey?.toBase58()}
                       onCopy={clipboardNotification}
                     >
-                      <span className={`cursor-pointer ml-1`}>
+                      <span className={`ml-1 cursor-pointer`}>
                         {wallet?.publicKey?.toBase58()}
                       </span>
                     </CopyToClipboard>

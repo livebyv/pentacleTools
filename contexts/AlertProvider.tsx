@@ -28,7 +28,7 @@ export function AlertProvider({ children }) {
       const timeout = setTimeout(() => {
         _setAlertState({
           open: false,
-          message:'',
+          message: '',
           severity: null
         })
       }, state.duration);
@@ -51,8 +51,8 @@ export function AlertProvider({ children }) {
         ${alertState.severity === "success" ? "alert-success" : ""}
         ${alertState.severity === "warning" ? "alert-warning" : ""}
         `}
-        // @ts-ignore
-        style={{'--tw-bg-opacity': '0.7'}}
+          // @ts-ignore
+          style={{ '--tw-bg-opacity': '0.7' }}
         >
           {alertState.message}
         </div>

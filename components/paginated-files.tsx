@@ -28,15 +28,15 @@ export default function PaginatedFiles({
   return (
     !!files.length && (
       <>
-        <div className="w-full max-w-full flex flex-row justify-between items-center mt-2 mb-6">
-          <h2 className=" text-3xl m-0 text-white">
+        <div className="flex flex-row justify-between items-center mt-2 mb-6 w-full max-w-full">
+          <h2 className="m-0 text-3xl text-white">
             File List | {files.length} files | {""}
             <span>{fileSizeInMb.toFixed(2)} MB</span>
           </h2>
 
           <button
             onClick={handleClear}
-            className="btn btn-sm btn-outline btn-error "
+            className="btn btn-sm btn-outline btn-error"
           >
             <i className="mr-2">
               <TrashIcon width={16} height={16} />
@@ -44,12 +44,12 @@ export default function PaginatedFiles({
             Clear all
           </button>
         </div>
-        <div className="grid grid-cols-6 md:grid-cols-9 lg:grid-cols-12 gap-3 my-3">
+        <div className="grid grid-cols-6 gap-3 my-3 md:grid-cols-9 lg:grid-cols-12">
           <div className="relative col-span-3">
-            <button className="card bg-base-100 h-36 bg-cover bg-center relative shadow-md w-full">
-              <div className="absolute inset-0 opacity-75 bg-black"></div>
-              <div className="card-body p-3 z-10  w-full">
-                <label className="file-upload w-full">
+            <button className="relative w-full h-36 bg-center bg-cover shadow-md card bg-base-100">
+              <div className="absolute inset-0 bg-black opacity-75"></div>
+              <div className="z-10 p-3 w-full card-body">
+                <label className="w-full file-upload">
                   <UploadIcon />
                   <span className="mt-2 text-base leading-normal">Add</span>
                   <input

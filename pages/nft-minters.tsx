@@ -137,8 +137,7 @@ export default function GetHolders() {
               <button
                 type="submit"
                 disabled={!!errors?.mints}
-                className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""}`}
+                className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
               >
                 {loading ? `${counter} / ${len}` : "Get Minters"}
               </button>

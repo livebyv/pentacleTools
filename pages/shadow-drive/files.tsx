@@ -146,7 +146,7 @@ export default function ShadowFiles() {
 
   return (
     <>
-      <div className="form-control fixed top-0 bg-black z-30 pb-5 w-full">
+      <div className="fixed top-0 z-30 pb-5 w-full bg-black form-control">
         <label className="label">
           <span className="label-text">Search</span>
         </label>
@@ -154,7 +154,7 @@ export default function ShadowFiles() {
         <input
           type="text"
           placeholder="file name"
-          className="input input-bordered w-64"
+          className="w-64 input input-bordered"
           onChange={(e) =>
             dispatch({
               type: "searchTerm",
@@ -189,11 +189,11 @@ export default function ShadowFiles() {
         {!!state.filteredData?.length &&
           state.filteredData.map((item) => (
             <div key={item.storageAccount}>
-              <div className=" sticky top-24 bg-black h-24  flex items-center border-b pb-5">
+              <div className="flex sticky top-24 items-center pb-5 h-24 bg-black border-b">
                 <h2 className="text-5xl">{item.title}</h2>
               </div>
               <div
-                className="flex gap-x-3 gap-y-2 pt-5"
+                className="flex gap-y-2 gap-x-3 pt-5"
                 style={{ flexWrap: "wrap" }}
               >
                 {item.items?.map((it) => (

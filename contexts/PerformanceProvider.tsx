@@ -37,8 +37,8 @@ export function PerformanceProvider({ children }) {
     setWarning(
       _tps < MIN_TPS
         ? `Solanas TPS are lower than 1500 (${Math.round(
-            _tps
-          )}). Network peformance might be degraded and transactions might fail.`
+          _tps
+        )}). Network peformance might be degraded and transactions might fail.`
         : ""
     );
   }, [connection]);
@@ -56,7 +56,7 @@ export function PerformanceProvider({ children }) {
   return (
     <PerformanceContext.Provider value={{ warning, tps }}>
       {warning && (
-        <div className="bg-red-800 text-white fixed left-0 lg:left-64 p-1 right-0 text-center bottom-0 lg:bottom-auto lg:top-0 z-50">
+        <div className="fixed right-0 bottom-0 left-0 z-50 p-1 text-center text-white bg-red-800 lg:left-64 lg:bottom-auto lg:top-0">
           {warning}
         </div>
       )}

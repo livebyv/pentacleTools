@@ -48,9 +48,9 @@ export default function FileTile({
   }, [file]);
   const size = sizeMB(file?.size);
   return file ? (
-    <article className="file-tile relative">
+    <article className="relative file-tile">
       <div
-        className="card bg-base-100 h-36 bg-cover bg-center relative"
+        className="relative h-36 bg-center bg-cover card bg-base-100"
         style={{
           backgroundImage: (file.type || "").startsWith("image")
             ? `url(${base64})`
@@ -63,16 +63,15 @@ export default function FileTile({
             <source src={base64} type={file.type} />
           </video>
         )}
-        <div className="absolute inset-0 opacity-30 bg-black"></div>
-        <div className="card-body p-3 z-10 absolute inset-0">
-          <span className="card-title text-base truncate bg-gray-800 text-white px-2 inline rounded-box">
+        <div className="absolute inset-0 bg-black opacity-30"></div>
+        <div className="absolute inset-0 z-10 p-3 card-body">
+          <span className="inline px-2 text-base text-white truncate bg-gray-800 card-title rounded-box">
             {file.name}
           </span>
-          <div className="mt-auto flex flex-wrap gap-3 justify-between">
+          <div className="flex flex-wrap gap-3 justify-between mt-auto">
             <span
-              className={`${
-                size > 150 ? "border border-error" : ""
-              } bg-gray-900 text-white px-2 inline rounded-box text-xs truncate shadow-md whitespace-nowrap`}
+              className={`${size > 150 ? "border border-error" : ""
+                } bg-gray-900 text-white px-2 inline rounded-box text-xs truncate shadow-md whitespace-nowrap`}
               style={{ maxWidth: "50%", letterSpacing: 1.25 }}
             >
               {size > 150 ? "Too large!" : `${size.toFixed(2)} MB`}
@@ -80,7 +79,7 @@ export default function FileTile({
 
             {!!file.type.trim() && (
               <span
-                className="bg-gray-800 text-white px-2 inline rounded-box text-xs truncate shadow-md"
+                className="inline px-2 text-xs text-white truncate bg-gray-800 shadow-md rounded-box"
                 style={{ maxWidth: "50%", letterSpacing: 1.25 }}
               >
                 {file.type.split("/")[1]}
@@ -90,7 +89,7 @@ export default function FileTile({
         </div>
       </div>
       <button
-        className="badge badge-primary absolute z-30 cursor-pointer shadow-md"
+        className="absolute z-30 shadow-md cursor-pointer badge badge-primary"
         style={{ right: -8, top: -8 }}
         onClick={() => remove(file.name)}
         title="Delete Item"
@@ -111,7 +110,7 @@ export default function FileTile({
   ) : (
     <label
       htmlFor="files"
-      className={`file-upload w-full mx-auto`}
+      className={`mx-auto w-full file-upload`}
       tabIndex={0}
       onClick={async (e) => {
         e.preventDefault();

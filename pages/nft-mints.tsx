@@ -115,8 +115,7 @@ export default function GibMints() {
               Be aware: One of the more recent updates to Solana included a size
               filter for certain calls, which is why we can no longer query as
               we used to. Right now this site is implementing experimental
-              crawling. It can be quite slow (&gt;30 minutes) and is not 100%
-              reliable.
+              crawling. Usually takes 3-4 minutes.
             </div>
             <div>
               <strong>
@@ -149,9 +148,8 @@ export default function GibMints() {
                   })}
                   required
                   type="text"
-                  className={`input shadow-lg w-full ${
-                    !!errors?.address?.message && "input-error"
-                  }`}
+                  className={`input shadow-lg w-full ${!!errors?.address?.message && "input-error"
+                    }`}
                   id="address-field"
                   autoComplete="on"
                 />
@@ -164,8 +162,7 @@ export default function GibMints() {
             </div>
             <div className="flex gap-4 justify-center items-center mt-6">
               <button
-                className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""}`}
+                className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
                 disabled={errors?.address}
                 type="submit"
               >

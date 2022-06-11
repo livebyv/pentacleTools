@@ -30,14 +30,14 @@ export default function TopMenu() {
         className="top-menu-nav"
       >
         <div
-          className="flex items-center flex-no-shrink text-white mr-4"
+          className="flex items-center mr-4 text-white flex-no-shrink"
           style={{ width: 128 }}
         >
           <a
             href="https://pentacle.xyz"
             target="_blank"
             rel="noreferrer noopener"
-            className="py-2 grid place-content-center"
+            className="grid place-content-center py-2"
           >
             <Image
               src={ImageURI.PentacleLogo}
@@ -47,7 +47,7 @@ export default function TopMenu() {
             />
           </a>
         </div>
-        <div className="xl:hidden w-1/4 flex col-start-4">
+        <div className="flex col-start-4 w-1/4 xl:hidden">
           <label htmlFor="my-drawer" id="app" className="btn">
             <i>
               <MenuIcon />
@@ -55,10 +55,10 @@ export default function TopMenu() {
           </label>
         </div>
         <ul
-          className="menu horizontal justify-center w-full flex-grow lg:items-center lg:w-auto hidden xl:flex"
+          className="hidden flex-grow justify-center w-full menu horizontal lg:items-center lg:w-auto xl:flex"
           id="menu"
         ></ul>
-        <div className="w-1/4 hidden xl:block"></div>
+        <div className="hidden w-1/4 xl:block"></div>
       </nav>
     </div>
   );

@@ -21,7 +21,7 @@ export default function SideMenu() {
   return (
     <div className="drawer-side lg:hidden">
       <label htmlFor="my-drawer" className="drawer-overlay"></label>
-      <ul className="menu p-4 overflow-y-auto w-80 bg-base-300 border-l flex flex-col border-gray-700 shadow text-base-content gap-2">
+      <ul className="flex overflow-y-auto flex-col gap-2 p-4 w-80 border-l border-gray-700 shadow menu bg-base-300 text-base-content">
         <li>
           <a
             href="https://pentacle.xyz"
@@ -46,15 +46,13 @@ export default function SideMenu() {
           </div>
         </MenuLink>
         <MenuLink href="/token-metadata">
-          <div>
-            <div
-              style={{ width: 14 }}
-              className="inline-flex items-center justify-center mr-3"
-            >
-              <InfoIcon />
-            </div>
-            Token Metadata
+          <div
+            style={{ width: 14 }}
+            className="inline-flex justify-center items-center mr-3"
+          >
+            <InfoIcon />
           </div>
+          Token Metadata
         </MenuLink>
         <MenuLink href="/holder-snapshot">
           <i className="mr-3">
@@ -116,7 +114,7 @@ export default function SideMenu() {
 
         <div className="mt-auto w-full">
           <div
-            className={`text-center flex items-center justify-center flex-row gap-4`}
+            className={`flex flex-row gap-4 justify-center items-center text-center`}
           >
             <MadeWithLove />
           </div>
@@ -132,7 +130,7 @@ export default function SideMenu() {
                   })
                 }
               >
-                <span className={`cursor-pointer ml-1`}>
+                <span className={`ml-1 cursor-pointer`}>
                   Donations: lolfees.sol
                 </span>
               </CopyToClipboard>

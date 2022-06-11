@@ -20,9 +20,9 @@ export function FileUpload() {
     <>
       {!files?.length && (
         <>
-          <h2 className="text-3xl text-center mb-6">Upload</h2>
-          <div className="flex gap-3 items-center justify-center">
-            <label className="file-upload w-64" tabIndex={0}>
+          <h2 className="mb-6 text-3xl text-center">Upload</h2>
+          <div className="flex gap-3 justify-center items-center">
+            <label className="w-64 file-upload" tabIndex={0}>
               <i>
                 <UploadIcon />
               </i>
@@ -38,7 +38,7 @@ export function FileUpload() {
             </label>
             <span>OR</span>
 
-            <label className="file-upload w-64" tabIndex={0}>
+            <label className="w-64 file-upload" tabIndex={0}>
               <i>
                 <UploadIcon />
               </i>
@@ -58,7 +58,7 @@ export function FileUpload() {
 
           <br />
           <div className="flex mt-4">
-            <span className="label-text ml-auto">
+            <span className="ml-auto label-text">
               * may not work with every browser
             </span>
           </div>

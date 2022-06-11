@@ -12,10 +12,10 @@ export function MadeWithLove() {
           <GithubIcon />
         </i>
       </a>
-      <div className="text-center flex items-center justify-center flex-col">
+      <div className="flex flex-col justify-center items-center text-center">
         <span>
           Made with{" "}
-          <i className="ml-1 inline">
+          <i className="inline ml-1">
             <HeartIcon width={16} height={16} />
           </i>
         </span>

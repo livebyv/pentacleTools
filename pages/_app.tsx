@@ -65,14 +65,14 @@ function Context({ children }: { children: React.ReactNode }) {
       </Head>
       <div className="drawer drawer-end">
         <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-        <div className="h-screen drawer-content lg:ml-64 relative">
-          <div className="hidden lg:inline-block p-4 absolute right-0 top-4 z-50">
+        <div className="relative h-screen drawer-content lg:ml-64">
+          <div className="hidden absolute right-0 top-4 z-50 p-4 lg:inline-block">
             <WalletMultiButton className="w-full" />
           </div>
           <div className="lg:hidden">
             <TopMenu />
           </div>
-          <ul className="hidden lg:inline-block lg:fixed left-0 top-0 bottom-0 menu p-4 overflow-y-auto w-64 bg-base-300 text-base-content space-y-2 relative">
+          <ul className="hidden overflow-y-auto relative top-0 bottom-0 left-0 p-4 space-y-2 w-64 lg:inline-block lg:fixed menu bg-base-300 text-base-content">
             <li>
               <a
                 href="https://pentacle.xyz"
@@ -105,13 +105,13 @@ function Context({ children }: { children: React.ReactNode }) {
               </div>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/holder-snapshot">
-              <i className="mr-3 inline-block">
+              <i className="inline-block mr-3">
                 <CameraIcon width={16} height={16} />
               </i>
               <span> Holder Snapshot</span>
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/nft-minters">
-              <i className="mr-3 inline-block">
+              <i className="inline-block mr-3">
                 <CoinsIcon width={16} height={16} />
               </i>
               NFT Minters
@@ -166,9 +166,9 @@ function Context({ children }: { children: React.ReactNode }) {
               <span>SnedMaster 9000</span>
             </MenuLink>
 
-            <div className="absolute bottom-4 left-0 w-full">
+            <div className="absolute left-0 bottom-4 w-full">
               <div
-                className={`text-center flex items-center justify-center flex-row gap-4`}
+                className={`flex flex-row gap-4 justify-center items-center text-center`}
               >
                 <MadeWithLove />
               </div>
@@ -184,7 +184,7 @@ function Context({ children }: { children: React.ReactNode }) {
                       })
                     }
                   >
-                    <span className={`cursor-pointer ml-1`}>
+                    <span className={`ml-1 cursor-pointer`}>
                       Donations: lolfees.sol
                     </span>
                   </CopyToClipboard>
@@ -194,15 +194,15 @@ function Context({ children }: { children: React.ReactNode }) {
           </ul>
 
           <main
-            className={`my-28 px-3 lg:col-span-1 col-span-2 relative`}
+            className={`relative col-span-2 px-3 my-28 lg:col-span-1`}
             style={{ maxWidth: "100%" }}
           >
             <div className="mx-auto" style={{ maxWidth: "100%", width: 800 }}>
-              {/* <div className="alert alert-warning mb-8">
+              {/* <div className="mb-8 alert alert-warning">
                 <div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="stroke-current flex-shrink-0 h-6 w-6"
+                    className="flex-shrink-0 w-6 h-6 stroke-current"
                     fill="none"
                     viewBox="0 0 24 24"
                   >
@@ -225,7 +225,7 @@ function Context({ children }: { children: React.ReactNode }) {
               {children}
             </div>
           </main>
-          <div className="text-center fixed right-6 bottom-6 hidden xl:block">
+          <div className="hidden fixed right-6 bottom-6 text-center xl:block">
             RPC powered by
             <a
               href="https://twitter.com/GenesysGo"
@@ -233,7 +233,7 @@ function Context({ children }: { children: React.ReactNode }) {
               rel="noreferrer noopener"
             >
               <img
-                className="w-16 mx-auto"
+                className="mx-auto w-16"
                 src={ImageURI.GenesysGo}
                 alt="Genesysgo"
               />

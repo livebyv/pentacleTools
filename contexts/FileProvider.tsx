@@ -11,7 +11,7 @@ export const FileContext = createContext<{
   setFiles: Dispatch<SetStateAction<File[]>>;
 }>({
   files: [],
-  setFiles: (files: File[]) => {},
+  setFiles: (files: File[]) => { },
 });
 
 export const useFiles = () => useContext(FileContext);

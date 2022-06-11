@@ -172,12 +172,12 @@ export default function GetARLinks() {
       <Head>
         <title>🛠️ Pentacle Tools - ⬆️ Arweave Upload</title>
       </Head>
-      <div className="max-w-full text-center mb-3">
+      <div className="mb-3 max-w-full text-center">
         <h2 className="text-3xl text-white">Arweave Upload</h2>
-        <hr className="opacity-10 my-4" />
+        <hr className="my-4 opacity-10" />
       </div>
       <div className="flex flex-col">
-        <div className="px-2 text-center mb-4">
+        <div className="px-2 mb-4 text-center">
           This tool lets you upload files to arweave. Currently limited to 150mb
           total per batch of files. <br />
           To reset the form please reload.
@@ -203,12 +203,10 @@ export default function GetARLinks() {
           </a>
         </div>
         {!jwk && (
-          <div className="card bg-gray-900">
+          <div className="bg-gray-900 card">
             <div className="card-body">
               <button
-                className={`btn btn-primary rounded-box inline-block mx-auto mb-3 shadow-lg ${
-                  loading ? "loading" : ""
-                }`}
+                className={`btn btn-primary rounded-box inline-block mx-auto mb-3 shadow-lg ${loading ? "loading" : ""}`}
                 onClick={generate}
               >
                 Generate Wallet
@@ -220,13 +218,13 @@ export default function GetARLinks() {
                 </label>
                 <textarea
                   {...register("key")}
-                  className="textarea shadow-lg w-full"
+                  className="w-full shadow-lg textarea"
                   rows={10}
                   id="key"
                 />
-                <div className="text-center mt-6">
+                <div className="mt-6 text-center">
                   <button
-                    className={`btn btn-primary rounded-box shadow-lg`}
+                    className={`shadow-lg btn btn-primary rounded-box`}
                     type="submit"
                   >
                     Import
@@ -238,14 +236,14 @@ export default function GetARLinks() {
         )}
         {jwk && (
           <div
-            className="card bg-primary text-white shadow-lg max-w-full mx-auto my-4"
+            className="mx-auto my-4 max-w-full text-white shadow-lg card bg-primary"
             style={{ width: 400 }}
           >
-            <div className="card-body p-4">
+            <div className="p-4 card-body">
               <div className="flex flex-row gap-5 items-center">
                 <Image
                   src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
-                  className="rounded-full w-14 h-14 shadow-lg"
+                  className="w-14 h-14 rounded-full shadow-lg"
                   width="56"
                   height="56"
                   alt="Arweave Logo"
@@ -256,7 +254,7 @@ export default function GetARLinks() {
                     text={address}
                     onCopy={clipboardNotification}
                   >
-                    <span className={`cursor-pointer ml-1`}>
+                    <span className={`ml-1 cursor-pointer`}>
                       {shortenAddress(address)}
                     </span>
                   </CopyToClipboard>
@@ -286,7 +284,7 @@ export default function GetARLinks() {
                         localStorage.removeItem("arweave-key");
                       }}
                       title="Delete"
-                      className="btn btn-circle btn-sm shadow-lg"
+                      className="shadow-lg btn btn-circle btn-sm"
                     >
                       <i>
                         <TrashIcon width={16} height={16} />
@@ -296,12 +294,12 @@ export default function GetARLinks() {
                       onClick={() =>
                         download(`arweave-${address}.json`, jsonFormat(jwk))
                       }
-                      className="btn btn-circle btn-sm shadow-lg"
+                      className="shadow-lg btn btn-circle btn-sm"
                       title="Download"
                     >
                       <DownloadIcon width={16} height={16} />
                     </button>
-                    <button className="btn btn-circle btn-sm shadow-lg">
+                    <button className="shadow-lg btn btn-circle btn-sm">
                       <a
                         href={`https://viewblock.io/arweave/address/${address}`}
                         target="_blank"
@@ -319,17 +317,15 @@ export default function GetARLinks() {
         )}
 
         {jwk && (
-          <div className="card bg-gray-900 max-w-full">
+          <div className="max-w-full bg-gray-900 card">
             <div className="card-body">
               <div className="mt-4">
                 <FileUpload />
               </div>
               {!!files.length && (
-                <div className="text-center mt-6">
+                <div className="mt-6 text-center">
                   <button
-                    className={`btn btn-primary rounded-box shadow-lg ${
-                      loading ? "loading" : ""
-                    }`}
+                    className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
                     disabled={!files.length}
                     onClick={upload}
                   >

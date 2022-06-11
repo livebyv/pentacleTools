@@ -131,7 +131,7 @@ export default function BurnNFTs() {
         )
         .map((a) => (a.account.data as ParsedAccountData).parsed.info.mint);
       const data = (
-        await fetchMetaForUI(mints, () => {}, connection).toPromise()
+        await fetchMetaForUI(mints, () => { }, connection).toPromise()
       ).filter((e) => !e.failed);
 
       const nftsWithImages = data.map((nft) => {
@@ -348,57 +348,55 @@ export default function BurnNFTs() {
   const confirmationModal = useMemo(() => {
     return state.isModalOpen && document.body
       ? createPortal(
-          <div className="flex fixed inset-0 justify-center items-center p-4 bg-black bg-opacity-75">
-            <div className="p-4 w-full max-w-sm bg-gray-800 rounded-lg shadow-lg">
-              <p className="text-2xl text-center text-white">
-                Are you sure you want to permanently destroy{" "}
-                {`${
-                  state.selectedNFTs.length === 1
-                    ? "this NFT"
-                    : ` these ${state.selectedNFTs.length} NFTs?`
+        <div className="flex fixed inset-0 justify-center items-center p-4 bg-black bg-opacity-75">
+          <div className="p-4 w-full max-w-sm bg-gray-800 rounded-lg shadow-lg">
+            <p className="text-2xl text-center text-white">
+              Are you sure you want to permanently destroy{" "}
+              {`${state.selectedNFTs.length === 1
+                  ? "this NFT"
+                  : ` these ${state.selectedNFTs.length} NFTs?`
                 }`}
-                ?
-                <br />
-                <br />
-                <strong>
-                  It cannot be undone and they will be destroyed!!! Make sure
-                  you know what you are doing!
-                </strong>
-              </p>
+              ?
+              <br />
+              <br />
+              <strong>
+                It cannot be undone and they will be destroyed!!! Make sure
+                you know what you are doing!
+              </strong>
+            </p>
 
-              <div className="flex justify-center items-center p-4 mt-8 w-full">
-                <button
-                  type="button"
-                  className="mr-4 btn rounded-box"
-                  onClick={() => {
-                    dispatch({
-                      type: "isModalOpen",
-                      payload: { isModalOpen: false },
-                    });
-                  }}
-                >
-                  nope
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    dispatch({
-                      type: "isModalOpen",
-                      payload: { isModalOpen: false },
-                    });
-                    handleBurn();
-                  }}
-                  className={`btn rounded-box btn-primary ${
-                    state.isBurning ? "loading" : ""
+            <div className="flex justify-center items-center p-4 mt-8 w-full">
+              <button
+                type="button"
+                className="mr-4 btn rounded-box"
+                onClick={() => {
+                  dispatch({
+                    type: "isModalOpen",
+                    payload: { isModalOpen: false },
+                  });
+                }}
+              >
+                nope
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  dispatch({
+                    type: "isModalOpen",
+                    payload: { isModalOpen: false },
+                  });
+                  handleBurn();
+                }}
+                className={`btn rounded-box btn-primary ${state.isBurning ? "loading" : ""
                   }`}
-                >
-                  {state.isBurning ? "burning!!" : "yup"}
-                </button>
-              </div>
+              >
+                {state.isBurning ? "burning!!" : "yup"}
+              </button>
             </div>
-          </div>,
-          document.querySelector("body")
-        )
+          </div>
+        </div>,
+        document.querySelector("body")
+      )
       : null;
   }, [state, handleNFTUnselect, handleBurn]);
 

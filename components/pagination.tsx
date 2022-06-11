@@ -17,7 +17,7 @@ export const Pagination = ({ pageSize, total, currentPage, setPage }) => {
   // Show all buttons for 10 or less pages
   if (total * pageSize < pageSize * 10) {
     return (
-      <div className="btn-group justify-center">
+      <div className="justify-center btn-group">
         {getRange(total).map((_, i) => (
           <PaginationButton
             key={i}
@@ -30,7 +30,7 @@ export const Pagination = ({ pageSize, total, currentPage, setPage }) => {
     );
   }
   return (
-    <div className="btn-group justify-center">
+    <div className="justify-center btn-group">
       {currentPage + 1 < 5 &&
         getRange(5, 0).map((i) => (
           <PaginationButton

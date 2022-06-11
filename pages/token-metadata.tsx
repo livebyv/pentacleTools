@@ -86,9 +86,8 @@ export default function GetMeta() {
                 required: "Field is required",
               })}
               rows={4}
-              className={`textarea w-full shadow-lg ${
-                !!errors?.mints && "input-error"
-              }`}
+              className={`textarea w-full shadow-lg ${!!errors?.mints && "input-error"
+                }`}
               id="mints"
               name="mints"
             />
@@ -99,8 +98,7 @@ export default function GetMeta() {
             )}
             <div className="mt-6 text-center">
               <button
-                className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""}`}
+                className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
                 type="submit"
               >
                 {loading ? `${counter} / ${len}` : "Get Meta"}

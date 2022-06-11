@@ -21,6 +21,8 @@ import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js-next";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { SHDW_TOKEN } from "../util/accounts";
+import { shortenAddress } from "../util/shorten-address";
+import { sleep } from "../util/sleep";
 
 export default function GibAirdrop() {
   const {
@@ -42,6 +44,20 @@ export default function GibAirdrop() {
       setFiles(files.filter((f) => f.name !== name));
     },
     [files]
+  );
+
+  const fileTiles = useMemo(
+    () =>
+      getRange(numberOfFiles).map((i) => (
+        <FileTile
+          key={i}
+          file={files[i]}
+          remove={handleRemoveFile}
+          setFiles={setFiles}
+          files={files}
+        />
+      )),
+    [numberOfFiles, files]
   );
 
   const FilesForm = useMemo(
@@ -75,16 +91,8 @@ export default function GibAirdrop() {
             </button>
           )}
         </div>
-        <div className="upload-field grid grid-cols-2 gap-4 my-4">
-          {getRange(numberOfFiles).map((i) => (
-            <FileTile
-              key={i}
-              file={files[i]}
-              remove={handleRemoveFile}
-              setFiles={setFiles}
-              files={files}
-            />
-          ))}
+        <div className="grid grid-cols-2 gap-4 my-4 upload-field">
+          {fileTiles}
         </div>
 
         {!!files?.length && (
@@ -95,7 +103,7 @@ export default function GibAirdrop() {
               </label>
               <select
                 {...register("imageUrlFileName")}
-                className="select w-full"
+                className="w-full select"
               >
                 <option selected disabled value=""></option>
                 {files.map((f, i) => (
@@ -111,7 +119,7 @@ export default function GibAirdrop() {
               </label>
               <select
                 {...register("animationUrlFileName")}
-                className="select w-full"
+                className="w-full select"
               >
                 <option selected disabled value=""></option>
                 {files.map((f, i) => (
@@ -129,11 +137,6 @@ export default function GibAirdrop() {
     [files, numberOfFiles, setNumberOfFiles, handleRemoveFile, register]
   );
 
-  const pubKeyString = useMemo(
-    () => wallet?.publicKey?.toBase58(),
-    [wallet?.publicKey]
-  );
-
   const upload = useCallback(
     async (formData) => {
       setLoading(true);
@@ -143,6 +146,10 @@ export default function GibAirdrop() {
         ),
         open: true,
       });
+
+      const metaplex = new Metaplex(connection).use(
+        walletAdapterIdentity(wallet.wallet.adapter)
+      );
 
       const shdwDrive = await new ShdwDrive(connection, wallet).init();
 
@@ -154,6 +161,8 @@ export default function GibAirdrop() {
         }),
       ];
 
+      const cat = formData?.properties?.category || "image";
+
       const meta = Object.assign({
         name: formData.name,
         symbol: formData.symbol || null,
@@ -164,49 +173,46 @@ export default function GibAirdrop() {
         attributes: formData.attributes || [],
         external_url: formData.external_url || null,
         properties: {
-          category: formData?.properties?.category || "image",
+          category: cat,
           creators,
         },
       });
 
       try {
-        // TODO: Upload all files at once, use determinstic file name
         const bytes = await files.reduce(async (acc, curr) => {
           return (await acc) + (await fileToBuffer(curr)).buffer.byteLength;
         }, Promise.resolve(0));
 
-        alert(
-          `You will need circa ${((bytes * 1.2) / LAMPORTS_PER_SOL).toFixed(
-            6
-          )} SHDW`
-        );
+        const shdwNeeded = ((bytes * 1.2) / LAMPORTS_PER_SOL).toFixed(6);
+
+        alert(`You will need circa ${shdwNeeded} SHDW`);
         const { shdw_bucket } = await shdwDrive.createStorageAccount(
           `NFT-${Date.now()}`,
           `${Math.round((bytes * 1.2) / 1000)}kb`
         );
 
-        const vidFile = files.find((_m) => _m.type.startsWith("video"));
+        const animFile = files.find((_m) => _m.type.startsWith("video") || _m.type.startsWith("glb"));
         const imgFile = files.find((_m) => _m.type.startsWith("image"));
 
         meta.animation_url = formData.animationUrlFileName
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.animationUrlFileName}`
-          : !!vidFile?.name
-          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${vidFile?.name}`
-          : null;
+          : !!animFile?.name
+            ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${animFile.name}`
+            : null;
         meta.image = formData.imageUrlFileName
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.imageUrlFileName}`
           : !!imgFile?.name
-          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${imgFile.name}`
-          : null;
+            ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${imgFile.name}`
+            : null;
 
         meta.properties.files = files.map((f) => {
           return {
-            type: f.type,
+            type: f.type || 'glb',
             uri: `https://shdw-drive.genesysgo.net/${shdw_bucket}/${f.name}`,
           };
         });
 
-        setAlertState!({
+        setAlertState({
           message: (
             <button className="loading btn btn-ghost">
               Uploading {files.length + 1 /** manifest */} files
@@ -219,19 +225,20 @@ export default function GibAirdrop() {
           type: "application/json",
         });
 
-        await shdwDrive.uploadMultipleFiles(
-          toPublicKey(shdw_bucket),
-          createFileList([...files, manifest])
-        );
 
-        setAlertState!({
+        setAlertState({
           message: (
-            <button className="loading btn btn-ghost">Minting NFT</button>
+            <div className="flex flex-row">
+              <button className="loading btn btn-ghost"/>
+              Signing and Minting NFT, check wallet for signature request.
+              There will be several.
+            </div>
           ),
           open: true,
         });
-        const metaplex = new Metaplex(connection).use(
-          walletAdapterIdentity(wallet.wallet.adapter)
+        await shdwDrive.uploadMultipleFiles(
+          toPublicKey(shdw_bucket),
+          createFileList([...files, manifest])
         );
 
         const { transactionId } = await metaplex.nfts().create({
@@ -245,51 +252,42 @@ export default function GibAirdrop() {
           isMutable: true,
         });
 
-        if (transactionId === "failed") {
-          alert(transactionId);
-          setLoading(false);
-        } else {
-          let confirmed = false;
-          while (!confirmed) {
-            setAlertState!({
-              message: (
-                <div className="flex flex-row items-center">
-                  <button className="loading btn btn-ghost"></button> Confirming
-                  transaction{" "}
-                  <a
-                    href={`https://explorer.solana.com/tx/${transactionId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate"
-                  >
-                    {transactionId.slice(0, 3)} ...{" "}
-                    {transactionId.slice(transactionId.length - 3)}
-                  </a>
-                </div>
-              ),
+        let confirmed = false;
+        while (!confirmed) {
+          setAlertState({
+            message: (
+              <div className="flex flex-row items-center">
+                <button className="loading btn btn-ghost"></button> Confirming
+                transaction{" "}
+                <a
+                  href={`https://explorer.solana.com/tx/${transactionId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="truncate"
+                >
+                  {shortenAddress(transactionId, 3)}
+                </a>
+              </div>
+            ),
+            open: true,
+          });
+          const tx = await connection.getTransaction(transactionId, {
+            commitment: "confirmed",
+          });
+
+          if (tx && tx?.meta?.postTokenBalances[0]?.mint) {
+            setMint(tx?.meta?.postTokenBalances[0]?.mint);
+            setAlertState({
+              severity: "success",
+              duration: 5000,
+              message: "Success!",
               open: true,
             });
-            const tx = await connection
-              .getTransaction(transactionId, { commitment: "confirmed" })
-              .catch((e) => {
-                alert(e);
-              });
-
-            if (tx && tx?.meta?.postTokenBalances[0]?.mint) {
-              setMint(tx?.meta?.postTokenBalances[0]?.mint);
-              setAlertState({
-                severity: "success",
-                duration: 5000,
-                message: "Success!",
-                open: true,
-              });
-              confirmed = true;
-            } else {
-              await new Promise((resolve) => setTimeout(resolve, 100));
-            }
+            confirmed = true;
+          } else {
+            await sleep(300);
           }
         }
-        setLoading(false);
       } catch (e) {
         console.error(e);
         setLoading(false);
@@ -335,21 +333,21 @@ export default function GibAirdrop() {
 
       <div>
         {!!balances.shdw && (
-          <div className="w-full text-center mt-3">
+          <div className="mt-3 w-full text-center">
             <span className="badge badge-success">{balances.shdw} SHDW</span>
-            <span className="badge badge-primary ml-3">{balances.sol} SOL</span>
+            <span className="ml-3 badge badge-primary">{balances.sol} SOL</span>
           </div>
         )}
       </div>
 
-      <hr className="opacity-10 my-3" />
+      <hr className="my-3 opacity-10" />
 
-      <div className="card bg-gray-900">
+      <div className="bg-gray-900 card">
         <div className="card-body">
           {!wallet && <WalletMultiButton />}
           {wallet && (
             <form
-              className={`w-full flex flex-col`}
+              className={`flex flex-col w-full`}
               onSubmit={handleSubmit((e) => upload(e))}
             >
               <h2 className="text-3xl font-bold text-center">Metadata</h2>
@@ -366,7 +364,7 @@ export default function GibAirdrop() {
               </div>
               <br />
               <div
-                className="form-control pb-6"
+                className="pb-6 form-control"
                 style={{ position: "relative" }}
               >
                 <label className="label">
@@ -375,17 +373,16 @@ export default function GibAirdrop() {
                 <input
                   type="text"
                   placeholder="Name"
-                  className={`input input-bordered ${
-                    !!errors.name ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered ${!!errors.name ? "input-error" : ""
+                    }`}
                   {...register("name", { required: true, maxLength: 32 })}
                 />
                 {errors.name && (
                   <label
-                    className="label py-0"
+                    className="py-0 label"
                     style={{ position: "absolute", bottom: 0 }}
                   >
-                    <span className="label-text-alt text-red-400">
+                    <span className="text-red-400 label-text-alt">
                       {errors.name.type === "maxLength" && "Max 32 characters!"}
                       {errors.name.type === "required" && "Field is required!"}
                     </span>
@@ -393,7 +390,7 @@ export default function GibAirdrop() {
                 )}
               </div>
               <div
-                className="form-control pb-6"
+                className="pb-6 form-control"
                 style={{ position: "relative" }}
               >
                 <label className="label" htmlFor="symbol">
@@ -402,37 +399,36 @@ export default function GibAirdrop() {
                 <input
                   type="text"
                   placeholder="Symbol"
-                  className={`input input-bordered ${
-                    !!errors.symbol ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered ${!!errors.symbol ? "input-error" : ""
+                    }`}
                   {...register("symbol", { maxLength: 10 })}
                 />
                 {errors.symbol && (
                   <label
-                    className="label py-0"
+                    className="py-0 label"
                     style={{ position: "absolute", bottom: 0 }}
                   >
-                    <span className="label-text-alt text-red-400">
+                    <span className="text-red-400 label-text-alt">
                       Max 10 characters!
                     </span>
                   </label>
                 )}
               </div>
               <div
-                className="form-control pb-6"
+                className="pb-6 form-control"
                 style={{ position: "relative" }}
               >
                 <label className="label" htmlFor="description">
                   <span className="label-text">Description</span>
                 </label>
                 <textarea
-                  className="textarea h-24"
+                  className="h-24 textarea"
                   placeholder="Description"
                   {...register("description")}
                 ></textarea>
               </div>{" "}
               <div
-                className="form-control pb-6"
+                className="pb-6 form-control"
                 style={{ position: "relative" }}
               >
                 <label className="label">
@@ -445,24 +441,23 @@ export default function GibAirdrop() {
                   type="text"
                   placeholder="External URL"
                   {...register("external_url", { pattern: URL_MATCHER })}
-                  className={`input input-bordered ${
-                    !!errors.external_url ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered ${!!errors.external_url ? "input-error" : ""
+                    }`}
                 />
 
                 {errors.external_url && (
                   <label
-                    className="label py-0"
+                    className="py-0 label"
                     style={{ position: "absolute", bottom: 0 }}
                   >
-                    <span className="label-text-alt text-red-400">
+                    <span className="text-red-400 label-text-alt">
                       Not a valid url, don&apos;t forget protocol (https://)
                     </span>
                   </label>
                 )}
               </div>
               <div
-                className="form-control pb-6"
+                className="pb-6 form-control"
                 style={{ position: "relative" }}
               >
                 <label htmlFor="category" className="label">
@@ -481,6 +476,7 @@ export default function GibAirdrop() {
                       name="category"
                     >
                       <option value="image">Image</option>
+                      <option value="vr">VR</option>
                       <option value="video">Video</option>
                       <option value="html">HTML</option>
                     </select>
@@ -488,7 +484,7 @@ export default function GibAirdrop() {
                 />
               </div>
               <div
-                className="form-control pb-6"
+                className="pb-6 form-control"
                 style={{ position: "relative" }}
               >
                 <label className="label" htmlFor="seller_fee_basis_points">
@@ -505,17 +501,16 @@ export default function GibAirdrop() {
                     min: 0,
                     max: 10_000,
                   })}
-                  className={`input input-bordered ${
-                    !!errors.seller_fee_basis_points ? "input-error" : ""
-                  }`}
+                  className={`input input-bordered ${!!errors.seller_fee_basis_points ? "input-error" : ""
+                    }`}
                 />
 
                 {errors.seller_fee_basis_points && (
                   <label
-                    className="label py-0"
+                    className="py-0 label"
                     style={{ position: "absolute", bottom: 0 }}
                   >
-                    <span className="label-text-alt text-red-400">
+                    <span className="text-red-400 label-text-alt">
                       Must be between 0 and 10 000
                     </span>
                   </label>
@@ -567,7 +562,7 @@ export default function GibAirdrop() {
     </div>
   ) : (
     <>
-      <div className="card bg-gray-700 max-w-xs mx-auto">
+      <div className="mx-auto max-w-xs bg-gray-700 card">
         <div className="card-body">
           <h2 className="text-center">To begin please</h2>
           <br />

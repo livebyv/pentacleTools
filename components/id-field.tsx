@@ -67,14 +67,14 @@ export default function IdField({ sned, loading }) {
           {...register("amount")}
         />
       </div>
-      <div className="form-control pb-6" style={{ position: "relative" }}>
+      <div className="pb-6 form-control" style={{ position: "relative" }}>
         <label className="label">
           <span className="label-text">
             List with all addresses (JSON, comma-separated or newline-separated)
           </span>
         </label>
         <textarea
-          className="textarea h-24"
+          className="h-24 textarea"
           placeholder={`GoThgFHS5W9jCLX7JoWnCHtL5RMJEBWL3HVuhGjVntyg\nBiRdzfdUcssYAzMnpnFvcqP8BeTxLtZ8RqAd8cKhVD6u`}
           {...register("ids", { validate: validate })}
         ></textarea>

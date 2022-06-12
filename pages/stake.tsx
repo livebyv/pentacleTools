@@ -328,10 +328,21 @@ const ValidatorList = () => {
           className="card-body"
           onClick={() => setSelectedValidator(meta.validatorInfo.key)}
         >
-          <h3 className="relative text-2xl">{meta?.validatorInfo?.info?.name}
-            <span className="absolute top-0 right-0 badge badge-secondary">Commission: {meta?.voteAccountInfo.commission} %</span>
-          </h3>
-          <hr className="opacity-10" />
+          <div className="relative">
+            <div
+              className="overflow-hidden text-2xl truncate text-ellipsis"
+              style={{ maxWidth: "calc(100% - 120px)" }}
+            >
+              {meta?.validatorInfo?.info?.name}
+            </div>{" "}
+            {meta?.validatorInfo?.info?.keybaseUsername && (
+              <>({meta?.validatorInfo?.info?.keybaseUsername})</>
+            )}
+            <span className="absolute top-0 right-0 badge badge-secondary">
+              Commission: {meta?.voteAccountInfo.commission} %
+            </span>
+          </div>
+          <hr className="mt-auto opacity-10" />
 
           <div className="flex justify-between items-center text-lg">
             <span className="mr-3 badge">

@@ -91,11 +91,11 @@ export default function GibMints() {
           </div>
         </div>
       </div> */}
-      <p className="px-2 text-center">
+      <p className="text-center">
         This tool gets all mint IDs associated with the given address.
       </p>
-      <hr className="my-4 opacity-10" />
-      <div className="px-2 text-center">
+      {/* <hr className="my-4 opacity-10" />
+      <div className="text-center">
         <div className="alert">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -125,7 +125,7 @@ export default function GibMints() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <hr className="my-4 opacity-10" />
       <div className="bg-gray-900 card">
         <form
@@ -148,8 +148,9 @@ export default function GibMints() {
                   })}
                   required
                   type="text"
-                  className={`input shadow-lg w-full ${!!errors?.address?.message && "input-error"
-                    }`}
+                  className={`input shadow-lg w-full ${
+                    !!errors?.address?.message && "input-error"
+                  }`}
                   id="address-field"
                   autoComplete="on"
                 />
@@ -162,7 +163,8 @@ export default function GibMints() {
             </div>
             <div className="flex gap-4 justify-center items-center mt-6">
               <button
-                className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
+                className={`btn btn-primary rounded-box shadow-lg ${
+                  loading ? "loading" : ""}`}
                 disabled={errors?.address}
                 type="submit"
               >

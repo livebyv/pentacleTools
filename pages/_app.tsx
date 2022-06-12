@@ -202,10 +202,10 @@ function Context({ children }: { children: React.ReactNode }) {
           </ul>
 
           <main
-            className={`relative col-span-2 px-3 my-28 lg:col-span-1`}
+            className={`relative col-span-2 my-28 lg:col-span-1`}
             style={{ maxWidth: "100%" }}
           >
-            <div className="mx-auto" style={{ maxWidth: "100%", width: 1200 }}>
+            <div className="px-6 mx-auto max-w-full" style={{  width: 1200 }}>
               {/* <div className="mb-8 alert alert-warning">
                 <div>
                   <svg

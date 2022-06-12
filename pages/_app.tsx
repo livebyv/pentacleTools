@@ -167,7 +167,7 @@ function Context({ children }: { children: React.ReactNode }) {
               <span>SnedMaster 9000</span>
             </MenuLink>
 
-            <MenuLink href="/stake">
+            <MenuLink activatesDrawer={false} href="/stake">
               <i className="mr-3">
                 <BankIcon width={16} height={16} />
               </i>
@@ -205,7 +205,7 @@ function Context({ children }: { children: React.ReactNode }) {
             className={`relative col-span-2 px-3 my-28 lg:col-span-1`}
             style={{ maxWidth: "100%" }}
           >
-            <div className="mx-auto" style={{ maxWidth: "100%", width: 800 }}>
+            <div className="mx-auto" style={{ maxWidth: "100%", width: 1200 }}>
               {/* <div className="mb-8 alert alert-warning">
                 <div>
                   <svg

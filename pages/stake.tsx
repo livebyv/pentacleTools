@@ -622,12 +622,12 @@ function StakeView() {
       <hr className="my-4 opacity-10" />
       <h2 className="relative text-2xl text-center">
         SOL Stake Accounts{" "}
-        <button
+        {/* <button
           className="absolute right-0 z-50 btn btn-xs btn-primary"
           onClick={() => setIsAdding(!isAdding)}
         >
           Add Stake Account
-        </button>{" "}
+        </button>{" "} */}
         {isAdding && (
           <form
             onSubmit={handleSubmit(({ stakeAmount }) => {

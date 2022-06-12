@@ -330,14 +330,21 @@ const ValidatorList = () => {
         >
           <div className="relative">
             <div
-              className="overflow-hidden text-2xl truncate text-ellipsis"
+              className="flex overflow-hidden gap-4 text-2xl truncate text-ellipsis"
               style={{ maxWidth: "calc(100% - 120px)" }}
             >
-              {meta?.validatorInfo?.info?.name}
+              {!!meta?.validatorInfo?.info?.keybaseUsername && (
+                <img 
+                 className="rounded-full shadow"
+                  src={`https://keybase.io/${meta?.validatorInfo?.info?.keybaseUsername}/picture`}
+                  style={{ width: 64 }}
+                />
+              )}
+              {meta?.validatorInfo?.info?.name} <br />
+                {meta?.validatorInfo?.info?.keybaseUsername && (
+                  <>({meta?.validatorInfo?.info?.keybaseUsername})</>
+                )}
             </div>{" "}
-            {meta?.validatorInfo?.info?.keybaseUsername && (
-              <>({meta?.validatorInfo?.info?.keybaseUsername})</>
-            )}
             <span className="absolute top-0 right-0 badge badge-secondary">
               Commission: {meta?.voteAccountInfo.commission} %
             </span>
@@ -376,6 +383,29 @@ const ValidatorList = () => {
 
             {meta?.voteAccountInfo?.votePubkey}
           </div>
+          <hr className="opacity-10" />
+
+          {!!meta?.validatorInfo?.info.website && (
+            <>
+              <div className="flex justify-between items-center text-lg">
+                <span className="mr-3 badge">
+                  Website
+                  <a
+                    href={meta?.validatorInfo?.info.website}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex justify-center items-center ml-2 cursor-pointer"
+                  >
+                    <LinkIcon width={16} height={16} />
+                  </a>
+                </span>
+
+                {meta?.validatorInfo?.info.website}
+              </div>
+              <hr className="opacity-10" />
+            </>
+          )}
+          <p className="mx-2">{meta?.validatorInfo?.info.details}</p>
         </div>
       </div>
     ));

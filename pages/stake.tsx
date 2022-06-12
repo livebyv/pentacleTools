@@ -699,7 +699,7 @@ function StakeView() {
         </div>
       )}
       <hr className="my-4 opacity-10" />
-      <ValidatorList />
+      {connected && <ValidatorList />}
     </>
   );
 }

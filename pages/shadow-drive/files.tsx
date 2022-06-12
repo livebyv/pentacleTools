@@ -6,46 +6,44 @@ import { DownloadIcon } from "../../components/icons";
 import { download } from "../../util/download";
 import jsonFormat from "json-format";
 
+const initState: {
+  balance: string;
+  searchTerm: string;
+  loading: boolean;
+  filteredData: any[];
+} = {
+  balance: "",
+  searchTerm: "",
+  loading: true,
+  filteredData: [],
+};
+
+type ShadowFileAction =
+  | { type: "loading"; payload?: { loading: boolean } }
+  | { type: "balance"; payload?: { balance: string } }
+  | { type: "searchTerm"; payload?: { searchTerm: string } }
+  | { type: "filteredData"; payload?: { filteredData: any[] } };
+
+const reducer = (state: typeof initState, action: ShadowFileAction) => {
+  const { type, payload } = action;
+  switch (type) {
+    case "loading":
+      return { ...state, loading: payload.loading };
+    case "balance":
+      return { ...state, balance: payload.balance };
+    case "searchTerm":
+      return { ...state, searchTerm: payload.searchTerm };
+    case "filteredData":
+      return { ...state, filteredData: payload.filteredData };
+    default: {
+      throw new Error("unsupported action type given on SHDW Drive reducer");
+    }
+  }
+};
+
 export default function ShadowFiles() {
   const { query } = useRouter();
-  const initState: {
-    balance: string;
-    searchTerm: string;
-    loading: boolean;
-    filteredData: any[];
-  } = {
-    balance: "",
-    searchTerm: "",
-    loading: true,
-    filteredData: [],
-  };
-  const [state, dispatch] = useReducer(
-    (
-      state: typeof initState,
-      action:
-        | { type: "loading"; payload?: { loading: boolean } }
-        | { type: "balance"; payload?: { balance: string } }
-        | { type: "searchTerm"; payload?: { searchTerm: string } }
-        | { type: "filteredData"; payload?: { filteredData: any[] } }
-    ) => {
-      switch (action.type) {
-        case "loading":
-          return { ...state, loading: action.payload.loading };
-        case "balance":
-          return { ...state, balance: action.payload.balance };
-        case "searchTerm":
-          return { ...state, searchTerm: action.payload.searchTerm };
-        case "filteredData":
-          return { ...state, filteredData: action.payload.filteredData };
-        default: {
-          throw new Error(
-            "unsupported action type given on SHDW Drive reducer"
-          );
-        }
-      }
-    },
-    initState
-  );
+  const [state, dispatch] = useReducer(reducer, initState);
   const data = useRef<any[]>();
   const debouncedSearchTerm = useDebounce(state.searchTerm, 500);
   const filterData = ({ data }) => {

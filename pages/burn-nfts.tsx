@@ -20,6 +20,68 @@ import { toPublicKey } from "../util/to-publickey";
 import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { FireIcon, LeftIcon, RightIcon } from "../components/icons";
+const initState: {
+  nfts: any[];
+  status: string;
+  publicAddress: null | string;
+  itemsPerPage: 12 | 24 | 120;
+  isModalOpen: boolean;
+  isBurning: boolean;
+  selectedNFTs: PublicKey[];
+} = {
+  nfts: [],
+  publicAddress: null,
+  status: "idle",
+  itemsPerPage: 12,
+  isModalOpen: false,
+  isBurning: false,
+  selectedNFTs: [],
+};
+
+type BurnNftAction =
+  | { type: "started"; payload?: null }
+  | { type: "error"; payload?: null }
+  | { type: "unselectAll"; payload?: null }
+  | { type: "burning"; payload?: null }
+  | { type: "burned"; payload?: null }
+  | { type: "success"; payload: { nfts: any[] } }
+  | { type: "nfts"; payload: { nfts: any[] } }
+  | { type: "isModalOpen"; payload: { isModalOpen: boolean } }
+  | { type: "publicAddress"; payload: { publicAddress: string } }
+  | { type: "itemsPerPage"; payload: { itemsPerPage: number } }
+  | { type: "selectedNFTs"; payload: { selectedNFTs: PublicKey[] } };
+
+const reducer = (state: typeof initState, action: BurnNftAction) => {
+  switch (action.type) {
+    case "started":
+      return { ...state, status: "pending" };
+    case "nfts":
+      return { ...state, nfts: action.payload.nfts };
+    case "burning":
+      return { ...state, isBurning: true };
+    case "burned":
+      return { ...state, isBurning: false };
+    case "error":
+      return { ...state, status: "rejected" };
+    case "itemsPerPage":
+      return { ...state, itemsPerPage: action.payload.itemsPerPage };
+    case "isModalOpen":
+      return { ...state, isModalOpen: action.payload.isModalOpen };
+    case "publicAddress":
+      return { ...state, publicAddress: action.payload.publicAddress };
+    case "success":
+      return { ...state, status: "resolved", nfts: action.payload.nfts };
+    case "unselectAll":
+      return { ...state, selectedNFTs: [] };
+    case "selectedNFTs":
+      return {
+        ...state,
+        selectedNFTs: action.payload.selectedNFTs,
+      };
+    default:
+      throw new Error("unsupported action type given on BurnNFTs reducer");
+  }
+};
 
 export default function BurnNFTs() {
   const { setModalState } = useModal();
@@ -28,71 +90,7 @@ export default function BurnNFTs() {
   const { publicKey, signTransaction } = useWallet();
   const router = useRouter();
 
-  const initState: {
-    nfts: any[];
-    status: string;
-    publicAddress: null | string;
-    itemsPerPage: 12 | 24 | 120;
-    isModalOpen: boolean;
-    isBurning: boolean;
-    selectedNFTs: PublicKey[];
-  } = {
-    nfts: [],
-    publicAddress: null,
-    status: "idle",
-    itemsPerPage: 12,
-    isModalOpen: false,
-    isBurning: false,
-    selectedNFTs: [],
-  };
-  const [state, dispatch] = useReducer(
-    (
-      state: typeof initState,
-      action:
-        | { type: "started"; payload?: null }
-        | { type: "error"; payload?: null }
-        | { type: "unselectAll"; payload?: null }
-        | { type: "burning"; payload?: null }
-        | { type: "burned"; payload?: null }
-        | { type: "success"; payload: { nfts: any[] } }
-        | { type: "nfts"; payload: { nfts: any[] } }
-        | { type: "isModalOpen"; payload: { isModalOpen: boolean } }
-        | { type: "publicAddress"; payload: { publicAddress: string } }
-        | { type: "itemsPerPage"; payload: { itemsPerPage: number } }
-        | { type: "selectedNFTs"; payload: { selectedNFTs: PublicKey[] } }
-    ) => {
-      switch (action.type) {
-        case "started":
-          return { ...state, status: "pending" };
-        case "nfts":
-          return { ...state, nfts: action.payload.nfts };
-        case "burning":
-          return { ...state, isBurning: true };
-        case "burned":
-          return { ...state, isBurning: false };
-        case "error":
-          return { ...state, status: "rejected" };
-        case "itemsPerPage":
-          return { ...state, itemsPerPage: action.payload.itemsPerPage };
-        case "isModalOpen":
-          return { ...state, isModalOpen: action.payload.isModalOpen };
-        case "publicAddress":
-          return { ...state, publicAddress: action.payload.publicAddress };
-        case "success":
-          return { ...state, status: "resolved", nfts: action.payload.nfts };
-        case "unselectAll":
-          return { ...state, selectedNFTs: [] };
-        case "selectedNFTs":
-          return {
-            ...state,
-            selectedNFTs: action.payload.selectedNFTs,
-          };
-        default:
-          throw new Error("unsupported action type given on BurnNFTs reducer");
-      }
-    },
-    initState
-  );
+  const [state, dispatch] = useReducer(reducer, initState);
 
   const pubKeyString = useMemo(() => publicKey?.toBase58(), [publicKey]);
 
@@ -131,7 +129,7 @@ export default function BurnNFTs() {
         )
         .map((a) => (a.account.data as ParsedAccountData).parsed.info.mint);
       const data = (
-        await fetchMetaForUI(mints, () => { }, connection).toPromise()
+        await fetchMetaForUI(mints, () => {}, connection).toPromise()
       ).filter((e) => !e.failed);
 
       const nftsWithImages = data.map((nft) => {
@@ -348,55 +346,57 @@ export default function BurnNFTs() {
   const confirmationModal = useMemo(() => {
     return state.isModalOpen && document.body
       ? createPortal(
-        <div className="flex fixed inset-0 justify-center items-center p-4 bg-black bg-opacity-75">
-          <div className="p-4 w-full max-w-sm bg-gray-800 rounded-lg shadow-lg">
-            <p className="text-2xl text-center text-white">
-              Are you sure you want to permanently destroy{" "}
-              {`${state.selectedNFTs.length === 1
-                  ? "this NFT"
-                  : ` these ${state.selectedNFTs.length} NFTs?`
+          <div className="flex fixed inset-0 justify-center items-center p-4 bg-black bg-opacity-75">
+            <div className="p-4 w-full max-w-sm bg-gray-800 rounded-lg shadow-lg">
+              <p className="text-2xl text-center text-white">
+                Are you sure you want to permanently destroy{" "}
+                {`${
+                  state.selectedNFTs.length === 1
+                    ? "this NFT"
+                    : ` these ${state.selectedNFTs.length} NFTs?`
                 }`}
-              ?
-              <br />
-              <br />
-              <strong>
-                It cannot be undone and they will be destroyed!!! Make sure
-                you know what you are doing!
-              </strong>
-            </p>
+                ?
+                <br />
+                <br />
+                <strong>
+                  It cannot be undone and they will be destroyed!!! Make sure
+                  you know what you are doing!
+                </strong>
+              </p>
 
-            <div className="flex justify-center items-center p-4 mt-8 w-full">
-              <button
-                type="button"
-                className="mr-4 btn rounded-box"
-                onClick={() => {
-                  dispatch({
-                    type: "isModalOpen",
-                    payload: { isModalOpen: false },
-                  });
-                }}
-              >
-                nope
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  dispatch({
-                    type: "isModalOpen",
-                    payload: { isModalOpen: false },
-                  });
-                  handleBurn();
-                }}
-                className={`btn rounded-box btn-primary ${state.isBurning ? "loading" : ""
+              <div className="flex justify-center items-center p-4 mt-8 w-full">
+                <button
+                  type="button"
+                  className="mr-4 btn rounded-box"
+                  onClick={() => {
+                    dispatch({
+                      type: "isModalOpen",
+                      payload: { isModalOpen: false },
+                    });
+                  }}
+                >
+                  nope
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    dispatch({
+                      type: "isModalOpen",
+                      payload: { isModalOpen: false },
+                    });
+                    handleBurn();
+                  }}
+                  className={`btn rounded-box btn-primary ${
+                    state.isBurning ? "loading" : ""
                   }`}
-              >
-                {state.isBurning ? "burning!!" : "yup"}
-              </button>
+                >
+                  {state.isBurning ? "burning!!" : "yup"}
+                </button>
+              </div>
             </div>
-          </div>
-        </div>,
-        document.querySelector("body")
-      )
+          </div>,
+          document.querySelector("body")
+        )
       : null;
   }, [state, handleNFTUnselect, handleBurn]);
 
@@ -490,7 +490,7 @@ export default function BurnNFTs() {
         <div>
           {state.nfts.length === 0 ? (
             <p className="text-lg text-center text-white">
-              You have no NFTs :(
+              You have no NFTs : (
             </p>
           ) : (
             <div className="flex flex-wrap items-center">

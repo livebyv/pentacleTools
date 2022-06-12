@@ -320,7 +320,10 @@ const ValidatorList = () => {
 
   const firstHundred = useMemo(() => {
     return filteredValidatorMetas.slice(0, 100).map((meta) => (
-      <div className="border border-gray-600 card">
+      <div
+        key={meta?.voteAccountInfo?.votePubkey}
+        className="border border-gray-600 card"
+      >
         <div
           className="card-body"
           onClick={() => setSelectedValidator(meta.validatorInfo.key)}
@@ -672,6 +675,7 @@ function StakeView() {
             return (
               <>
                 <div
+                  key={account.address.toBase58()}
                   className={`card bg-neutral ${
                     !!delegation ? "border border-primary" : ""}`}
                 >

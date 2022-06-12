@@ -262,7 +262,7 @@ const ValidatorList = () => {
     ValidatorMeta[]
   >([]);
 
-  const maxComission = watch("maxCommission", "");
+  const maxCommission = watch("maxCommission", "");
   const searchCriteria = watch("searchCriteria", "");
 
   const {
@@ -306,13 +306,13 @@ const ValidatorList = () => {
             : true;
 
           return (
-            meta.voteAccountInfo.commission <= +maxComission &&
+            meta.voteAccountInfo.commission <= +maxCommission &&
             (votePubkeyMatches || nameMatches)
           );
         })
         .filter((meta) => !!meta?.validatorInfo?.key)
     );
-  }, [validatorMetas, maxComission, searchCriteria]);
+  }, [validatorMetas, maxCommission, searchCriteria]);
 
   const [selectedValidator, setSelectedValidator] = useState<
     PublicKey | undefined
@@ -332,7 +332,7 @@ const ValidatorList = () => {
           <hr className="opacity-10" />
 
           <h3 className="text-lg">
-            <span className="badge">
+            <span className="mr-3 badge">
               {" "}
               Identity{" "}
               <a
@@ -349,7 +349,7 @@ const ValidatorList = () => {
           <hr className="opacity-10" />
 
           <h3 className="text-lg">
-            <span className="badge">
+            <span className="mr-3 badge">
               Vote Account
               <a
                 href={`https://solscan.io/account/${meta?.voteAccountInfo?.votePubkey}`}
@@ -389,7 +389,7 @@ const ValidatorList = () => {
             />
           </div>
           <div className="flex flex-col gap-3 items-center">
-            <label>Max Commission: {maxComission}% </label>
+            <label>Max Commission: {maxCommission}% </label>
             <input
               type="range"
               min="0"
@@ -662,7 +662,7 @@ function StakeView() {
           <button className="mt-4 btn btn-ghost loading"></button>
         </div>
       )}
-      <div className="w-full text-center">
+      <div className="mb-6 w-full text-center">
         <WalletMultiButton />
       </div>
       {!loading && !stakeAccounts && connected && (

@@ -153,9 +153,9 @@ function Context({ children }: { children: React.ReactNode }) {
             <MenuLink activatesDrawer={false} href="/arweave-upload">
               <i className="mr-3">
                 <img
-                  src={ImageURI.ArweaveLogo}
-                  width={"16px"}
-                  height={"16px"}
+                  src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
+                  width={16}
+                  height={16}
                 />
               </i>
               <span>Arweave Upload</span>
@@ -205,7 +205,7 @@ function Context({ children }: { children: React.ReactNode }) {
             className={`relative col-span-2 my-28 lg:col-span-1`}
             style={{ maxWidth: "100%" }}
           >
-            <div className="px-6 mx-auto max-w-full" style={{  width: 1200 }}>
+            <div className="px-6 mx-auto max-w-full" style={{ width: 1200 }}>
               {/* <div className="mb-8 alert alert-warning">
                 <div>
                   <svg

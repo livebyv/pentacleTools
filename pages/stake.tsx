@@ -328,10 +328,12 @@ const ValidatorList = () => {
           className="card-body"
           onClick={() => setSelectedValidator(meta.validatorInfo.key)}
         >
-          <h3 className="text-2xl">{meta?.validatorInfo?.info?.name}</h3>
+          <h3 className="relative text-2xl">{meta?.validatorInfo?.info?.name}
+            <span className="absolute top-0 right-0 badge badge-secondary">Commission: {meta?.voteAccountInfo.commission} %</span>
+          </h3>
           <hr className="opacity-10" />
 
-          <h3 className="text-lg">
+          <div className="flex justify-between items-center text-lg">
             <span className="mr-3 badge">
               {" "}
               Identity{" "}
@@ -345,10 +347,10 @@ const ValidatorList = () => {
               </a>
             </span>
             {meta.validatorInfo?.key.toBase58()}
-          </h3>
+          </div>
           <hr className="opacity-10" />
 
-          <h3 className="text-lg">
+          <div className="flex justify-between items-center text-lg">
             <span className="mr-3 badge">
               Vote Account
               <a
@@ -362,7 +364,7 @@ const ValidatorList = () => {
             </span>
 
             {meta?.voteAccountInfo?.votePubkey}
-          </h3>
+          </div>
         </div>
       </div>
     ));

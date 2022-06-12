@@ -369,10 +369,10 @@ const ValidatorList = () => {
     <>
       <h2 className="relative mt-6 mb-3 text-2xl text-center">Validators</h2>
       <div className="text-center">
-       Total: {filteredValidatorMetas.length} active Validators with this search
-      criteria 
+        Total: {filteredValidatorMetas.length} active Validators with this
+        search criteria
       </div>
-     <br />
+      <br />
       <form className="" onSubmit={handleSubmit((res) => {})}>
         <div className="grid grid-cols-2 gap-6 my-6 w-full">
           <div className="flex gap-3 items-center">
@@ -616,12 +616,9 @@ function StakeView() {
 
   return (
     <>
-      <div className="w-full text-center">
-        <WalletMultiButton />
-      </div>
       <hr className="my-4 opacity-10" />
       <h2 className="relative text-2xl text-center">
-        SOL Stake Accounts{" "}
+        SOL Validator Staking{" "}
         {/* <button
           className="absolute right-0 z-50 btn btn-xs btn-primary"
           onClick={() => setIsAdding(!isAdding)}
@@ -660,7 +657,10 @@ function StakeView() {
           <button className="mt-4 btn btn-ghost loading"></button>
         </div>
       )}
-      {!loading && !stakeAccounts && (
+      <div className="w-full text-center">
+        <WalletMultiButton />
+      </div>
+      {!loading && !stakeAccounts && connected && (
         <div className="w-full text-center">
           <span className="text-xl">You do not have any stake accounts</span>
         </div>

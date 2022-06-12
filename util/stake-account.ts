@@ -9,12 +9,13 @@ import {
 import { coerce, create, instance, string } from "superstruct";
 import BN from "bignumber.js";
 import { Infer, number, nullable, enums, type } from "superstruct";
+import { toPublicKey } from "./to-publickey";
 /* eslint-disable @typescript-eslint/no-redeclare */
 
 export const PublicKeyFromString = coerce(
   instance(PublicKey),
   string(),
-  (value) => new PublicKey(value)
+  (value) => toPublicKey(value)
 );
 export const BigNumFromString = coerce(instance(BN), string(), (value) => {
   if (typeof value === "string") return new BN(value, 10);

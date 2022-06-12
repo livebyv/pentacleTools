@@ -2,6 +2,7 @@ import { from } from "rxjs";
 import { mergeMap, toArray, map } from "rxjs/operators";
 import { Connection, ParsedInstruction, PublicKey } from "@solana/web3.js";
 import { sliceIntoChunks } from "./slice-into-chunks";
+import { toPublicKey } from "./to-publickey";
 
 let count = 0;
 export async function getMints(
@@ -15,7 +16,7 @@ export async function getMints(
     let retries = 0;
     while (true) {
       const signatures = await connection.getSignaturesForAddress(
-        new PublicKey(candy_id),
+        toPublicKey(candy_id),
         options
       );
       if (signatures.length == 0) {
@@ -45,7 +46,7 @@ export async function getMints(
             if (!parsedTxs?.every((tx) => !!tx)) {
               retries++;
             } else {
-              return parsedTxs.filter(tx => !!tx);
+              return parsedTxs.filter((tx) => !!tx);
             }
           }
         }, 4),

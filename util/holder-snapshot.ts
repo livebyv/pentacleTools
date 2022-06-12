@@ -1,6 +1,7 @@
 import { Connection, ParsedAccountData, PublicKey } from "@solana/web3.js";
 import { from, lastValueFrom } from "rxjs";
 import { mergeMap } from "rxjs/operators";
+import { toPublicKey } from "./to-publickey";
 
 export async function getOwners(
   mints: string[],
@@ -12,7 +13,7 @@ export async function getOwners(
   const mints_obs = from(mints).pipe(
     mergeMap(async (mint) => {
       const token_account = (
-        await connection.getTokenLargestAccounts(new PublicKey(mint))
+        await connection.getTokenLargestAccounts(toPublicKey(mint))
       )?.value[0]?.address;
       if (token_account) {
         const token_account_info = await connection.getParsedAccountInfo(

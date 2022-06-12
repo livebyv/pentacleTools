@@ -1,6 +1,7 @@
 import { VoteAccountInfo, ValidatorInfo, PublicKey } from "@solana/web3.js";
 import { sleep } from "./sleep";
 import { ValidatorApy } from "./stakeviewApp";
+import { toPublicKey } from "./to-publickey";
 import { ValidatorScore } from "./validatorsApp";
 export interface ValidatorMeta {
   voteAccountInfo: VoteAccountInfo;
@@ -41,7 +42,7 @@ export async function validatorBatcher(
 
     const validatorInfoIndex = remainingValidatorInfos.findIndex(
       (validatorInfo) =>
-        validatorInfo.key.equals(new PublicKey(voteAccountInfo.nodePubkey))
+        validatorInfo.key.equals(toPublicKey(voteAccountInfo.nodePubkey))
     );
     let validatorInfo: ValidatorInfo | undefined;
     [validatorInfo] =
@@ -81,7 +82,7 @@ export async function validatorBatcher(
 
     const validatorInfoIndex = remainingValidatorInfos.findIndex(
       (validatorInfo) =>
-        validatorInfo.key.equals(new PublicKey(voteAccountInfo.nodePubkey))
+        validatorInfo.key.equals(toPublicKey(voteAccountInfo.nodePubkey))
     );
     let validatorInfo: ValidatorInfo | undefined;
     [validatorInfo] =

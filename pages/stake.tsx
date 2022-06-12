@@ -374,6 +374,8 @@ const ValidatorList = () => {
       <div className="text-center">
         Total: {filteredValidatorMetas.length} active Validators with this
         search criteria
+        <br />
+        Showing first 100
       </div>
       <br />
       <form className="" onSubmit={handleSubmit((res) => {})}>
@@ -392,7 +394,7 @@ const ValidatorList = () => {
               type="range"
               min="0"
               max="100"
-              defaultValue={7}
+              defaultValue={0}
               className="range range-sm"
               {...register("maxCommission")}
               step="1"

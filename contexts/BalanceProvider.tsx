@@ -42,7 +42,7 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
   const { connection } = useConnection();
 
   useEffect(() => {
-    const iv = setInterval(async () => {
+    const fetchBalances = async () => {
       dispatch({
         type: "solBalance",
         payload: {
@@ -61,6 +61,12 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
           ).value.uiAmount.toFixed(2),
         },
       });
+    };
+
+    fetchBalances();
+
+    const iv = setInterval(async () => {
+      await fetchBalances();
     }, 10000);
     return () => clearInterval(iv);
   }, []);

@@ -379,7 +379,7 @@ const ValidatorList = () => {
       </div>
       <br />
       <form className="" onSubmit={handleSubmit((res) => {})}>
-        <div className="grid grid-cols-2 gap-6 my-6 w-full">
+        <div className="grid gap-6 my-6 w-full md:grid-cols-2">
           <div className="flex gap-3 items-center">
             <SearchIcon width={32} height={32} />
             <input
@@ -394,7 +394,7 @@ const ValidatorList = () => {
               type="range"
               min="0"
               max="100"
-              defaultValue={0}
+              defaultValue={100}
               className="range range-sm"
               {...register("maxCommission")}
               step="1"
@@ -402,7 +402,7 @@ const ValidatorList = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">{firstHundred}</div>
+        <div className="grid gap-2 lg:grid-cols-2">{firstHundred}</div>
       </form>
     </>
   );

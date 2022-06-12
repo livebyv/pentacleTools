@@ -98,3 +98,7 @@ i svg {
 svg {
   display: inline !important;
 }
+
+.card-selected {
+  box-shadow: 0px 0px 0px 2px hsl(var(--p) / var(--tw-bg-opacity));
+}

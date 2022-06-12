@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import jsonFormat from "json-format";
 import { download } from "../util/download";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
@@ -19,15 +19,17 @@ import { sliceIntoChunks } from "../util/slice-into-chunks";
 import { parseAddresses } from "../util/parse-addresses";
 import { useModal } from "../contexts/ModalProvider";
 import { LinkIcon } from "../components/icons";
+import { useBalance } from "../contexts/BalanceProvider";
 
 export default function Snedmaster() {
   const [loading, setLoading] = useState(false);
   const { connection } = useConnection();
   const { setAlertState } = useAlert();
   const { setModalState } = useModal();
-  const [solBalance, setSolBalance] = useState<number | "none">("none");
+  const { solBalance } = useBalance();
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
-  const wallet = useWallet();
+  const { publicKey, connected, signAllTransactions } = useWallet();
+  const pubkeyString = useMemo(() => publicKey?.toBase58(), [publicKey]);
 
   const mint = useCallback(
     async ({ amount, ids = "" }: { amount: string; ids: string }) => {
@@ -70,12 +72,10 @@ export default function Snedmaster() {
             SystemProgram.transfer({
               lamports: Math.round(amount * LAMPORTS_PER_SOL),
               toPubkey: toPublicKey(destination),
-              fromPubkey: wallet?.publicKey,
+              fromPubkey: publicKey,
             }),
             new TransactionInstruction({
-              keys: [
-                { pubkey: wallet?.publicKey, isSigner: true, isWritable: true },
-              ],
+              keys: [{ pubkey: publicKey, isSigner: true, isWritable: true }],
               data: Buffer.from(`Sent over pentacle.tools`, "utf-8"),
               programId: MEMO_ID,
             }),
@@ -102,14 +102,14 @@ export default function Snedmaster() {
           const tx = new Transaction();
           const ixs = [...slice.map((s) => s.ixs).flat()];
           tx.add(...ixs);
-          tx.feePayer = wallet?.publicKey;
+          tx.feePayer = publicKey;
           tx.recentBlockhash = (
             await getBlockhashWithRetries(connection)
           ).blockhash;
           txs.push(tx);
         }
 
-        await wallet.signAllTransactions(txs);
+        await signAllTransactions(txs);
 
         let counter = 1;
 
@@ -157,20 +157,12 @@ export default function Snedmaster() {
         setLoading(false);
       }
     },
-    [connection, isSnackbarOpen, wallet, setAlertState, setModalState]
+    [connection, isSnackbarOpen, setAlertState, setModalState]
   );
 
   const clipboardNotification = () =>
     setAlertState({ message: "Copied to clipboard!", duration: 2000 });
 
-  useEffect(() => {
-    if (wallet?.publicKey) {
-      const itv = setInterval(async () => {
-        setSolBalance(await connection.getBalance(wallet?.publicKey).catch());
-      }, 1000);
-      return () => clearInterval(itv);
-    }
-  }, [connection, wallet?.publicKey]);
   return (
     <>
       <div className="mb-3 w-full max-w-full text-center">
@@ -185,71 +177,59 @@ export default function Snedmaster() {
       <hr className="my-4 opacity-10" />
 
       <div className={`grid grid-cols-1 gap-4`}>
-        {wallet && (
-          <div className="card bg-primary">
-            <div className="p-4 card-body">
-              <div className="flex flex-row gap-5 items-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/solana-logo.jpeg"
-                  className="w-14 h-14 rounded-full"
-                  width="56"
-                  height="56"
-                  alt=""
-                />
-                {wallet?.connected ? (
-                  <div>
-                    Address:
-                    <CopyToClipboard
-                      text={wallet?.publicKey?.toBase58()}
-                      onCopy={clipboardNotification}
-                    >
-                      <span className={`ml-1 cursor-pointer`}>
-                        {wallet?.publicKey?.toBase58()}
-                      </span>
-                    </CopyToClipboard>
-                    <p>
-                      Balance:{" "}
-                      {solBalance === "none" ? (
-                        <span style={{ marginLeft: "1rem" }}>
-                          <button className="btn btn-ghost loading btn-disabled"></button>
-                        </span>
-                      ) : (
-                        solBalance / LAMPORTS_PER_SOL
-                      )}
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <WalletMultiButton />
-                    {!wallet?.connected && (
-                      <h2 className="text-2xl">Please log into wallet!</h2>
-                    )}
-                  </>
-                )}
+        <div className="card bg-primary">
+          <div className="p-4 card-body">
+            <div className="flex flex-row gap-5 items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/solana-logo.jpeg"
+                className="w-14 h-14 rounded-full"
+                width="56"
+                height="56"
+              />
+              {connected ? (
+                <div>
+                  Address:
+                  <CopyToClipboard
+                    text={pubkeyString}
+                    onCopy={clipboardNotification}
+                  >
+                    <span className={`ml-1 cursor-pointer`}>
+                      {pubkeyString}
+                    </span>
+                  </CopyToClipboard>
+                  <p>Balance:{solBalance}</p>
+                </div>
+              ) : (
+                <>
+                  <WalletMultiButton />
+                  {!connected && (
+                    <h2 className="text-2xl">Please log into wallet!</h2>
+                  )}
+                </>
+              )}
 
-                <div className="ml-auto">
-                  <div className="btn-group">
-                    {wallet?.connected && (
-                      <a
-                        className="btn btn-circle btn-sm"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        href={`https://solanabeach.io/address/${wallet?.publicKey.toBase58()}`}
-                      >
-                        <LinkIcon width={16} height={16} />
-                      </a>
-                    )}
-                  </div>
+              <div className="ml-auto">
+                <div className="btn-group">
+                  {connected && (
+                    <a
+                      className="btn btn-circle btn-sm"
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      href={`https://solanabeach.io/address/${pubkeyString}`}
+                    >
+                      <LinkIcon width={16} height={16} />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       <hr className="my-4 opacity-10" />
-      {wallet?.connected && <IdField sned={(e) => mint(e)} loading={loading} />}
+      {connected && <IdField sned={(e) => mint(e)} loading={loading} />}
     </>
   );
 }

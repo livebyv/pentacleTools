@@ -1,7 +1,4 @@
-// DISCLAIMER:
-// THIS FILE IS ABSOLUTE CHAOS AND I KNOW IT!
-
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
 import jsonFormat from "json-format";
 import { Controller, useForm } from "react-hook-form";
@@ -19,10 +16,9 @@ import { useModal } from "../contexts/ModalProvider";
 import { Creator } from "../util/metadata-schema";
 import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js-next";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
-import { SHDW_TOKEN } from "../util/accounts";
 import { shortenAddress } from "../util/shorten-address";
 import { sleep } from "../util/sleep";
+import { useBalance } from "../contexts/BalanceProvider";
 
 export default function GibAirdrop() {
   const {
@@ -191,23 +187,25 @@ export default function GibAirdrop() {
           `${Math.round((bytes * 1.2) / 1000)}kb`
         );
 
-        const animFile = files.find((_m) => _m.type.startsWith("video") || _m.type.startsWith("glb"));
+        const animFile = files.find(
+          (_m) => _m.type.startsWith("video") || _m.type.startsWith("glb")
+        );
         const imgFile = files.find((_m) => _m.type.startsWith("image"));
 
         meta.animation_url = formData.animationUrlFileName
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.animationUrlFileName}`
           : !!animFile?.name
-            ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${animFile.name}`
-            : null;
+          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${animFile.name}`
+          : null;
         meta.image = formData.imageUrlFileName
           ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${formData.imageUrlFileName}`
           : !!imgFile?.name
-            ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${imgFile.name}`
-            : null;
+          ? `https://shdw-drive.genesysgo.net/${shdw_bucket}/${imgFile.name}`
+          : null;
 
         meta.properties.files = files.map((f) => {
           return {
-            type: f.type || 'glb',
+            type: f.type || "glb",
             uri: `https://shdw-drive.genesysgo.net/${shdw_bucket}/${f.name}`,
           };
         });
@@ -225,13 +223,12 @@ export default function GibAirdrop() {
           type: "application/json",
         });
 
-
         setAlertState({
           message: (
             <div className="flex flex-row">
-              <button className="loading btn btn-ghost"/>
-              Signing and Minting NFT, check wallet for signature request.
-              There will be several.
+              <button className="loading btn btn-ghost" />
+              Signing and Minting NFT, check wallet for signature request. There
+              will be several.
             </div>
           ),
           open: true,
@@ -303,25 +300,7 @@ export default function GibAirdrop() {
     [wallet, files, connection, setAlertState]
   );
 
-  const [balances, setBalances] = useState({
-    shdw: "0",
-    sol: "0",
-  });
-
-  useEffect(() => {
-    (async () => {
-      if (wallet.publicKey) {
-        const shdwBalance = await connection.getTokenAccountBalance(
-          await getAssociatedTokenAddress(SHDW_TOKEN, wallet.publicKey)
-        );
-        const solBalance = await connection.getBalance(wallet.publicKey);
-        setBalances({
-          shdw: shdwBalance.value.uiAmount.toFixed(2),
-          sol: (solBalance / LAMPORTS_PER_SOL).toFixed(2),
-        });
-      }
-    })();
-  }, [wallet?.publicKey]);
+  const { solBalance, shdwBalance } = useBalance();
 
   return wallet?.publicKey ? (
     <div>
@@ -332,10 +311,12 @@ export default function GibAirdrop() {
       </h2>
 
       <div>
-        {!!balances.shdw && (
+        {!!shdwBalance && (
           <div className="mt-3 w-full text-center">
-            <span className="badge badge-success">{balances.shdw} SHDW</span>
-            <span className="ml-3 badge badge-primary">{balances.sol} SOL</span>
+            <span className="badge badge-success">{shdwBalance} SHDW</span>
+            <span className="ml-3 badge badge-primary">
+              {solBalance}BalashdwBalance SOL
+            </span>
           </div>
         )}
       </div>
@@ -373,8 +354,9 @@ export default function GibAirdrop() {
                 <input
                   type="text"
                   placeholder="Name"
-                  className={`input input-bordered ${!!errors.name ? "input-error" : ""
-                    }`}
+                  className={`input input-bordered ${
+                    !!errors.name ? "input-error" : ""
+                  }`}
                   {...register("name", { required: true, maxLength: 32 })}
                 />
                 {errors.name && (
@@ -399,8 +381,9 @@ export default function GibAirdrop() {
                 <input
                   type="text"
                   placeholder="Symbol"
-                  className={`input input-bordered ${!!errors.symbol ? "input-error" : ""
-                    }`}
+                  className={`input input-bordered ${
+                    !!errors.symbol ? "input-error" : ""
+                  }`}
                   {...register("symbol", { maxLength: 10 })}
                 />
                 {errors.symbol && (
@@ -441,8 +424,9 @@ export default function GibAirdrop() {
                   type="text"
                   placeholder="External URL"
                   {...register("external_url", { pattern: URL_MATCHER })}
-                  className={`input input-bordered ${!!errors.external_url ? "input-error" : ""
-                    }`}
+                  className={`input input-bordered ${
+                    !!errors.external_url ? "input-error" : ""
+                  }`}
                 />
 
                 {errors.external_url && (
@@ -501,8 +485,9 @@ export default function GibAirdrop() {
                     min: 0,
                     max: 10_000,
                   })}
-                  className={`input input-bordered ${!!errors.seller_fee_basis_points ? "input-error" : ""
-                    }`}
+                  className={`input input-bordered ${
+                    !!errors.seller_fee_basis_points ? "input-error" : ""
+                  }`}
                 />
 
                 {errors.seller_fee_basis_points && (

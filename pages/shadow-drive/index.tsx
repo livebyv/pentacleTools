@@ -5,18 +5,17 @@ import Head from "next/head";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { ShdwDrive } from "@shadow-drive/sdk";
 import { StorageAccount } from "@shadow-drive/sdk/dist/types";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
 
 import { useAlert } from "../../contexts/AlertProvider";
 import { sizeMB } from "../../components/file-tile";
 import { ImageURI } from "../../util/image-uri";
-import { SHDW_TOKEN } from "../../util/accounts";
 import { FileUpload } from "../../components/file-upload";
 import { useFiles } from "../../contexts/FileProvider";
 import { sliceIntoChunks } from "../../util/slice-into-chunks";
 import createFileList from "../../util/create-file-list";
 import { TrashIcon } from "../../components/icons";
+import { BalanceProvider, useBalance } from "../../contexts/BalanceProvider";
 
 const sortStorageAccounts = (a, b) =>
   b.account.creationTime - a.account.creationTime;
@@ -32,10 +31,8 @@ const isValidUnit = (str: string) => {
   }
   return true;
 };
-export default function ShdwDrivePage() {
+function ShdwDrivePage() {
   const initState: {
-    balance: string;
-    shdwBalance: string;
     totalFileSize: number;
     uploading: string;
     isResizing: string;
@@ -48,8 +45,6 @@ export default function ShdwDrivePage() {
     isCreatingStorageAccount: boolean;
     loading: boolean;
   } = {
-    balance: "",
-    shdwBalance: "",
     totalFileSize: 0,
     isResizing: "",
     uploadInProgress: false,
@@ -68,37 +63,35 @@ export default function ShdwDrivePage() {
       action:
         | { type: "totalFileSize"; payload?: { totalFileSize: number } }
         | {
-          type: "increaseOrDecrease";
-          payload?: { increaseOrDecrease: "increase" | "decrease" };
-        }
+            type: "increaseOrDecrease";
+            payload?: { increaseOrDecrease: "increase" | "decrease" };
+          }
         | { type: "isResizing"; payload?: { isResizing: string } }
         | { type: "loading"; payload?: { loading: boolean } }
-        | { type: "balance"; payload?: { balance: string } }
         | { type: "uploadInProgress"; payload?: { uploadInProgress: boolean } }
         | { type: "uploading"; payload?: { uploading: string } }
-        | { type: "shdwBalance"; payload?: { shdwBalance: string } }
         | {
-          type: "createStorageLoading";
-          payload?: { createStorageLoading: boolean };
-        }
+            type: "createStorageLoading";
+            payload?: { createStorageLoading: boolean };
+          }
         | { type: "shdwDrive"; payload?: { shdwDrive: ShdwDrive } }
         | {
-          type: "isCreatingStorageAccount";
-          payload?: { isCreatingStorageAccount: boolean };
-        }
+            type: "isCreatingStorageAccount";
+            payload?: { isCreatingStorageAccount: boolean };
+          }
         | {
-          type: "storageAccounts";
-          payload?: {
-            storageAccounts: {
-              account: StorageAccount;
-              publicKey: PublicKey;
-            }[];
-          };
-        }
+            type: "storageAccounts";
+            payload?: {
+              storageAccounts: {
+                account: StorageAccount;
+                publicKey: PublicKey;
+              }[];
+            };
+          }
         | {
-          type: "buttonsLoading";
-          payload?: { buttonsLoading: Record<string, boolean> };
-        }
+            type: "buttonsLoading";
+            payload?: { buttonsLoading: Record<string, boolean> };
+          }
     ) => {
       switch (action.type) {
         case "loading":
@@ -119,12 +112,8 @@ export default function ShdwDrivePage() {
             ...state,
             uploadInProgress: action.payload.uploadInProgress,
           };
-        case "balance":
-          return { ...state, balance: action.payload.balance };
         case "storageAccounts":
           return { ...state, storageAccounts: action.payload.storageAccounts };
-        case "shdwBalance":
-          return { ...state, shdwBalance: action.payload.shdwBalance };
         case "shdwDrive":
           return { ...state, shdwDrive: action.payload.shdwDrive };
         case "isCreatingStorageAccount":
@@ -154,6 +143,9 @@ export default function ShdwDrivePage() {
   const { connection } = useConnection();
   const { files, setFiles } = useFiles();
   const wallet = useWallet();
+  const {
+    balance: { shdw, sol },
+  } = useBalance();
 
   const uploadFiles = useCallback(
     async (account: PublicKey) => {
@@ -190,10 +182,10 @@ export default function ShdwDrivePage() {
         });
       } catch (e) {
         setAlertState({
-          message: 'An error occured. Check Console for more info!',
+          message: "An error occured. Check Console for more info!",
           open: true,
           duration: 10000,
-          severity: 'error'
+          severity: "error",
         });
         dispatch({
           type: "uploadInProgress",
@@ -230,7 +222,7 @@ export default function ShdwDrivePage() {
           payload: { shdwDrive },
         });
         const storageAccounts = await shdwDrive.getStorageAccounts();
-        debugger
+        debugger;
 
         dispatch({
           type: "storageAccounts",
@@ -242,20 +234,6 @@ export default function ShdwDrivePage() {
           },
         });
 
-        const shdwBalance = await connection.getTokenAccountBalance(
-          await getAssociatedTokenAddress(SHDW_TOKEN, wallet.publicKey)
-        );
-        const solBalance = await connection.getBalance(wallet.publicKey);
-        dispatch({
-          type: "shdwBalance",
-          payload: {
-            shdwBalance: shdwBalance.value.uiAmount.toFixed(2),
-          },
-        });
-        dispatch({
-          type: "balance",
-          payload: { balance: (solBalance / LAMPORTS_PER_SOL).toFixed(2) },
-        });
         dispatch({ type: "loading", payload: { loading: false } });
       }
     })();
@@ -289,10 +267,10 @@ export default function ShdwDrivePage() {
           message: <></>,
         });
         setAlertState({
-          message: 'Storage account created at ' + response.shdw_bucket,
+          message: "Storage account created at " + response.shdw_bucket,
           open: true,
           duration: 3000,
-          severity: 'success'
+          severity: "success",
         });
 
         reset();
@@ -318,9 +296,9 @@ export default function ShdwDrivePage() {
           message: <></>,
         });
         setAlertState({
-          message: 'An error occured. Check Console for more info!',
+          message: "An error occured. Check Console for more info!",
           duration: 10000,
-          severity: 'error',
+          severity: "error",
           open: true,
         });
       }
@@ -340,9 +318,9 @@ export default function ShdwDrivePage() {
       const response = await state.shdwDrive.deleteStorageAccount(publicKey);
       if (response.txid) {
         setAlertState({
-          message: 'Storage Account is marked for deletion',
+          message: "Storage Account is marked for deletion",
           open: true,
-          duration: 3000
+          duration: 3000,
         });
         const updatedArr = [...state.storageAccounts];
         updatedArr[i].account.deleteRequestEpoch =
@@ -397,7 +375,7 @@ export default function ShdwDrivePage() {
         publicKey
       );
       setAlertState({
-        message: 'Storage Account delete request will be cancelled',
+        message: "Storage Account delete request will be cancelled",
         duration: 3000,
         open: true,
       });
@@ -413,10 +391,10 @@ export default function ShdwDrivePage() {
       });
     } catch (e) {
       setAlertState({
-        message: 'An error occured. Check Console for more info!',
+        message: "An error occured. Check Console for more info!",
         open: true,
         duration: 10000,
-        severity: 'error'
+        severity: "error",
       });
       console.log(e);
     }
@@ -467,10 +445,10 @@ export default function ShdwDrivePage() {
       });
       console.error(e);
       setAlertState({
-        message: 'An error occured. Check Console for more info!',
+        message: "An error occured. Check Console for more info!",
         open: true,
         duration: 10000,
-        severity: 'error'
+        severity: "error",
       });
     }
   };
@@ -515,14 +493,10 @@ export default function ShdwDrivePage() {
             }}
           />
         </h1>
-        {!!state.shdwBalance && (
+        {!!shdw && (
           <div className="mt-3">
-            <span className="badge badge-success">
-              {state.shdwBalance} SHDW
-            </span>
-            <span className="ml-3 badge badge-primary">
-              {state.balance} SOL
-            </span>
+            <span className="badge badge-success">{shdw} SHDW</span>
+            <span className="ml-3 badge badge-primary">{sol} SOL</span>
           </div>
         )}
         <hr className="my-4 opacity-10" />
@@ -585,8 +559,9 @@ export default function ShdwDrivePage() {
                         />
                       )}
                       <button
-                        className={`btn btn-primary btn-sm ${state.isCreatingStorageAccount ? "w-24" : ""
-                          }`}
+                        className={`btn btn-primary btn-sm ${
+                          state.isCreatingStorageAccount ? "w-24" : ""
+                        }`}
                         onClick={async () => {
                           dispatch({
                             type: "isCreatingStorageAccount",
@@ -624,8 +599,9 @@ export default function ShdwDrivePage() {
                           <div className="flex flex-row gap-6 w-full">
                             <div className="w-full">
                               <span
-                                className={`${!!account.deleteRequestEpoch && "text-red-500"
-                                  }`}
+                                className={`${
+                                  !!account.deleteRequestEpoch && "text-red-500"
+                                }`}
                               >
                                 {" "}
                                 <strong>{account.identifier}</strong>
@@ -639,7 +615,12 @@ export default function ShdwDrivePage() {
                                 </span>
                               )}
                               <br />
-                              <span className="my-2">Created:  {new Date(account.creationTime * 1000).toLocaleString()}</span>
+                              <span className="my-2">
+                                Created:{" "}
+                                {new Date(
+                                  account.creationTime * 1000
+                                ).toLocaleString()}
+                              </span>
                               <br />
 
                               <a
@@ -663,10 +644,11 @@ export default function ShdwDrivePage() {
                                   </a>
                                 )}
                                 <button
-                                  className={`btn btn-sm m-2 ${state.uploading === pubKeyString
-                                    ? "btn-error btn-outline"
-                                    : "btn-primary"
-                                    }`}
+                                  className={`btn btn-sm m-2 ${
+                                    state.uploading === pubKeyString
+                                      ? "btn-error btn-outline"
+                                      : "btn-primary"
+                                  }`}
                                   onClick={() => {
                                     if (state.uploading === pubKeyString) {
                                       setFiles([]);
@@ -698,10 +680,11 @@ export default function ShdwDrivePage() {
                                 </button>
 
                                 <button
-                                  className={`btn btn-primary btn-sm my-2 ${state.isResizing === pubKeyString
-                                    ? "btn-outline"
-                                    : ""
-                                    }`}
+                                  className={`btn btn-primary btn-sm my-2 ${
+                                    state.isResizing === pubKeyString
+                                      ? "btn-outline"
+                                      : ""
+                                  }`}
                                   onClick={() => handleResize(pubKeyString)}
                                 >
                                   {state.isResizing !== pubKeyString
@@ -712,10 +695,11 @@ export default function ShdwDrivePage() {
                                 {!account.deleteRequestEpoch &&
                                   !(state.uploading === pubKeyString) && (
                                     <button
-                                      className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${!!state.buttonsLoading[pubKeyString]
-                                        ? "loading"
-                                        : ""
-                                        } `}
+                                      className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${
+                                        !!state.buttonsLoading[pubKeyString]
+                                          ? "loading"
+                                          : ""
+                                      } `}
                                       onClick={() =>
                                         handleDeleteStorageAccount({
                                           pubKeyString,
@@ -735,9 +719,10 @@ export default function ShdwDrivePage() {
                                   )}
                                 {!!account.deleteRequestEpoch && (
                                   <button
-                                    className={`btn btn-error btn-sm w-32 btn-outline ml-auto ${state.buttonsLoading[pubKeyString] &&
+                                    className={`btn btn-error btn-sm w-32 btn-outline ml-auto ${
+                                      state.buttonsLoading[pubKeyString] &&
                                       " loading"
-                                      }`}
+                                    }`}
                                     onClick={() =>
                                       handleCancelDeleteStorageAccountRequest({
                                         pubKeyString,
@@ -760,8 +745,9 @@ export default function ShdwDrivePage() {
                                 pubKeyString === state.uploading && (
                                   <div className="flex flex-col mb-2">
                                     <button
-                                      className={`btn btn-primary btn-sm ml-auto ${state.uploadInProgress ? "loading" : ""
-                                        }`}
+                                      className={`btn btn-primary btn-sm ml-auto ${
+                                        state.uploadInProgress ? "loading" : ""
+                                      }`}
                                       onClick={() => uploadFiles(publicKey)}
                                     >
                                       {/* @TODO */}
@@ -799,10 +785,11 @@ export default function ShdwDrivePage() {
                             <div className="flex flex-row gap-3">
                               <div className="btn-group">
                                 <button
-                                  className={`btn btn-sm ${state.increaseOrDecrease === "increase"
-                                    ? "btn-active"
-                                    : ""
-                                    }`}
+                                  className={`btn btn-sm ${
+                                    state.increaseOrDecrease === "increase"
+                                      ? "btn-active"
+                                      : ""
+                                  }`}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     dispatch({
@@ -816,10 +803,11 @@ export default function ShdwDrivePage() {
                                   Increase
                                 </button>
                                 <button
-                                  className={`btn btn-sm ${state.increaseOrDecrease === "decrease"
-                                    ? "btn-active"
-                                    : ""
-                                    }`}
+                                  className={`btn btn-sm ${
+                                    state.increaseOrDecrease === "decrease"
+                                      ? "btn-active"
+                                      : ""
+                                  }`}
                                   onClick={(e) => {
                                     e.preventDefault();
                                     dispatch({
@@ -884,3 +872,13 @@ export default function ShdwDrivePage() {
     </>
   );
 }
+
+const Wrapped = () => {
+  return (
+    <BalanceProvider>
+      <ShdwDrivePage />
+    </BalanceProvider>
+  );
+};
+
+export default Wrapped;

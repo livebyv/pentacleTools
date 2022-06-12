@@ -143,9 +143,7 @@ function ShdwDrivePage() {
   const { connection } = useConnection();
   const { files, setFiles } = useFiles();
   const wallet = useWallet();
-  const {
-    balance: { shdw, sol },
-  } = useBalance();
+  const { solBalance, shdwBalance } = useBalance();
 
   const uploadFiles = useCallback(
     async (account: PublicKey) => {
@@ -493,10 +491,10 @@ function ShdwDrivePage() {
             }}
           />
         </h1>
-        {!!shdw && (
+        {!!shdwBalance && (
           <div className="mt-3">
-            <span className="badge badge-success">{shdw} SHDW</span>
-            <span className="ml-3 badge badge-primary">{sol} SOL</span>
+            <span className="badge badge-success">{shdwBalance} SHDW</span>
+            <span className="ml-3 badge badge-primary">{solBalance} SOL</span>
           </div>
         )}
         <hr className="my-4 opacity-10" />

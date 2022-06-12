@@ -415,8 +415,9 @@ const ValidatorList = () => {
     <>
       <h2 className="relative mt-6 mb-3 text-2xl text-center">Validators</h2>
       <div className="text-center">
-        Total: {filteredValidatorMetas.length} active Validators with this
-        search criteria
+        Total: {validatorMetas.length} active Validators <br /> 
+        
+        {filteredValidatorMetas.length} with this search criteria
         <br />
         Showing first 100
       </div>

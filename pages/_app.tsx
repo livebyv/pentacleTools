@@ -19,6 +19,7 @@ import { MadeWithLove } from "../components/made-with-love";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { PerformanceProvider } from "../contexts/PerformanceProvider";
 import {
+  BankIcon,
   CameraIcon,
   CoinsIcon,
   FingerPrintIcon,
@@ -164,6 +165,13 @@ function Context({ children }: { children: React.ReactNode }) {
                 <GetCashIcon width={16} height={16} />
               </i>
               <span>SnedMaster 9000</span>
+            </MenuLink>
+
+            <MenuLink href="/stake">
+              <i className="mr-3">
+                <BankIcon width={16} height={16} />
+              </i>
+              <span>Stake View</span>
             </MenuLink>
 
             <div className="absolute left-0 bottom-4 w-full">

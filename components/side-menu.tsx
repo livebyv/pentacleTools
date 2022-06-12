@@ -1,10 +1,10 @@
-import Image from "next/image";
 import { ImageURI } from "../util/image-uri";
 import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { useAlert } from "../contexts/AlertProvider";
 import { MadeWithLove } from "./made-with-love";
 import {
+  BankIcon,
   CameraIcon,
   CoinsIcon,
   FingerPrintIcon,
@@ -29,7 +29,7 @@ export default function SideMenu() {
             rel="noreferrer noopener"
             className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
-            <Image
+            <img
               src={ImageURI.PentacleLogo}
               width={221}
               height={64}
@@ -110,6 +110,12 @@ export default function SideMenu() {
             <GetCashIcon width={16} height={16} />
           </i>
           <span>SnedMaster</span>
+        </MenuLink>
+        <MenuLink href="/stake">
+          <i className="mr-3">
+            <BankIcon width={16} height={16} />
+          </i>
+          <span>Stake View</span>
         </MenuLink>
 
         <div className="mt-auto w-full">

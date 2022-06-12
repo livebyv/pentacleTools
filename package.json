@@ -39,6 +39,7 @@
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "rxjs": "^7.4.0",
+    "superstruct": "^0.16.0",
     "uuid": "^8.3.2",
     "web-file-polyfill": "^1.0.4"
   },

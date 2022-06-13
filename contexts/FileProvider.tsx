@@ -11,11 +11,11 @@ export const FileContext = createContext<{
   setFiles: Dispatch<SetStateAction<File[]>>;
 }>({
   files: [],
-  setFiles: (files: File[]) => { },
+  setFiles: (files: File[]) => {},
 });
 
 export const useFiles = () => useContext(FileContext);
-export function FileProvider({ children }: any) {
+export function FileProvider({ children }: { children: JSX.Element }) {
   const [files, setFiles] = useState<File[]>([]);
 
   return (

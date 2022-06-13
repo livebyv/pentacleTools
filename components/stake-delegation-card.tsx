@@ -26,11 +26,16 @@ export function StakeDelegationCard({
     () => account?.address?.toBase58(),
     [account?.address]
   );
+  const delegationAddress = useMemo(
+    () => account.stakeAccount.info.stake?.delegation?.voter.toBase58(),
+    [account?.address]
+  );
   const shortedAddress = useMemo(
-    () => shortenAddress(accountAddress, 6),
+    () => shortenAddress(accountAddress, 10),
     [accountAddress]
   );
   const delegation = account.stakeAccount.info?.stake?.delegation;
+
   return (
     <div
       key={accountAddress}
@@ -50,8 +55,23 @@ export function StakeDelegationCard({
           </span>
         )}
         <div className="card-title">{shortedAddress}</div>
-        <p>Stake: {account.lamports / LAMPORTS_PER_SOL} SOL</p>
-        {account.stakeAccount.info.stake?.delegation?.voter.toBase58()}
+        <p>
+          <span className="mr-3 badge badge-outline">Stake</span>
+          {account.lamports / LAMPORTS_PER_SOL} SOL
+        </p>
+        {!!delegationAddress && (
+          <span>
+            <a
+              href={`https://solscan.io/account/${delegationAddress}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="inline-flex justify-center items-center cursor-pointer"
+            >
+              <span className="mr-3 badge badge-outline">Delegation</span>
+            {delegationAddress}
+            </a>
+          </span>
+        )}
         {/* {!delegation && (
           <div className="card-actions">
             <button

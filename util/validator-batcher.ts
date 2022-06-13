@@ -16,7 +16,7 @@ export async function validatorBatcher(
   validatorInfos: ValidatorInfo[],
   validatorScores: ValidatorScore[],
   validatorApys: ValidatorApy[],
-  // onValidatorMetas: (metas: ValidatorMeta[]) => void,
+  onValidatorMetas: (metas: ValidatorMeta[]) => void,
   abortSignal: AbortSignal
 ) {
   let validatorMetas: ValidatorMeta[] = [];
@@ -69,7 +69,7 @@ export async function validatorBatcher(
     if (i % BATCH_SIZE === 0) {
       await sleep(1);
       console.log(`batch index: ${i}`);
-      // onValidatorMetas([...validatorMetas]);
+      onValidatorMetas([...validatorMetas]);
     }
 
     if (abortSignal.aborted) {
@@ -109,6 +109,7 @@ export async function validatorBatcher(
     if (i % BATCH_SIZE === 0) {
       await sleep(1);
       console.log(`batch index: ${i}`);
+      onValidatorMetas([...validatorMetas]);
     }
 
     if (abortSignal.aborted) {

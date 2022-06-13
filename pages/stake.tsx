@@ -47,7 +47,6 @@ import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
 import ValidatorCard from "../components/validator-card";
 import { getStakeviewApys, ValidatorApy } from "../util/stakeviewApp";
 import { getValidatorScores, ValidatorScore } from "../util/validatorsApp";
-import CreateStakeAccount from "../components/create-stake-account";
 
 const CONFIG_PROGRAM_ID = new PublicKey(
   "Config1111111111111111111111111111111111111"
@@ -290,6 +289,9 @@ function StakeView() {
   const { manualPublicKey } = useContext(AccountsContext);
   const [isAdding, setIsAdding] = useState(false);
   const [isDelegating, setIsDelegating] = useState<boolean>(false);
+  const { solBalance } = useBalance();
+  const [createLoading, setCreateLoading] = useState(false);
+  const stakeAmount = watch("stakeAmount", 0);
   const maxCommission = watch("maxCommission", "");
   const searchCriteria = watch("searchCriteria", "");
   const [state, dispatch] = useReducer(reducer, initState);
@@ -334,9 +336,9 @@ function StakeView() {
     if (!connected) {
       return;
     }
-    // getValidatorScores(cluster).then((validatorScores) =>
-    //   dispatch({ type: "validatorScores", payload: { validatorScores } })
-    // );
+    getValidatorScores(cluster).then((validatorScores) =>
+      dispatch({ type: "validatorScores", payload: { validatorScores } })
+    );
   }, [connected, cluster]);
 
   useEffect(() => {
@@ -364,6 +366,7 @@ function StakeView() {
           </>
         ),
       });
+      setCreateLoading(true);
       try {
         const stakePubkey = await PublicKey.createWithSeed(
           publicKey,
@@ -400,6 +403,7 @@ function StakeView() {
           severity: "success",
         });
       } catch (e) {
+        setCreateLoading(false);
         setAlertState({
           duration: 10000,
           message: "An Error occured",
@@ -548,18 +552,12 @@ function StakeView() {
         validatorInfos,
         validatorScores,
         validatorApys,
+        (validatorMetas) =>
+          dispatch({ type: "validatorMetas", payload: { validatorMetas } }),
         abortSignal
       );
       if (validatorMetas) {
-        if (validatorMetas.length) {
-          debugger;
-        }
-        dispatch({
-          type: "validatorMetas",
-          payload: {
-            validatorMetas: validatorMetas,
-          },
-        });
+        dispatch({ type: "validatorMetas", payload: { validatorMetas } });
       }
     },
     [voteAccountInfos, validatorInfos, validatorScores]
@@ -655,29 +653,36 @@ function StakeView() {
       <hr className="my-4 opacity-10" />
       <h2 className="relative text-2xl text-center">
         SOL Validator Staking{" "}
-        {connected && (
+        {/* {connected && (
           <button
             className="absolute top-0 right-0 btn btn-sm"
-            onClick={(e) => {
-              e.preventDefault();
-              setIsAdding(!isAdding);
-            }}
+            onClick={() => setIsAdding(!isAdding)}
           >
             Add Stake account
           </button>
-        )}
+        )} */}
         {isAdding && (
-          <CreateStakeAccount
-            {...{
-              seed: state.seed,
-              stakeAccounts: state.stakeAccounts,
-              dispatch,
-              callback: (e) => {
+          <div className="flex absolute right-0 top-8 z-40 flex-col px-4 py-2 rounded border shadow border-slate-800 bg-neutral">
+            <input
+              {...register("stakeAmount")}
+              className="input"
+              type="number"
+              min={0}
+              step={1 / LAMPORTS_PER_SOL}
+              max={+solBalance - 0.003}
+            />
+            <span className="mt-3">SOL</span>
+            <button
+              className="btn btn-primary btn-sm"
+              disabled={!stakeAmount}
+              onClick={(e) => {
                 e.preventDefault();
-                // createStakeAccount(+stakeAmount);
-              },
-            }}
-          />
+                createStakeAccount(+stakeAmount);
+              }}
+            >
+              Create
+            </button>
+          </div>
         )}
       </h2>
       <hr className="my-4 opacity-10" />

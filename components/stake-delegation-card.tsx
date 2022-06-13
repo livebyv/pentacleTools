@@ -2,6 +2,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useMemo } from "react";
 import { shortenAddress } from "../util/shorten-address";
 import { StakeAccountMeta } from "../util/stake-account";
+import { ValidatorMeta } from "../util/validator-batcher";
 import { InfoIcon } from "./icons";
 
 export function StakeDelegationCard({
@@ -21,19 +22,19 @@ export function StakeDelegationCard({
   selectedDelegate: string;
   handleDelegate: any;
 }) {
-  const delegation = account.stakeAccount.info?.stake?.delegation;
   const accountAddress = useMemo(
     () => account?.address?.toBase58(),
     [account?.address]
   );
   const delegationAddress = useMemo(
-    () => delegation?.voter?.toBase58(),
-    [delegation?.voter]
+    () => account.stakeAccount.info.stake?.delegation?.voter.toBase58(),
+    [account?.address]
   );
   const shortedAddress = useMemo(
     () => shortenAddress(accountAddress, 10),
     [accountAddress]
   );
+  const delegation = account.stakeAccount.info?.stake?.delegation;
 
   return (
     <div
@@ -67,7 +68,7 @@ export function StakeDelegationCard({
               className="inline-flex justify-center items-center cursor-pointer"
             >
               <span className="mr-3 badge badge-outline">Delegation</span>
-              {delegationAddress}
+            {delegationAddress}
             </a>
           </span>
         )}

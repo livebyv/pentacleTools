@@ -47,6 +47,7 @@ import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
 import ValidatorCard from "../components/validator-card";
 import { getStakeviewApys, ValidatorApy } from "../util/stakeviewApp";
 import { getValidatorScores, ValidatorScore } from "../util/validatorsApp";
+import Head from "next/head";
 
 const CONFIG_PROGRAM_ID = new PublicKey(
   "Config1111111111111111111111111111111111111"
@@ -172,6 +173,7 @@ const cluster = "mainnet-beta";
 
 const initState: {
   loading: boolean;
+  creatingStakeAccount: boolean;
   seed: string;
   stakeAccounts: StakeAccountMeta[] | null;
   selectedStakeAccount: string | null;
@@ -185,6 +187,7 @@ const initState: {
   totalActivatedStake: number;
 } = {
   loading: false,
+  creatingStakeAccount: false,
   seed: "0",
   stakeAccounts: [],
   validatorMetas: [],
@@ -200,6 +203,10 @@ const initState: {
 
 type StakeViewAction =
   | { type: "loading"; payload?: { loading: boolean } }
+  | {
+      type: "creatingStakeAccount";
+      payload?: { creatingStakeAccount: boolean };
+    }
   | { type: "seed"; payload?: { seed: string } }
   | {
       type: "stakeAccounts";
@@ -251,6 +258,8 @@ const reducer = (state: typeof initState, action: StakeViewAction) => {
       return { ...state, seed: payload.seed };
     case "stakeAccounts":
       return { ...state, stakeAccounts: payload.stakeAccounts };
+    case "creatingStakeAccount":
+      return { ...state, creatingStakeAccount: payload.creatingStakeAccount };
     case "selectedDelegate":
       return { ...state, selectedDelegate: payload.selectedDelegate };
     case "selectedStakeAccount":
@@ -290,7 +299,6 @@ function StakeView() {
   const [isAdding, setIsAdding] = useState(false);
   const [isDelegating, setIsDelegating] = useState<boolean>(false);
   const { solBalance } = useBalance();
-  const [createLoading, setCreateLoading] = useState(false);
   const stakeAmount = watch("stakeAmount", 0);
   const maxCommission = watch("maxCommission", "");
   const searchCriteria = watch("searchCriteria", "");
@@ -366,7 +374,10 @@ function StakeView() {
           </>
         ),
       });
-      setCreateLoading(true);
+      dispatch({
+        type: "creatingStakeAccount",
+        payload: { creatingStakeAccount: true },
+      });
       try {
         const stakePubkey = await PublicKey.createWithSeed(
           publicKey,
@@ -403,7 +414,10 @@ function StakeView() {
           severity: "success",
         });
       } catch (e) {
-        setCreateLoading(false);
+        dispatch({
+          type: "creatingStakeAccount",
+          payload: { creatingStakeAccount: false },
+        });
         setAlertState({
           duration: 10000,
           message: "An Error occured",
@@ -650,9 +664,11 @@ function StakeView() {
 
   return (
     <>
-      <hr className="my-4 opacity-10" />
-      <h2 className="relative text-2xl text-center">
-        SOL Validator Staking{" "}
+      <Head>
+        <title>🛠️ Pentacle Tools - 🪙 Validator Staking</title>
+      </Head>
+      <h2 className="text-3xl text-center text-white">
+        SOL Validator Staking
         {/* {connected && (
           <button
             className="absolute top-0 right-0 btn btn-sm"

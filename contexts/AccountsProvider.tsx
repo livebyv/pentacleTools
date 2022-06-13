@@ -45,9 +45,7 @@ export function AccountsProvider({ children = null as any }) {
     });
     const subscriptionId = connection.onAccountChange(
       userPublicKey,
-      (accountInfo) => {
-        setSystemProgramAccountInfo(accountInfo);
-      }
+      (accountInfo) => setSystemProgramAccountInfo(accountInfo)
     );
     return () => {
       connection.removeAccountChangeListener(subscriptionId);

@@ -19,7 +19,7 @@ export function StakeDelegationCard({
   delegatingStakeAccount: string;
   handleDelegationClick: any;
   selectedValidatorName: string;
-  selectedDelegate: ValidatorMeta;
+  selectedDelegate: string;
   handleDelegate: any;
 }) {
   const accountAddress = useMemo(
@@ -52,7 +52,7 @@ export function StakeDelegationCard({
         <div className="card-title">{shortedAddress}</div>
         <p>Stake: {account.lamports / LAMPORTS_PER_SOL} SOL</p>
         {account.stakeAccount.info.stake?.delegation?.voter.toBase58()}
-        {!delegation && (
+        {/* {!delegation && (
           <div className="card-actions">
             <button
               onClick={handleDelegationClick}
@@ -61,7 +61,7 @@ export function StakeDelegationCard({
               {isDelegating ? "Cancel" : "Delegate"}
             </button>
           </div>
-        )}
+        )} */}
         {delegatingStakeAccount === accountAddress &&
           !selectedDelegate &&
           isDelegating && (

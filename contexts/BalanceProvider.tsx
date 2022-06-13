@@ -5,7 +5,6 @@ import {
   createContext,
   useContext,
   useEffect,
-  useReducer,
   useState,
 } from "react";
 import { SHDW_TOKEN } from "../util/accounts";

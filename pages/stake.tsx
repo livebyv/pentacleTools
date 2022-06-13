@@ -3,16 +3,23 @@ import {
   PublicKey,
   AccountInfo,
   LAMPORTS_PER_SOL,
-  Connection,
-  KeyedAccountInfo,
-  Context,
   ParsedAccountData,
   Authorized,
   StakeProgram,
-  ValidatorInfo,
+  Connection,
+  KeyedAccountInfo,
+  Context,
   VoteAccountInfo,
+  ValidatorInfo,
 } from "@solana/web3.js";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
 import {
   accountInfoToStakeAccount,
   findStakeAccountMetas,
@@ -31,159 +38,42 @@ import BN from "bignumber.js";
 import { useForm } from "react-hook-form";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { useAlert } from "../contexts/AlertProvider";
-import {
-  ValidatorsContext,
-  ValidatorsProvider,
-} from "../contexts/ValidatorsProvider";
-import { ValidatorApy } from "../util/stakeviewApp";
 import { useAsyncAbortable } from "react-async-hook";
-import { ValidatorScore } from "../util/validatorsApp";
-import { shortenAddress } from "../util/shorten-address";
-import { useRouter } from "next/router";
-import { LinkIcon, SearchIcon } from "../components/icons";
-import { ExplorerLink } from "../components/explorer-link";
+import { SearchIcon } from "../components/icons";
+import { ValidatorMeta, validatorBatcher } from "../util/validator-batcher";
+import { toPublicKey } from "../util/to-publickey";
+import { StakeDelegationCard } from "../components/stake-delegation-card";
+import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
+import ValidatorCard from "../components/validator-card";
+import { getStakeviewApys, ValidatorApy } from "../util/stakeviewApp";
+import { getValidatorScores, ValidatorScore } from "../util/validatorsApp";
 
-interface ValidatorMeta {
-  voteAccountInfo: VoteAccountInfo;
-  validatorInfo: ValidatorInfo | undefined;
-  validatorScore: ValidatorScore | undefined;
-  validatorApy: ValidatorApy | undefined;
+const CONFIG_PROGRAM_ID = new PublicKey(
+  "Config1111111111111111111111111111111111111"
+);
+
+async function getValidatorInfos(connection: Connection) {
+  const validatorInfoAccounts = await connection.getProgramAccounts(
+    CONFIG_PROGRAM_ID
+  );
+
+  console.log(validatorInfoAccounts.length);
+  return validatorInfoAccounts.flatMap((validatorInfoAccount) => {
+    const validatorInfo = ValidatorInfo.fromConfigData(
+      validatorInfoAccount.account.data
+    );
+    return validatorInfo ? [validatorInfo] : [];
+  });
 }
 
-const BATCH_SIZE = 100;
-
-async function batchMatcher(
-  voteAccountStatus: VoteAccountInfo[],
-  validatorInfos: ValidatorInfo[],
-  validatorScores: ValidatorScore[],
-  validatorApys: ValidatorApy[],
-  onValidatorMetas: (metas: ValidatorMeta[]) => void,
-  abortSignal: AbortSignal
-) {
-  let validatorMetas: ValidatorMeta[] = [];
-  let remainingVoteAccountInfos = [...voteAccountStatus];
-  let remainingValidatorInfos = [...validatorInfos];
-  let remainingValidatorApys = [...validatorApys];
-
-  console.log("scores", validatorScores.length);
-
-  for (let i = 0; i < validatorScores.length; i++) {
-    const validatorScore = validatorScores[i];
-    const voteAccountIndex = remainingVoteAccountInfos.findIndex(
-      (info) => info.nodePubkey === validatorScore.account
-    );
-    if (voteAccountIndex < 0) {
-      // If score does not match anything then it goes into the no score bucket
-      continue;
-    }
-    const [voteAccountInfo] = remainingVoteAccountInfos.splice(
-      voteAccountIndex,
-      1
-    );
-
-    const validatorInfoIndex = remainingValidatorInfos.findIndex(
-      (validatorInfo) =>
-        validatorInfo.key.equals(new PublicKey(voteAccountInfo.nodePubkey))
-    );
-    let validatorInfo: ValidatorInfo | undefined;
-    [validatorInfo] =
-      validatorInfoIndex > -1
-        ? remainingValidatorInfos.splice(validatorInfoIndex, 1)
-        : [];
-
-    const validatorApyIndex = remainingValidatorApys.findIndex(
-      (validatorApy) => validatorApy.id === voteAccountInfo.nodePubkey
-    );
-    let validatorApy: ValidatorApy | undefined;
-    [validatorApy] =
-      validatorApyIndex > -1
-        ? remainingValidatorApys.splice(validatorApyIndex, 1)
-        : [];
-
-    validatorMetas.push({
-      voteAccountInfo,
-      validatorInfo,
-      validatorScore,
-      validatorApy,
-    });
-
-    if (i % BATCH_SIZE === 0) {
-      await sleep(1);
-      console.log(`batch index: ${i}`);
-      onValidatorMetas([...validatorMetas]);
-    }
-
-    if (abortSignal.aborted) {
-      return;
-    }
-  }
-
-  for (let i = 0; i < remainingVoteAccountInfos.length; i++) {
-    const voteAccountInfo = remainingVoteAccountInfos[i];
-
-    const validatorInfoIndex = remainingValidatorInfos.findIndex(
-      (validatorInfo) =>
-        validatorInfo.key.equals(new PublicKey(voteAccountInfo.nodePubkey))
-    );
-    let validatorInfo: ValidatorInfo | undefined;
-    [validatorInfo] =
-      validatorInfoIndex > -1
-        ? remainingValidatorInfos.splice(validatorInfoIndex, 1)
-        : [];
-
-    const validatorApyIndex = remainingValidatorApys.findIndex(
-      (validatorApy) => validatorApy.id === voteAccountInfo.nodePubkey
-    );
-    let validatorApy: ValidatorApy | undefined;
-    [validatorApy] =
-      validatorApyIndex > -1
-        ? remainingValidatorApys.splice(validatorApyIndex, 1)
-        : [];
-
-    validatorMetas.push({
-      voteAccountInfo,
-      validatorInfo,
-      validatorScore: undefined,
-      validatorApy,
-    });
-
-    if (i % BATCH_SIZE === 0) {
-      await sleep(1);
-      console.log(`batch index: ${i}`);
-      onValidatorMetas([...validatorMetas]);
-    }
-
-    if (abortSignal.aborted) {
-      return;
-    }
-  }
-  return validatorMetas;
+interface Validators {
+  voteAccountInfos: VoteAccountInfo[];
+  validatorInfos: ValidatorInfo[];
+  validatorScores: ValidatorScore[];
+  validatorApys: ValidatorApy[];
+  totalActivatedStake: number;
 }
-
-async function findFirstAvailableSeed(
-  userPublicKey: PublicKey,
-  stakeAccountMetas: StakeAccountMeta[]
-) {
-  let seedIndex = 0;
-  while (1) {
-    const newStakeAccountPubkey = await PublicKey.createWithSeed(
-      userPublicKey,
-      seedIndex.toString(),
-      STAKE_PROGRAM_ID
-    );
-    const matching = stakeAccountMetas.find((meta) =>
-      newStakeAccountPubkey.equals(meta.address)
-    );
-    if (!matching) {
-      break;
-    }
-    seedIndex++;
-  }
-
-  return seedIndex.toString();
-}
-
-async function onStakeAccountChangeCallback(
+export async function onStakeAccountChangeCallback(
   connection: Connection,
   keyedAccountInfo: KeyedAccountInfo,
   _context: Context,
@@ -255,258 +145,211 @@ async function onStakeAccountChangeCallback(
   return updatedStakeAccounts;
 }
 
-const ValidatorList = () => {
-  const { register, watch, handleSubmit } = useForm();
-  const [validatorMetas, setValidatorMetas] = useState<ValidatorMeta[]>([]);
-  const [filteredValidatorMetas, setFilteredValidatorMetas] = useState<
-    ValidatorMeta[]
-  >([]);
+export async function findFirstAvailableSeed(
+  userPublicKey: PublicKey,
+  stakeAccountMetas: StakeAccountMeta[]
+) {
+  let seedIndex = 0;
+  while (1) {
+    const newStakeAccountPubkey = await PublicKey.createWithSeed(
+      userPublicKey,
+      seedIndex.toString(),
+      STAKE_PROGRAM_ID
+    );
+    const matching = stakeAccountMetas.find((meta) =>
+      newStakeAccountPubkey.equals(meta.address)
+    );
+    if (!matching) {
+      break;
+    }
+    seedIndex++;
+  }
 
+  return seedIndex.toString();
+}
+
+const cluster = "mainnet-beta";
+
+const initState: {
+  loading: boolean;
+  seed: string;
+  stakeAccounts: StakeAccountMeta[] | null;
+  selectedStakeAccount: string | null;
+  validatorMetas: ValidatorMeta[] | null;
+  filteredValidatorMetas: ValidatorMeta[] | null;
+  selectedDelegate: string | null;
+  voteAccountInfos: VoteAccountInfo[];
+  validatorInfos: ValidatorInfo[];
+  validatorScores: ValidatorScore[];
+  validatorApys: ValidatorApy[];
+  totalActivatedStake: number;
+} = {
+  loading: false,
+  seed: "0",
+  stakeAccounts: [],
+  validatorMetas: [],
+  filteredValidatorMetas: [],
+  selectedStakeAccount: null,
+  selectedDelegate: "",
+  voteAccountInfos: [],
+  validatorInfos: [],
+  validatorScores: [],
+  validatorApys: [],
+  totalActivatedStake: 0,
+};
+
+type StakeViewAction =
+  | { type: "loading"; payload?: { loading: boolean } }
+  | { type: "seed"; payload?: { seed: string } }
+  | {
+      type: "stakeAccounts";
+      payload?: { stakeAccounts: StakeAccountMeta[] };
+    }
+  | {
+      type: "selectedStakeAccount";
+      payload?: { selectedStakeAccount: string | null };
+    }
+  | {
+      type: "validatorMetas";
+      payload?: { validatorMetas: ValidatorMeta[] };
+    }
+  | {
+      type: "validatorInfos";
+      payload?: { validatorInfos: ValidatorInfo[] };
+    }
+  | {
+      type: "voteAccountInfos";
+      payload?: { voteAccountInfos: VoteAccountInfo[] };
+    }
+  | {
+      type: "validatorScores";
+      payload?: { validatorScores: ValidatorScore[] };
+    }
+  | {
+      type: "validatorApys";
+      payload?: { validatorApys: ValidatorApy[] };
+    }
+  | {
+      type: "totalActivatedStake";
+      payload?: { totalActivatedStake: number };
+    }
+  | {
+      type: "filteredValidatorMetas";
+      payload?: { filteredValidatorMetas: ValidatorMeta[] };
+    }
+  | {
+      type: "selectedDelegate";
+      payload?: { selectedDelegate: string };
+    };
+
+const reducer = (state: typeof initState, action: StakeViewAction) => {
+  const { payload, type } = action;
+  switch (type) {
+    case "loading":
+      return { ...state, loading: payload.loading };
+    case "seed":
+      return { ...state, seed: payload.seed };
+    case "stakeAccounts":
+      return { ...state, stakeAccounts: payload.stakeAccounts };
+    case "selectedDelegate":
+      return { ...state, selectedDelegate: payload.selectedDelegate };
+    case "selectedStakeAccount":
+      return { ...state, selectedStakeAccount: payload.selectedStakeAccount };
+    case "totalActivatedStake":
+      return { ...state, totalActivatedStake: payload.totalActivatedStake };
+    case "validatorApys":
+      return { ...state, validatorApys: payload.validatorApys };
+    case "validatorScores":
+      return { ...state, validatorScores: payload.validatorScores };
+    case "validatorInfos":
+      return { ...state, validatorInfos: payload.validatorInfos };
+    case "voteAccountInfos":
+      return { ...state, voteAccountInfos: payload.voteAccountInfos };
+    case "validatorMetas":
+      return { ...state, validatorMetas: payload.validatorMetas };
+    case "filteredValidatorMetas":
+      return {
+        ...state,
+        filteredValidatorMetas: payload.filteredValidatorMetas,
+      };
+    default:
+      // console.log(action.type);
+      throw new Error("unsupported action type given on StakeReducer reducer");
+  }
+};
+
+function StakeView() {
+  const [selectedValidator, setSelectedValidator] = useState<
+    string | undefined
+  >();
+  const { register, watch } = useForm();
+  const { connection } = useConnection();
+  const { publicKey, connected } = useWallet();
+  const { setAlertState } = useAlert();
+  const { manualPublicKey } = useContext(AccountsContext);
+  const [isAdding, setIsAdding] = useState(false);
+  const [isDelegating, setIsDelegating] = useState<boolean>(false);
+  const { solBalance } = useBalance();
+  const [createLoading, setCreateLoading] = useState(false);
+  const stakeAmount = watch("stakeAmount", 0);
   const maxCommission = watch("maxCommission", "");
   const searchCriteria = watch("searchCriteria", "");
-
+  const [state, dispatch] = useReducer(reducer, initState);
   const {
     voteAccountInfos,
     validatorInfos,
     validatorScores,
     validatorApys,
     totalActivatedStake,
-  } = useContext(ValidatorsContext);
+  } = state;
 
-  // Batched validator meta building
-  // Order is VoteAccountInfo[] order, until validatorScores is available
-  // VoteAccountInfo with no available score go at the bottom of the list
-  useAsyncAbortable(
-    async (abortSignal) => {
-      const validatorMetas = await batchMatcher(
-        voteAccountInfos,
-        validatorInfos,
-        validatorScores,
-        validatorApys,
-        (validatorMetas) => setValidatorMetas(validatorMetas),
-        abortSignal
-      );
-      if (validatorMetas) {
-        setValidatorMetas(validatorMetas);
-      }
-    },
-    [voteAccountInfos, validatorInfos, validatorScores]
-  );
-  useEffect(() => {
-    setFilteredValidatorMetas(
-      validatorMetas
-        .filter((meta) => {
-          const votePubkeyMatches = searchCriteria
-            ? meta.voteAccountInfo.votePubkey.includes(searchCriteria)
-            : true;
-          const nameMatches = searchCriteria
-            ? meta.validatorInfo?.info.name
-                .toLowerCase()
-                .includes(searchCriteria.toLowerCase())
-            : true;
-
-          return (
-            meta.voteAccountInfo.commission <= +maxCommission &&
-            (votePubkeyMatches || nameMatches)
-          );
-        })
-        .filter((meta) => !!meta?.validatorInfo?.key)
+  const handleDelegate = useCallback(async () => {
+    const selectedDelegate = state.validatorMetas.find(
+      (m) => m.validatorInfo.key.toBase58() === state.selectedDelegate
     );
-  }, [validatorMetas, maxCommission, searchCriteria]);
-
-  const [selectedValidator, setSelectedValidator] = useState<
-    PublicKey | undefined
-  >();
-
-  const firstHundred = useMemo(() => {
-    return filteredValidatorMetas.slice(0, 100).map((meta) => (
-      <div
-        key={meta?.voteAccountInfo?.votePubkey}
-        className="border border-gray-600 card"
-      >
-        <div
-          className="card-body"
-          onClick={() => setSelectedValidator(meta.validatorInfo.key)}
-        >
-          <div className="relative">
-            <div
-              className="flex overflow-hidden gap-4 text-2xl truncate text-ellipsis"
-              style={{ maxWidth: "calc(100% - 120px)" }}
-            >
-              {!!meta?.validatorInfo?.info?.keybaseUsername && (
-                <img 
-                 className="rounded-full shadow"
-                  src={`https://keybase.io/${meta?.validatorInfo?.info?.keybaseUsername}/picture`}
-                  style={{ width: 64 }}
-                />
-              )}
-              {meta?.validatorInfo?.info?.name} <br />
-                {meta?.validatorInfo?.info?.keybaseUsername && (
-                  <>({meta?.validatorInfo?.info?.keybaseUsername})</>
-                )}
-            </div>{" "}
-            <span className="absolute top-0 right-0 badge badge-secondary">
-              Commission: {meta?.voteAccountInfo.commission} %
-            </span>
-          </div>
-          <hr className="mt-auto opacity-10" />
-
-          <div className="flex justify-between items-center text-lg">
-            <span className="mr-3 badge">
-              {" "}
-              Identity{" "}
-              <a
-                href={`https://solscan.io/account/${meta.validatorInfo?.key.toBase58()}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex justify-center items-center ml-2 cursor-pointer"
-              >
-                <LinkIcon width={16} height={16} />
-              </a>
-            </span>
-            {meta.validatorInfo?.key.toBase58()}
-          </div>
-          <hr className="opacity-10" />
-
-          <div className="flex justify-between items-center text-lg">
-            <span className="mr-3 badge">
-              Vote Account
-              <a
-                href={`https://solscan.io/account/${meta?.voteAccountInfo?.votePubkey}`}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex justify-center items-center ml-2 cursor-pointer"
-              >
-                <LinkIcon width={16} height={16} />
-              </a>
-            </span>
-
-            {meta?.voteAccountInfo?.votePubkey}
-          </div>
-          <hr className="opacity-10" />
-
-          {!!meta?.validatorInfo?.info.website && (
-            <>
-              <div className="flex justify-between items-center text-lg">
-                <span className="mr-3 badge">
-                  Website
-                  <a
-                    href={meta?.validatorInfo?.info.website}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="inline-flex justify-center items-center ml-2 cursor-pointer"
-                  >
-                    <LinkIcon width={16} height={16} />
-                  </a>
-                </span>
-
-                {meta?.validatorInfo?.info.website}
-              </div>
-              <hr className="opacity-10" />
-            </>
-          )}
-          <p className="mx-2">{meta?.validatorInfo?.info.details}</p>
-        </div>
-      </div>
-    ));
-  }, [filteredValidatorMetas, searchCriteria]);
-
-  return (
-    <>
-      <h2 className="relative mt-6 mb-3 text-2xl text-center">Validators</h2>
-      <div className="text-center">
-        Total: {validatorMetas.length} active Validators <br /> 
-        
-        {filteredValidatorMetas.length} with this search criteria
-        <br />
-        Showing first 100
-      </div>
-      <br />
-      <form className="" onSubmit={handleSubmit((res) => {})}>
-        <div className="grid gap-6 my-6 w-full md:grid-cols-2">
-          <div className="flex gap-3 items-center">
-            <SearchIcon width={32} height={32} />
-            <input
-              {...register("searchCriteria")}
-              type="text"
-              className="flex-1 input"
-            />
-          </div>
-          <div className="flex flex-col gap-3 items-center">
-            <label>Max Commission: {maxCommission}% </label>
-            <input
-              type="range"
-              min="0"
-              max="100"
-              defaultValue={100}
-              className="range range-sm"
-              {...register("maxCommission")}
-              step="1"
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-2 lg:grid-cols-2">{firstHundred}</div>
-      </form>
-    </>
-  );
-};
-
-function StakeView() {
-  const { register, handleSubmit, watch } = useForm();
-  const [stakeAccounts, setStakeAccounts] = useState<StakeAccountMeta[] | null>(
-    null
-  );
-  const [loading, setLoading] = useState(false);
-  const { connection } = useConnection();
-  const { publicKey, connected } = useWallet();
-  const [seed, setSeed] = useState("0");
-  const { manualPublicKey } = useContext(AccountsContext);
-  const [isAdding, setIsAdding] = useState(false);
-  const [userBalance, setUserBalance] = useState<string | undefined>();
-  const [createLoading, setCreateLoading] = useState(false);
-  const { setAlertState } = useAlert();
-  const [validatorMetas, setValidatorMetas] = useState<ValidatorMeta[]>([]);
-  const [filteredValidatorMetas, setFilteredValidatorMetas] = useState<
-    ValidatorMeta[]
-  >([]);
-  const [selectedIndex, setSelectedIndex] = useState<number>();
-  const router = useRouter();
-  const {
-    query: { validator },
-  } = router;
-  const stakeAmount = watch("stakeAmount", 0);
+    const transaction = StakeProgram.delegate({
+      stakePubkey: toPublicKey(state.selectedStakeAccount),
+      authorizedPubkey: publicKey,
+      votePubkey: toPublicKey(selectedDelegate?.voteAccountInfo?.votePubkey),
+    });
+    transaction.feePayer = publicKey;
+    transaction.recentBlockhash = (
+      await getBlockhashWithRetries(connection)
+    ).blockhash;
+    await connection.sendRawTransaction(transaction.serialize());
+  }, [connection, state.selectedDelegate, state.selectedStakeAccount]);
 
   useEffect(() => {
-    if (
-      selectedIndex !== undefined &&
-      selectedIndex >= filteredValidatorMetas.length
-    ) {
-      setSelectedIndex(undefined);
-    }
-  }, [filteredValidatorMetas, selectedIndex]);
-
-  // Yield first seed sequentially from unused seeds
-  useEffect(() => {
-    if (!stakeAccounts || !publicKey) {
+    if (!connected) {
       return;
     }
+    getValidatorInfos(connection).then((validatorInfos) => {
+      console.log(`validatorInfos.length: ${validatorInfos.length}`);
+      dispatch({
+        type: "validatorInfos",
+        payload: { validatorInfos },
+      });
+    });
+  }, [connection, connected]);
 
-    findFirstAvailableSeed(publicKey, stakeAccounts).then(setSeed);
-  }, [publicKey, stakeAccounts]);
   useEffect(() => {
-    setStakeAccounts(null);
-    const newPublicKey = connected ? publicKey : manualPublicKey;
-    if (newPublicKey) {
-      setLoading(true);
-      Promise.all([
-        connection
-          .getBalance(publicKey)
-          .then((res) => setUserBalance((res / LAMPORTS_PER_SOL).toFixed(4))),
-        findStakeAccountMetas(connection, newPublicKey).then(setStakeAccounts),
-      ]).then((res) => setLoading(false));
+    if (!connected) {
+      return;
     }
-  }, [connection, connected, publicKey, manualPublicKey]);
+    getValidatorScores(cluster).then((validatorScores) =>
+      dispatch({ type: "validatorScores", payload: { validatorScores } })
+    );
+  }, [connected, cluster]);
+
+  useEffect(() => {
+    if (cluster !== "mainnet-beta") {
+      dispatch({ type: "validatorApys", payload: { validatorApys: [] } });
+      return;
+    }
+    getStakeviewApys().then((validatorApys) =>
+      dispatch({ type: "validatorApys", payload: { validatorApys } })
+    );
+  }, [cluster]);
 
   const createStakeAccount = useCallback(
     async (amount) => {
@@ -527,26 +370,25 @@ function StakeView() {
       try {
         const stakePubkey = await PublicKey.createWithSeed(
           publicKey,
-          seed,
+          state.seed,
           StakeProgram.programId
         );
 
         const lamports = new BN(amount)
           .multipliedBy(LAMPORTS_PER_SOL)
           .toNumber();
-
         const transaction = StakeProgram.createAccountWithSeed({
           fromPubkey: publicKey,
           stakePubkey,
           basePubkey: publicKey,
-          seed,
+          seed: state.seed,
           authorized: new Authorized(publicKey, publicKey),
           lamports,
         });
 
         const newStakeAccountPubkey = await PublicKey.createWithSeed(
           publicKey,
-          seed,
+          state.seed,
           STAKE_PROGRAM_ID
         );
         transaction.feePayer = publicKey;
@@ -554,16 +396,7 @@ function StakeView() {
           await getBlockhashWithRetries(connection)
         ).blockhash;
         await connection.sendRawTransaction(transaction.serialize());
-        addStakeAccount(newStakeAccountPubkey, seed);
-
-        // const transaction = StakeProgram.delegate({
-        //   stakePubkey,
-        //   authorizedPubkey: publicKey,
-        //   votePubkey: new PublicKey(
-        //     filteredValidatorMetas[selectedIndex].voteAccountInfo.votePubkey
-        //   ),
-        // });
-
+        addStakeAccount(newStakeAccountPubkey, state.seed);
         setAlertState({
           duration: 3000,
           message: "Stake account added!",
@@ -578,8 +411,55 @@ function StakeView() {
         });
       }
     },
-    [publicKey, seed, connection]
+    [publicKey, state.seed, connection]
   );
+
+  useEffect(() => {
+    if (!connected) {
+      return;
+    }
+    connection.getVoteAccounts().then((voteAccountStatus) => {
+      const activatedStake = voteAccountStatus.current
+        .concat(voteAccountStatus.delinquent)
+        .reduce((sum, current) => sum + current.activatedStake, 0);
+      console.log("totalActivatedStake", activatedStake);
+      dispatch({
+        type: "totalActivatedStake",
+        payload: { totalActivatedStake: activatedStake },
+      });
+      dispatch({
+        type: "voteAccountInfos",
+        payload: { voteAccountInfos: voteAccountStatus.current },
+      });
+    });
+  }, [connection, connected]);
+
+  // Yield first seed sequentially from unused seeds
+  useEffect(() => {
+    if (!state.stakeAccounts || !publicKey) {
+      return;
+    }
+
+    findFirstAvailableSeed(publicKey, state.stakeAccounts).then((seed) =>
+      dispatch({ type: "seed", payload: { seed } })
+    );
+  }, [publicKey, state.stakeAccounts]);
+
+  useEffect(() => {
+    dispatch({ type: "stakeAccounts", payload: { stakeAccounts: null } });
+    const newPublicKey = connected ? publicKey : manualPublicKey;
+    if (newPublicKey) {
+      dispatch({ type: "loading", payload: { loading: true } });
+
+      findStakeAccountMetas(connection, newPublicKey)
+        .then((stakeAccounts) =>
+          dispatch({ type: "stakeAccounts", payload: { stakeAccounts } })
+        )
+        .then((res) =>
+          dispatch({ type: "loading", payload: { loading: false } })
+        );
+    }
+  }, [connection, connected, publicKey, manualPublicKey]);
 
   useEffect(() => {
     (async () => {
@@ -590,11 +470,14 @@ function StakeView() {
             connection,
             keyedAccountInfo,
             context,
-            stakeAccounts,
+            state.stakeAccounts,
             publicKey
           );
           if (updatedStakeAccounts) {
-            setStakeAccounts(updatedStakeAccounts);
+            dispatch({
+              type: "stakeAccounts",
+              payload: { stakeAccounts: updatedStakeAccounts },
+            });
           }
         },
         connection.commitment,
@@ -617,10 +500,10 @@ function StakeView() {
 
   const addStakeAccount = useCallback(
     async (stakeAccountPublicKey: PublicKey, seed: string) => {
-      if (!stakeAccounts) {
+      if (!state.stakeAccounts) {
         return;
       }
-      let newStakeAccounts = [...stakeAccounts];
+      let newStakeAccounts = [...state.stakeAccounts];
 
       // Try a few times with standoff
       let parsedAccountInfo: AccountInfo<Buffer | ParsedAccountData> | null =
@@ -651,114 +534,246 @@ function StakeView() {
         inflationRewards: [],
       });
       sortStakeAccountMetas(newStakeAccounts);
-      setStakeAccounts(newStakeAccounts);
+      dispatch({
+        type: "stakeAccounts",
+        payload: { stakeAccounts: newStakeAccounts },
+      });
     },
     [publicKey]
   );
 
+  // Batched validator meta building
+  // Order is VoteAccountInfo[] order, until validatorScores is available
+  // VoteAccountInfo with no available score go at the bottom of the list
+  useAsyncAbortable(
+    async (abortSignal) => {
+      const validatorMetas = await validatorBatcher(
+        voteAccountInfos,
+        validatorInfos,
+        validatorScores,
+        validatorApys,
+        (validatorMetas) =>
+          dispatch({ type: "validatorMetas", payload: { validatorMetas } }),
+        abortSignal
+      );
+      if (validatorMetas) {
+        dispatch({ type: "validatorMetas", payload: { validatorMetas } });
+      }
+    },
+    [voteAccountInfos, validatorInfos, validatorScores]
+  );
   useEffect(() => {
-    if (validator) {
-      //   setSearchCriteria(validator as string);
-      setSelectedIndex(0);
-    }
-  }, [validator]);
+    const filteredValidatorMetas = state.validatorMetas
+      .filter((meta) => {
+        const votePubkeyMatches = searchCriteria
+          ? meta.voteAccountInfo.votePubkey.includes(searchCriteria)
+          : true;
+        const nameMatches = searchCriteria
+          ? meta.validatorInfo?.info.name
+              .toLowerCase()
+              .includes(searchCriteria.toLowerCase())
+          : true;
+
+        return (
+          meta.voteAccountInfo.commission <= +maxCommission &&
+          (votePubkeyMatches || nameMatches)
+        );
+      })
+      .filter((meta) => !!meta?.validatorInfo?.key);
+    dispatch({
+      type: "filteredValidatorMetas",
+      payload: { filteredValidatorMetas },
+    });
+  }, [state.validatorMetas, maxCommission, searchCriteria]);
+
+  const selectedValidatorName = useMemo(() => {
+    return state.validatorMetas.find(
+      (meta) =>
+        !!state.selectedDelegate &&
+        !!meta.validatorInfo?.key &&
+        toPublicKey(meta.validatorInfo?.key).equals(
+          toPublicKey(state.selectedDelegate)
+        )
+    )?.validatorInfo?.info?.name;
+  }, [state.validatorMetas, state.selectedDelegate]);
+
+  const handleCardSelect = ({ validatorKey, meta }) => {
+    setSelectedValidator(validatorKey);
+    dispatch({
+      type: "selectedDelegate",
+      payload: { selectedDelegate: meta },
+    });
+  };
+
+  const firstHundred = useMemo(() => {
+    return state.filteredValidatorMetas.slice(0, 100).map((meta) => {
+      const validatorKey = meta.validatorInfo.key.toBase58();
+      return (
+        <ValidatorCard
+          key={meta?.voteAccountInfo?.votePubkey}
+          {...{
+            handleCardSelect,
+            meta,
+            isDelegating,
+            selectedValidator,
+            validatorKey,
+          }}
+        />
+      );
+    });
+  }, [
+    state.filteredValidatorMetas,
+    searchCriteria,
+    selectedValidator,
+    setSelectedValidator,
+    isDelegating,
+  ]);
+
+  const handleDelegationClick = useCallback(
+    (accountAddress: string) => {
+      if (isDelegating) {
+        setIsDelegating(false);
+        dispatch({
+          type: "selectedStakeAccount",
+          payload: { selectedStakeAccount: null },
+        });
+        return;
+      }
+      setIsDelegating(true);
+      dispatch({
+        type: "selectedStakeAccount",
+        payload: { selectedStakeAccount: accountAddress },
+      });
+    },
+    [isDelegating]
+  );
 
   return (
     <>
       <hr className="my-4 opacity-10" />
       <h2 className="relative text-2xl text-center">
         SOL Validator Staking{" "}
-        {/* <button
-          className="absolute right-0 z-50 btn btn-xs btn-primary"
-          onClick={() => setIsAdding(!isAdding)}
-        >
-          Add Stake Account
-        </button>{" "} */}
-        {isAdding && (
-          <form
-            onSubmit={handleSubmit(({ stakeAmount }) => {
-              createStakeAccount(+stakeAmount);
-            })}
-            className="flex absolute right-0 top-8 z-40 flex-col px-4 py-2 rounded border shadow border-slate-800 bg-neutral"
+        {/* {connected && (
+          <button
+            className="absolute top-0 right-0 btn btn-sm"
+            onClick={() => setIsAdding(!isAdding)}
           >
+            Add Stake account
+          </button>
+        )} */}
+        {isAdding && (
+          <div className="flex absolute right-0 top-8 z-40 flex-col px-4 py-2 rounded border shadow border-slate-800 bg-neutral">
             <input
               {...register("stakeAmount")}
               className="input"
               type="number"
               min={0}
               step={1 / LAMPORTS_PER_SOL}
-              max={+userBalance - 0.003}
+              max={+solBalance - 0.003}
             />
             <span className="mt-3">SOL</span>
             <button
               className="btn btn-primary btn-sm"
               disabled={!stakeAmount}
-              onClick={createStakeAccount}
+              onClick={(e) => {
+                e.preventDefault();
+                createStakeAccount(+stakeAmount);
+              }}
             >
               Create
             </button>
-          </form>
+          </div>
         )}
       </h2>
       <hr className="my-4 opacity-10" />
-      {loading && (
+      {state.loading && (
         <div className="w-full text-center">
           <button className="mt-4 btn btn-ghost loading"></button>
         </div>
       )}
       <div className="mb-6 w-full text-center">
-        <WalletMultiButton />
+        <span className="inline-block mx-auto">
+          <WalletMultiButton />
+        </span>
       </div>
-      {!loading && !stakeAccounts && connected && (
+      {!state.loading && !state.stakeAccounts?.length && connected && (
         <div className="w-full text-center">
           <span className="text-xl">You do not have any stake accounts</span>
         </div>
       )}
-      {stakeAccounts?.length && (
+      {state.stakeAccounts?.length && (
         <div className="grid gap-3 lg:grid-cols-2">
-          {stakeAccounts.map((account) => {
-            const delegation = account.stakeAccount.info?.stake?.delegation;
-            return (
-              <>
-                <div
-                  key={account.address.toBase58()}
-                  className={`card bg-neutral ${
-                    !!delegation ? "border border-primary" : ""}`}
-                >
-                  <div className="relative card-body">
-                    {!!delegation && (
-                      <span className="absolute top-4 right-4 badge badge-primary">
-                        Active
-                      </span>
-                    )}
-                    {!delegation && (
-                      <span className="absolute top-4 right-4 badge badge-outline">
-                        Inactive
-                      </span>
-                    )}
-                    <div className="card-title">
-                      {shortenAddress(account.address.toBase58(), 6)}
-                    </div>
-                    <p>Stake: {account.lamports / LAMPORTS_PER_SOL} SOL</p>
-                    {account.stakeAccount.info.stake?.delegation?.voter.toBase58()}
-                  </div>
-                </div>
-              </>
-            );
-          })}
+          {state.stakeAccounts?.map((account) => (
+            <StakeDelegationCard
+              key={account.address.toBase58()}
+              {...{
+                account,
+                isDelegating,
+                delegatingStakeAccount: state?.selectedStakeAccount,
+                handleDelegate,
+                handleDelegationClick,
+                selectedDelegate: state.selectedDelegate,
+                selectedValidatorName,
+              }}
+            />
+          ))}
         </div>
       )}
+
       <hr className="my-4 opacity-10" />
-      {connected && <ValidatorList />}
+      {connected && (
+        <>
+          <h2 className="relative mt-6 mb-3 text-2xl text-center">
+            Validators
+          </h2>
+          <div className="text-center">
+            Total: {state.validatorMetas.length} active Validators and{" "}
+            {Math.round(
+              state.totalActivatedStake / LAMPORTS_PER_SOL / 1_000_000
+            )}
+            M SOL staked <br />
+            {state.filteredValidatorMetas.length} with this search criteria
+            <br />
+            Showing first 100
+          </div>
+          <br />
+          <div>
+            <div className="grid gap-6 my-6 w-full md:grid-cols-2">
+              <div className="flex gap-3 items-center">
+                <SearchIcon width={32} height={32} />
+                <input
+                  {...register("searchCriteria")}
+                  type="text"
+                  className="flex-1 input"
+                />
+              </div>
+              <div className="flex flex-col gap-3 items-center">
+                <label>Max Commission: {maxCommission}% </label>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  defaultValue={100}
+                  className="range range-sm"
+                  {...register("maxCommission")}
+                  step="1"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2 lg:grid-cols-2">{firstHundred}</div>
+          </div>
+        </>
+      )}
     </>
   );
 }
 
 const Wrapped = () => (
-  <ValidatorsProvider>
+  <BalanceProvider>
     <AccountsProvider>
       <StakeView />
     </AccountsProvider>
-  </ValidatorsProvider>
+  </BalanceProvider>
 );
 export default Wrapped;

@@ -25,35 +25,40 @@ export default function HolderSnapshot() {
   const { connection } = useConnection();
   const fetchHolders = useCallback(
     async ({ mints }: { mints: string }) => {
-      const parsed = getAddresses(mints);
-      setAlertState({
-        message: (
-          <button className="btn btn-ghost loading">
-            Downloading your data.
-          </button>
-        ),
-        open: true,
-      });
-      setLen(parsed.length);
-      setLoading(true);
+      try {
+        const parsed = getAddresses(mints);
+        setAlertState({
+          message: (
+            <button className="btn btn-ghost loading">
+              Downloading your data.
+            </button>
+          ),
+          open: true,
+        });
+        setLen(parsed.length);
+        setLoading(true);
 
-      const owners = await getOwners(parsed, connection, setCounter).catch(
-        () => {
-          setModalState({
-            open: true,
-            message: "An error occured!",
-          });
-          setLoading(false);
-        }
-      );
+        const owners = await getOwners(parsed, connection, setCounter).catch(
+          () => {
+            setModalState({
+              open: true,
+              message: "An error occured!",
+            });
+            setLoading(false);
+          }
+        );
 
-      const filename = "gib-holders.json";
-      download(filename, jsonFormat(owners, { size: 1, type: "tab" }));
-      setLoading(false);
-      setModalState({
-        message: `Successfully downloaded ${filename}`,
-        open: true,
-      });
+        const filename = "gib-holders.json";
+        download(filename, jsonFormat(owners, { size: 1, type: "tab" }));
+        setLoading(false);
+        setModalState({
+          message: `Successfully downloaded ${filename}`,
+          open: true,
+        });
+        setAlertState({ open: false });
+      } catch (e) {
+        console.error(e);
+      }
     },
     [setAlertState, setModalState, connection]
   );
@@ -97,14 +102,27 @@ export default function HolderSnapshot() {
                 {errors?.mints?.message}
               </label>
             )}
-            <div className="mt-6 text-center">
-              <button
-                type="submit"
-                disabled={!!errors?.mints}
-                className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
-              >
-                {loading ? `${counter} / ${len}` : "Get Holders"}
-              </button>
+            <div className="flex flex-col gap-3 justify-center items-center mt-6 text-center">
+              {loading && (
+                <div className="w-60">
+                  <span>{((counter / len) * 100).toFixed(2)}%</span>
+                  <progress
+                    className="border progress progress-primary border-slate-700"
+                    value={(counter / len) * 100}
+                    max={100}
+                  ></progress>
+                </div>
+              )}
+              <div>
+                <button
+                  type="submit"
+                  disabled={!!errors?.mints}
+                  className={`btn btn-primary rounded-box shadow-lg ${
+                    loading ? "loading" : ""}`}
+                >
+                  Get Holders
+                </button>
+              </div>
             </div>
           </div>
         </form>

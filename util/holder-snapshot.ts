@@ -3,6 +3,8 @@ import { from, lastValueFrom } from "rxjs";
 import { mergeMap } from "rxjs/operators";
 import { toPublicKey } from "./to-publickey";
 
+const CONCURRENCY = 3;
+
 export async function getOwners(
   mints: string[],
   connection: Connection,
@@ -12,20 +14,23 @@ export async function getOwners(
   let all_owners = {};
   const mints_obs = from(mints).pipe(
     mergeMap(async (mint) => {
+
       const token_account = (
         await connection.getTokenLargestAccounts(toPublicKey(mint))
       )?.value[0]?.address;
+
       if (token_account) {
         const token_account_info = await connection.getParsedAccountInfo(
           token_account
         );
+
         return {
           owner: (token_account_info?.value?.data as ParsedAccountData)?.parsed
             ?.info?.owner,
           mint: mint,
         };
       }
-    }, 6),
+    }, CONCURRENCY),
   );
   mints_obs.subscribe((res) => {
     if (res) {
@@ -43,7 +48,6 @@ export async function getOwners(
     }
   });
   if (await lastValueFrom(mints_obs)) {
-    console.log(Object.keys(all_owners).length);
     return all_owners;
   }
 }

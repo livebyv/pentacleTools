@@ -86,8 +86,9 @@ export default function GetMeta() {
                 required: "Field is required",
               })}
               rows={4}
-              className={`textarea w-full shadow-lg ${!!errors?.mints && "input-error"
-                }`}
+              className={`textarea w-full shadow-lg ${
+                !!errors?.mints && "input-error"
+              }`}
               id="mints"
               name="mints"
             />
@@ -96,12 +97,23 @@ export default function GetMeta() {
                 {errors?.mints?.message}
               </label>
             )}
-            <div className="mt-6 text-center">
+            <div className="flex flex-col gap-3 justify-center items-center mt-6 text-center">
+              {loading && (
+                <div className="w-60">
+                  <span>{((counter / len) * 100).toFixed(2)}%</span>
+                  <progress
+                    className="border progress progress-primary border-slate-700"
+                    value={(counter / len) * 100}
+                    max={100}
+                  ></progress>
+                </div>
+              )}
               <button
-                className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
+                className={`btn btn-primary rounded-box shadow-lg ${
+                  loading ? "loading" : ""}`}
                 type="submit"
               >
-                {loading ? `${counter} / ${len}` : "Get Meta"}
+                Get Meta
               </button>
             </div>
           </div>

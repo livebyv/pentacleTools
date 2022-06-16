@@ -133,13 +133,24 @@ export default function GetHolders() {
                 {errors?.mints?.message}
               </label>
             )}
-            <div className="mt-6 text-center">
+            <div className="flex flex-col gap-3 justify-center items-center mt-6 text-center">
+              {loading && (
+                <div className="w-60">
+                  <span>{((counter / len) * 100).toFixed(2)}%</span>
+                  <progress
+                    className="border progress progress-primary border-slate-700"
+                    value={(counter / len) * 100}
+                    max={100}
+                  ></progress>
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={!!errors?.mints}
-                className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
+                className={`btn btn-primary rounded-box shadow-lg ${
+                  loading ? "loading" : ""}`}
               >
-                {loading ? `${counter} / ${len}` : "Get Minters"}
+                Get Minters
               </button>
             </div>
           </div>

@@ -1,8 +1,9 @@
 # SOL NFT Tools
 
-Free to use and distribute anywhere
+[![Powered By Vercel](http://www.pentacle.tools/1618983297-powered-by-vercel.svg)](https://vercel.com?utm_source=madteaparty&utm_campaign=oss)
 
-[Live Version](https://sol-nft.tools/)
+
+[Live Version](https://pentacle.tools/)
 
 ## Getting Started
 
@@ -16,39 +17,3 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Tools
-
-### Gib Mints
-
-Will accept a wallet ID and return all the mint IDs created by it. Similar to [tools.abstratica.art](tools.abstratica.art)
-
-### Gib Meta
-
-Will accept a list of mint IDs and fetch their token metadata and arweave metadata. Returns an array in format
-
-```
- {
-   tokenData: {
-     // ... mint token data
-   },
-   metadata {
-     // arweave metadata
-   },
-   mint: '<Mint ID>'
- }[]
-```
-
-### Gib Holders
-
-Will accept a list of mint IDs and fetch their holders.
-
-Returns an object in format
-
-```
-{
-    [holderPubkey: string]: {
-      mints: string[],
-      amount: number
-    }
-}
-```

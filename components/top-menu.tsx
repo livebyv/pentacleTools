@@ -1,8 +1,6 @@
 import Link from "next/link";
-import Image from "next/image";
 import React from "react";
 import { useRouter } from "next/router";
-import { ImageURI } from "../util/image-uri";
 import { MenuIcon } from "./icons";
 
 export default function TopMenu() {
@@ -39,8 +37,8 @@ export default function TopMenu() {
             rel="noreferrer noopener"
             className="grid place-content-center py-2"
           >
-            <Image
-              src={ImageURI.PentacleLogo}
+            <img
+              src="/pentacle.svg"
               width={221}
               height={65}
               alt="Pentacle"

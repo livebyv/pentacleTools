@@ -4,7 +4,6 @@ import { ConnectionProvider } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Head from "next/head";
 import React from "react";
 
@@ -81,7 +80,7 @@ function Context({ children }: { children: React.ReactNode }) {
                 rel="noreferrer noopener"
                 className="hover:bg-opacity-0 focus:bg-opacity-0"
               >
-                <Image
+                <img
                   src="/pentacle.svg"
                   width={221}
                   height={65}
@@ -198,11 +197,25 @@ function Context({ children }: { children: React.ReactNode }) {
                   </CopyToClipboard>
                 </div>
               </div>
+
+              <div className="flex justify-center items-center my-2 w-full">
+                <a
+                  className="inline-block mx-auto"
+                  href="https://vercel.com?utm_source=madteaparty&utm_campaign=oss"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="/1618983297-powered-by-vercel.svg"
+                    style={{ width: 120 }}
+                  />
+                </a>
+              </div>
             </div>
           </ul>
 
           <main
-            className={`relative col-span-2 my-28 lg:col-span-1`}
+            className={`relative col-span-2 mt-28 mb-12 lg:col-span-1`}
             style={{ maxWidth: "100%" }}
           >
             <div className="px-6 mx-auto max-w-full" style={{ width: 1200 }}>
@@ -262,6 +275,21 @@ function MyApp({ Component, pageProps }: AppProps) {
         <PerformanceProvider>
           {/* @ts-ignore */}
           <Component {...pageProps} />
+
+          <div className="mt-8 text-center lg:hidden">
+            <a
+              className="inline-block mx-auto"
+              href="https://vercel.com?utm_source=madteaparty&utm_campaign=oss"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="/1618983297-powered-by-vercel.svg"
+                style={{ width: 120 }}
+                alt=""
+              />
+            </a>
+          </div>
         </PerformanceProvider>
       </Context>
     </Providers>

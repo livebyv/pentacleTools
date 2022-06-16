@@ -30,7 +30,7 @@ export default function SideMenu() {
             className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
             <img
-              src={ImageURI.PentacleLogo}
+              src="/pentacle.svg"
               width={221}
               height={64}
               alt="Pentacle"
@@ -124,7 +124,7 @@ export default function SideMenu() {
 
         <div className="mt-auto w-full">
           <div
-            className={`flex flex-row gap-4 justify-center items-center text-center`}
+            className={`flex flex-col gap-4 justify-center items-center text-center`}
           >
             <MadeWithLove />
           </div>

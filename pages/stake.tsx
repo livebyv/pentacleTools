@@ -274,7 +274,7 @@ const reducer = (state: typeof initState, action: StakeViewAction) => {
       return { ...state, validatorInfos: payload.validatorInfos };
     case "voteAccountInfos":
       return { ...state, voteAccountInfos: payload.voteAccountInfos };
-    case "validatorMetas":
+  case "validatorMetas":
       return { ...state, validatorMetas: payload.validatorMetas };
     case "filteredValidatorMetas":
       return {

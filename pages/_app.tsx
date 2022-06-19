@@ -5,7 +5,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-import React from "react";
+import React, { useEffect } from "react";
 
 import { AlertProvider, useAlert } from "../contexts/AlertProvider";
 import { ModalProvider } from "../contexts/ModalProvider";
@@ -269,6 +269,20 @@ function Context({ children }: { children: React.ReactNode }) {
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
+  useEffect(() => {
+    console.log(`
+
+
+Thank you to the community, and in special to Pentacle and Nomad for inspiring me to make this site what it is today.
+A beloved tool in the Solana community. Most the energy I put into it is largely in tribute to both of you.
+
+Pentacle, you pulled me into the boat and gave me clout. You reminded me of what good UI design means. Thank you, you are the most valuable of friends.
+Nomad, you drove me to make this site better and better. To make it the best. It is sometimes still wonky but I am giving her all I got, promise. I wish to meet you one day.
+    
+Thanks guys. You made a difference. Even if it's just on my small scale.
+    
+    `)
+  }, [])
   return (
     <Providers>
       <Context>

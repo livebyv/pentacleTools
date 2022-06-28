@@ -58,6 +58,7 @@ function Context({ children }: { children: React.ReactNode }) {
       endpoint={endpoint}
       config={{
         confirmTransactionInitialTimeout: 120000,
+        commitment: 'finalized'
       }}
     >
       <Head>

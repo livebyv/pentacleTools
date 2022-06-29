@@ -76,7 +76,7 @@ export default function HolderSnapshot() {
         This tool gives you a snapshot of holders from Solana Mint IDs. It will
         return an object with holders, mints and amounts.
         <br />
-        <strong>Works with SPLs as well as NFTs</strong>
+        <strong>Designed to work with NFTs only</strong>
       </p>
       <hr className="my-4 opacity-10" />
       <div className="max-w-full bg-gray-900 card">

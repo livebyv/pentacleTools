@@ -28,7 +28,7 @@ import {
   InfoIcon,
   SendIcon,
 } from "../components/icons";
-const endpoint = process.env.NEXT_PUBLIC_RPC!;
+const endpoint = process.env.NEXT_PUBLIC_RPC;
 
 const WalletProvider = dynamic(
   () => import("../contexts/ClientWalletProvider"),
@@ -52,6 +52,9 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
 
 function Context({ children }: { children: React.ReactNode }) {
   const { setAlertState } = useAlert();
+  if (endpoint === undefined) {
+    throw new Error('Missing NEXT_PUBLIC_RPC in env file');
+  }
 
   return (
     <ConnectionProvider

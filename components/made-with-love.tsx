@@ -6,7 +6,7 @@ export function MadeWithLove() {
       <a
         target="_blank"
         rel="noopener noreferrer"
-        href="https://github.com/penta-fun/sol-nft-tools/"
+        href="https://github.com/21e8/pentacle.tools/"
       >
         <i>
           <GithubIcon />

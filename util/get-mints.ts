@@ -1,6 +1,9 @@
 import { from } from "rxjs";
 import { mergeMap, toArray, map } from "rxjs/operators";
-import { Connection, ParsedInstruction, PublicKey } from "@solana/web3.js";
+import {
+    Connection,
+    ParsedInstruction,
+} from "@solana/web3.js";
 import { sliceIntoChunks } from "./slice-into-chunks";
 import { toPublicKey } from "./to-publickey";
 
@@ -57,7 +60,12 @@ export async function getMints(
                 h?.transaction?.message?.instructions as ParsedInstruction[]
               )?.find((ix) => ix?.parsed?.type === "mintTo")?.parsed?.info
                 ?.mint;
-              if (!h?.meta?.err && mint) {
+
+              const botTax = h?.meta?.logMessages?.find(log =>
+                  log.includes('Candy Machine Botting is taxed at')
+              );
+
+              if (!h?.meta?.err && mint && !botTax) {
                 setCounter(count++);
                 return mint;
               }

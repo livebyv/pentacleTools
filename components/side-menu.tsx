@@ -14,7 +14,7 @@ import {
   SendIcon,
 } from "./icons";
 import { toast } from "react-toastify";
-import SwitchHorizontalIcon from '@heroicons/react/solid/SwitchHorizontalIcon';
+import SwitchHorizontalIcon from "@heroicons/react/solid/SwitchHorizontalIcon";
 
 export default function SideMenu() {
   return (
@@ -65,13 +65,11 @@ export default function SideMenu() {
           {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ImageURI.GenesysGo}
-            alt="GenesysGos"
-            className="mr-2"
+            alt="GenesysGo"
+            className="inline mr-2 grayscale"
             style={{
-              filter: "grayscale(100%)",
               width: 16,
               height: 16,
-              display: "inline",
             }}
           />
           Shadow Drive Console

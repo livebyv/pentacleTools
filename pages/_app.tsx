@@ -158,12 +158,10 @@ function Context({ children }: { children: React.ReactNode }) {
                 <img
                   src={ImageURI.GenesysGo}
                   alt="GenesysGo"
-                  className="mr-2"
+                  className="inline mr-2 grayscale"
                   style={{
-                    filter: " grayscale(100%)",
                     width: 16,
                     height: 16,
-                    display: "inline",
                   }}
                 />
                 <span> Shadow Drive Console</span>

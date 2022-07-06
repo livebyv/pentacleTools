@@ -119,6 +119,7 @@ function Context({ children }: { children: React.ReactNode }) {
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/pentacle.svg"
+                    className="mb-6"
                     width={221}
                     height={65}
                     alt="Pentacle"

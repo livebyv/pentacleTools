@@ -29,7 +29,7 @@ export default function SideMenu() {
             className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/pentacle.svg" width={221} height={64} alt="Pentacle" />
+            <img className="mb-6" src="/pentacle.svg" width={221} height={64} alt="Pentacle" />
           </a>
         </li>
         <MenuLink href="/nft-mints">

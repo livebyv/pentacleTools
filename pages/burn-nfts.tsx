@@ -539,31 +539,7 @@ export default function BurnNFTs() {
         owns. It also releases the rent (ca 0.002 SOL per NFT)
       </p>
       <div className="flex flex-col justify-center items-center my-4 text-sm">
-        {publicKey ? (
-          <p className="text-center text-white break-all">
-            <span>Connected Address:</span>
-            <br />{" "}
-            {state.publicAddress && (
-              <CopyToClipboard
-                text={state.publicAddress}
-                onCopy={() =>
-                  toast("Copied to clipboard!", {
-                    autoClose: 2000,
-                  })
-                }
-              >
-                <span className={`cursor-pointer`}>{state.publicAddress}</span>
-              </CopyToClipboard>
-            )}
-          </p>
-        ) : (
-          <WalletMultiButton
-            style={{
-              fontSize: "0.75rem",
-              height: "2rem",
-            }}
-          />
-        )}
+        <WalletMultiButton />
       </div>
       <hr className="my-4 opacity-10" />
       {publicKey ? (

@@ -687,18 +687,9 @@ export default function SendNFTs() {
         This tool facilitates bulk sending of NFTs
       </p>
       <div className="flex flex-col justify-center items-center my-4 text-sm">
-        {publicKey ? (
-          <p className="text-center text-white break-all">
-            <WalletMultiButton />
-          </p>
-        ) : (
-          <WalletMultiButton
-            style={{
-              fontSize: "0.75rem",
-              height: "2rem",
-            }}
-          />
-        )}
+        <p className="text-center text-white break-all">
+          <WalletMultiButton />
+        </p>
       </div>
       <hr className="my-4 opacity-10" />
       {publicKey && (

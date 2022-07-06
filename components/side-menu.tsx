@@ -20,7 +20,7 @@ export default function SideMenu() {
   return (
     <div className="drawer-side lg:hidden">
       <label htmlFor="my-drawer" className="drawer-overlay"></label>
-      <ul className="flex overflow-y-auto flex-col gap-2 p-4 w-80 border-l border-gray-700 shadow menu bg-base-300 text-base-content">
+      <ul className="side-menu--mobile">
         <li>
           <a
             href="https://pentacle.xyz"

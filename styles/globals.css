@@ -102,3 +102,35 @@ svg {
 .card-selected {
   box-shadow: 0px 0px 0px 2px hsl(var(--p) / var(--tw-bg-opacity));
 }
+.side-menu--desktop {
+ 
+  @apply hidden;
+  @apply overflow-y-auto;
+  @apply relative;
+  @apply top-0;
+  @apply bottom-0;
+  @apply left-0;
+  @apply flex-col;
+  @apply gap-2;
+  @apply p-4;
+  @apply w-64;
+  @apply lg:inline-flex;
+  @apply lg:fixed;
+  @apply bg-gray-900;
+  @apply text-base-content;
+  @apply border-r border-gray-700;
+}
+.side-menu--mobile {
+  @apply flex;
+  @apply overflow-y-auto;
+  @apply flex-col;
+  @apply gap-2;
+  @apply p-4;
+  @apply w-80;
+  @apply bg-gray-900;
+  @apply border-l;
+  @apply border-gray-700;
+  @apply shadow;
+  @apply menu;
+  @apply text-base-content;
+}

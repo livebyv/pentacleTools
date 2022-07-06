@@ -301,11 +301,12 @@ export default function SendNFTs() {
       }
       if (txs.length) {
         await signAllTransactions(txs);
-      }
-
-      for (const tx of txs) {
-        const id = await connection.sendRawTransaction(tx.serialize());
-        await connection.confirmTransaction(id);
+        await Promise.all(
+          txs.map(async (tx) => {
+            const id = await connection.sendRawTransaction(tx.serialize());
+            await connection.confirmTransaction(id);
+          })
+        );
       }
     },
     [signAllTransactions, connection, publicKey]

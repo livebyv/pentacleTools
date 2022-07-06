@@ -1,6 +1,10 @@
 import "../styles/globals.css";
 
-import { ConnectionProvider } from "@solana/wallet-adapter-react";
+import {
+  ConnectionProvider,
+  useConnection,
+  useWallet,
+} from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
@@ -29,6 +33,7 @@ import {
 } from "../components/icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { JupiterProvider } from "@jup-ag/react-hook";
 
 const endpoint = process.env.NEXT_PUBLIC_RPC;
 
@@ -40,13 +45,22 @@ const WalletProvider = dynamic(
 );
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
+  const { connection } = useConnection();
+  const { publicKey } = useWallet();
   return (
     <FileProvider>
       {/* @ts-ignore */}
-      <WalletProvider>
-        <ToastContainer theme="dark" />
-        <ModalProvider>{children}</ModalProvider>
-      </WalletProvider>
+
+      <ToastContainer theme="dark" />
+      <ModalProvider>
+        <JupiterProvider
+          connection={connection}
+          cluster="mainnet-beta"
+          userPublicKey={publicKey}
+        >
+          {children}
+        </JupiterProvider>
+      </ModalProvider>
     </FileProvider>
   );
 };
@@ -64,170 +78,171 @@ function Context({ children }: { children: React.ReactNode }) {
         commitment: "finalized",
       }}
     >
-      <Head>
-        <title>🛠️ Pentacle Tools</title>
-      </Head>
-      <div className="drawer drawer-end">
-        <input id="my-drawer" type="checkbox" className="drawer-toggle" />
-        <div className="relative h-screen drawer-content lg:ml-64">
-          <div className="hidden absolute right-0 top-4 z-50 p-4 lg:inline-block">
-            <WalletMultiButton className="w-full" />
-          </div>
-          <div className="lg:hidden">
-            <TopMenu />
-          </div>
-          <ul className="hidden overflow-y-auto relative top-0 bottom-0 left-0 p-4 space-y-2 w-64 lg:inline-block lg:fixed menu bg-base-300 text-base-content">
-            <li>
-              <a
-                href="https://pentacle.xyz"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="hover:bg-opacity-0 focus:bg-opacity-0"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/pentacle.svg"
-                  width={221}
-                  height={65}
-                  alt="Pentacle"
-                />
-              </a>
-            </li>
-            <MenuLink activatesDrawer={false} href="/nft-mints">
-              <div>
-                <i className="mr-3">
-                  <FingerPrintIcon />
-                </i>
-                Get NFT Mints
-              </div>
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/token-metadata">
-              <div>
-                <i className="mr-3">
-                  <InfoIcon />
-                </i>
-                Token Metadata
-              </div>
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/holder-snapshot">
-              <i className="inline-block mr-3">
-                <CameraIcon width={16} height={16} />
-              </i>
-              <span> Holder Snapshot</span>
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/nft-minters">
-              <i className="inline-block mr-3">
-                <CoinsIcon width={16} height={16} />
-              </i>
-              NFT Minters
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/shadow-drive">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={ImageURI.GenesysGo}
-                alt="GenesysGo"
-                className="mr-2"
-                style={{
-                  filter: " grayscale(100%)",
-                  width: 16,
-                  height: 16,
-                  display: "inline",
-                }}
-              />
-              <span> Shadow Drive Console</span>
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/burn-nfts">
-              <i className="mr-3">
-                <FireIcon />
-              </i>
-              <span> Burn NFTs</span>
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/mint-nft">
-              <i className="mr-3">
-                <HammerIcon />
-              </i>
-              <span> Mint NFT</span>
-            </MenuLink>
-
-            <MenuLink activatesDrawer={false} href="/send-nfts">
-              <i className="mr-3">
-                <SendIcon />
-              </i>
-              Send Multiple NFTs
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/arweave-upload">
-              <i className="mr-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
-                  width={16}
-                  height={16}
-                  alt="Arweave"
-                />
-              </i>
-              <span>Arweave Upload</span>
-            </MenuLink>
-            <MenuLink activatesDrawer={false} href="/snedmaster">
-              <i className="mr-3">
-                <GetCashIcon width={16} height={16} />
-              </i>
-              <span>SnedMaster 9000</span>
-            </MenuLink>
-
-            <MenuLink activatesDrawer={false} href="/stake">
-              <i className="mr-3">
-                <BankIcon width={16} height={16} />
-              </i>
-              <span>Stake View</span>
-            </MenuLink>
-
-            <div className="absolute left-0 bottom-4 w-full">
-              <div
-                className={`flex flex-row gap-4 justify-center items-center text-center`}
-              >
-                <MadeWithLove />
-              </div>
-              <div>
-                <div className="text-sm text-center">
-                  <CopyToClipboard
-                    text={"lolfees.sol"}
-                    onCopy={() =>
-                      toast("Copied to clipboard!", {
-                        autoClose: 2000,
-                      })
-                    }
-                  >
-                    <span className={`ml-1 cursor-pointer`}>
-                      Donations: lolfees.sol
-                    </span>
-                  </CopyToClipboard>
-                </div>
-              </div>
-
-              <div className="flex justify-center items-center my-2 w-full">
+      <WalletProvider>
+        <Head>
+          <title>🛠️ Pentacle Tools</title>
+        </Head>
+        <div className="drawer drawer-end">
+          <input id="my-drawer" type="checkbox" className="drawer-toggle" />
+          <div className="relative h-screen drawer-content lg:ml-64">
+            <div className="hidden absolute right-0 top-4 z-50 p-4 lg:inline-block">
+              <WalletMultiButton className="w-full" />
+            </div>
+            <div className="lg:hidden">
+              <TopMenu />
+            </div>
+            <ul className="hidden overflow-y-auto relative top-0 bottom-0 left-0 p-4 space-y-2 w-64 lg:inline-block lg:fixed menu bg-base-300 text-base-content">
+              <li>
                 <a
-                  className="inline-block mx-auto"
-                  href="https://vercel.com?utm_source=madteaparty&utm_campaign=oss"
+                  href="https://pentacle.xyz"
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="noreferrer noopener"
+                  className="hover:bg-opacity-0 focus:bg-opacity-0"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/1618983297-powered-by-vercel.svg"
-                    style={{ width: 120 }}
-                    alt="vercel"
+                    src="/pentacle.svg"
+                    width={221}
+                    height={65}
+                    alt="Pentacle"
                   />
                 </a>
-              </div>
-            </div>
-          </ul>
+              </li>
+              <MenuLink activatesDrawer={false} href="/nft-mints">
+                <div>
+                  <i className="mr-3">
+                    <FingerPrintIcon />
+                  </i>
+                  Get NFT Mints
+                </div>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/token-metadata">
+                <div>
+                  <i className="mr-3">
+                    <InfoIcon />
+                  </i>
+                  Token Metadata
+                </div>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/holder-snapshot">
+                <i className="inline-block mr-3">
+                  <CameraIcon width={16} height={16} />
+                </i>
+                <span> Holder Snapshot</span>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/nft-minters">
+                <i className="inline-block mr-3">
+                  <CoinsIcon width={16} height={16} />
+                </i>
+                NFT Minters
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/shadow-drive">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={ImageURI.GenesysGo}
+                  alt="GenesysGo"
+                  className="mr-2"
+                  style={{
+                    filter: " grayscale(100%)",
+                    width: 16,
+                    height: 16,
+                    display: "inline",
+                  }}
+                />
+                <span> Shadow Drive Console</span>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/burn-nfts">
+                <i className="mr-3">
+                  <FireIcon />
+                </i>
+                <span> Burn NFTs</span>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/mint-nft">
+                <i className="mr-3">
+                  <HammerIcon />
+                </i>
+                <span> Mint NFT</span>
+              </MenuLink>
 
-          <main
-            className={`relative col-span-2 mt-28 mb-12 lg:col-span-1`}
-            style={{ maxWidth: "100%" }}
-          >
-            <div className="px-6 mx-auto max-w-full" style={{ width: 1200 }}>
-              {/* <div className="mb-8 alert alert-warning">
+              <MenuLink activatesDrawer={false} href="/send-nfts">
+                <i className="mr-3">
+                  <SendIcon />
+                </i>
+                Send Multiple NFTs
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/arweave-upload">
+                <i className="mr-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
+                    width={16}
+                    height={16}
+                    alt="Arweave"
+                  />
+                </i>
+                <span>Arweave Upload</span>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/snedmaster">
+                <i className="mr-3">
+                  <GetCashIcon width={16} height={16} />
+                </i>
+                <span>SnedMaster 9000</span>
+              </MenuLink>
+
+              <MenuLink activatesDrawer={false} href="/stake">
+                <i className="mr-3">
+                  <BankIcon width={16} height={16} />
+                </i>
+                <span>Stake View</span>
+              </MenuLink>
+
+              <div className="absolute left-0 bottom-4 w-full">
+                <div
+                  className={`flex flex-row gap-4 justify-center items-center text-center`}
+                >
+                  <MadeWithLove />
+                </div>
+                <div>
+                  <div className="text-sm text-center">
+                    <CopyToClipboard
+                      text={"lolfees.sol"}
+                      onCopy={() =>
+                        toast("Copied to clipboard!", {
+                          autoClose: 2000,
+                        })
+                      }
+                    >
+                      <span className={`ml-1 cursor-pointer`}>
+                        Donations: lolfees.sol
+                      </span>
+                    </CopyToClipboard>
+                  </div>
+                </div>
+
+                <div className="flex justify-center items-center my-2 w-full">
+                  <a
+                    className="inline-block mx-auto"
+                    href="https://vercel.com?utm_source=madteaparty&utm_campaign=oss"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/1618983297-powered-by-vercel.svg"
+                      style={{ width: 120 }}
+                      alt="vercel"
+                    />
+                  </a>
+                </div>
+              </div>
+            </ul>
+
+            <main
+              className={`relative col-span-2 mt-28 mb-12 lg:col-span-1`}
+              style={{ maxWidth: "100%" }}
+            >
+              <div className="px-6 mx-auto max-w-full" style={{ width: 1200 }}>
+                {/* <div className="mb-8 alert alert-warning">
                 <div>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -251,28 +266,29 @@ function Context({ children }: { children: React.ReactNode }) {
                   </span>
                 </div>
               </div> */}
-              {children}
+                {children}
+              </div>
+            </main>
+            <div className="hidden fixed right-6 bottom-6 text-center xl:block">
+              RPC powered by
+              <a
+                href="https://twitter.com/GenesysGo"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className="mx-auto w-16"
+                  src={ImageURI.GenesysGo}
+                  alt="Genesysgo"
+                />
+              </a>
             </div>
-          </main>
-          <div className="hidden fixed right-6 bottom-6 text-center xl:block">
-            RPC powered by
-            <a
-              href="https://twitter.com/GenesysGo"
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                className="mx-auto w-16"
-                src={ImageURI.GenesysGo}
-                alt="Genesysgo"
-              />
-            </a>
           </div>
-        </div>
 
-        <SideMenu />
-      </div>
+          <SideMenu />
+        </div>
+      </WalletProvider>
     </ConnectionProvider>
   );
 }
@@ -293,8 +309,8 @@ Thanks guys. You made a difference. Even if it's just on my small scale.
     `);
   }, []);
   return (
-    <Providers>
-      <Context>
+    <Context>
+      <Providers>
         <PerformanceProvider>
           {/* @ts-ignore */}
           <Component {...pageProps} />
@@ -315,8 +331,8 @@ Thanks guys. You made a difference. Even if it's just on my small scale.
             </a>
           </div>
         </PerformanceProvider>
-      </Context>
-    </Providers>
+      </Providers>
+    </Context>
   );
 }
 export default MyApp;

@@ -13,9 +13,8 @@ import { toPublicKey } from "../util/to-publickey";
 import createFileList from "../util/create-file-list";
 import { useModal } from "../contexts/ModalProvider";
 import { Creator } from "../util/metadata-schema";
-import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js-next";
+import { Metaplex, walletAdapterIdentity } from "/Users/madbook/git/metaplex-js/dist/esm/index.mjs";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { shortenAddress } from "../util/shorten-address";
 import { sleep } from "../util/sleep";
 import { useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
@@ -325,7 +324,9 @@ export default function GibAirdrop() {
                     style={{ position: "absolute", bottom: 0 }}
                   >
                     <span className="text-red-400 label-text-alt">
+                      {/* @ts-ignore */}
                       {errors.name.type === "maxLength" && "Max 32 characters!"}
+                      {/* @ts-ignore */}
                       {errors.name.type === "required" && "Field is required!"}
                     </span>
                   </label>

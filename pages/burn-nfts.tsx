@@ -14,7 +14,7 @@ import {
   createCloseAccountInstruction,
   getAssociatedTokenAddress,
   TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+} from "@solana/spl-token-v2";
 import { toPublicKey } from "../util/to-publickey";
 import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";

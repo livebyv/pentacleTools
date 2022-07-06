@@ -14,7 +14,6 @@ import {
 import { useForm } from "react-hook-form";
 
 import { useModal } from "../contexts/ModalProvider";
-import { useAlert } from "../contexts/AlertProvider";
 import Head from "next/head";
 import { fetchMetaForUI } from "../util/token-metadata";
 
@@ -24,6 +23,8 @@ import { sliceIntoChunks } from "../util/slice-into-chunks";
 import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { LeftIcon, RightIcon } from "../components/icons";
+import { shortenAddress } from "../util/shorten-address";
+import { toast } from "react-toastify";
 const initState: {
   nfts: any[];
   status: string;
@@ -89,7 +90,6 @@ const reducer = (state: typeof initState, action: SendNftAction) => {
 
 export default function SendNFTs() {
   const { setModalState } = useModal();
-  const { setAlertState } = useAlert();
   const { connection } = useConnection();
   const { publicKey, signAllTransactions } = useWallet();
   const router = useRouter();
@@ -316,14 +316,8 @@ export default function SendNFTs() {
 
     const { destination } = getValues();
 
-    setAlertState({
-      message: (
-        <>
-          <button className="mr-2 btn btn-ghost loading" />
-          <div className="flex-1"> Creating token accounts...</div>
-        </>
-      ),
-      open: true,
+    const id = toast("Creating token accounts..", {
+      isLoading: true,
     });
 
     await createAssociatedTokenAccountsForMints(
@@ -380,15 +374,9 @@ export default function SendNFTs() {
       }
 
       await signAllTransactions(txs);
-
-      setAlertState({
-        message: (
-          <>
-            <button className="mr-2 btn btn-ghost loading" />
-            <div className="flex-1"> Sending {txs.length} transactions...</div>
-          </>
-        ),
-        open: true,
+      toast.done(id);
+      const loadingId = toast(`Sending ${txs.length} transactions...`, {
+        isLoading: true,
       });
       const sliced = sliceIntoChunks(
         txs.map(async (tx, i) => {
@@ -404,12 +392,7 @@ export default function SendNFTs() {
         3
       );
 
-      const txIds = await Promise.all(sliced.flat());
-
-      setAlertState({
-        message: <></>,
-        open: false,
-      });
+      toast.done(loadingId);
       await handleNFTs();
       dispatch({ type: "sent" });
       setModalState({
@@ -418,12 +401,10 @@ export default function SendNFTs() {
       });
     } catch (err) {
       console.error(err);
+      toast.dismiss();
       setModalState({
         message: err.message,
         open: true,
-      });
-      setAlertState({
-        open: false,
       });
       dispatch({ type: "sent" });
     }
@@ -433,8 +414,8 @@ export default function SendNFTs() {
     removeNFT,
     handleNFTUnselect,
     connection,
-    setAlertState,
     setModalState,
+    signAllTransactions
   ]);
 
   const confirmationModal = useMemo(() => {
@@ -444,7 +425,7 @@ export default function SendNFTs() {
             <div className="p-4 w-full max-w-sm bg-gray-800 rounded-lg shadow-lg">
               <p className="text-2xl text-center text-white">
                 Are you sure you want send thse NFTs to{" "}
-                {getValues().destination}
+                {shortenAddress(getValues().destination)}
                 {`${
                   state.selectedNFTs.length === 1
                     ? "this NFT"

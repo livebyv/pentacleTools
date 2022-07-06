@@ -37,7 +37,6 @@ import { sleep } from "../util/sleep";
 import BN from "bignumber.js";
 import { useForm } from "react-hook-form";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
-import { useAlert } from "../contexts/AlertProvider";
 import { useAsyncAbortable } from "react-async-hook";
 import { SearchIcon } from "../components/icons";
 import { ValidatorMeta, validatorBatcher } from "../util/validator-batcher";
@@ -48,6 +47,7 @@ import ValidatorCard from "../components/validator-card";
 import { getStakeviewApys, ValidatorApy } from "../util/stakeviewApp";
 import { getValidatorScores, ValidatorScore } from "../util/validatorsApp";
 import Head from "next/head";
+import { toast } from "react-toastify";
 
 const CONFIG_PROGRAM_ID = new PublicKey(
   "Config1111111111111111111111111111111111111"
@@ -274,7 +274,7 @@ const reducer = (state: typeof initState, action: StakeViewAction) => {
       return { ...state, validatorInfos: payload.validatorInfos };
     case "voteAccountInfos":
       return { ...state, voteAccountInfos: payload.voteAccountInfos };
-  case "validatorMetas":
+    case "validatorMetas":
       return { ...state, validatorMetas: payload.validatorMetas };
     case "filteredValidatorMetas":
       return {
@@ -294,7 +294,6 @@ function StakeView() {
   const { register, watch } = useForm();
   const { connection } = useConnection();
   const { publicKey, connected } = useWallet();
-  const { setAlertState } = useAlert();
   const { manualPublicKey } = useContext(AccountsContext);
   const [isAdding, setIsAdding] = useState(false);
   const [isDelegating, setIsDelegating] = useState<boolean>(false);
@@ -308,7 +307,6 @@ function StakeView() {
     validatorInfos,
     validatorScores,
     validatorApys,
-    totalActivatedStake,
   } = state;
 
   const handleDelegate = useCallback(async () => {
@@ -325,7 +323,13 @@ function StakeView() {
       await getBlockhashWithRetries(connection)
     ).blockhash;
     await connection.sendRawTransaction(transaction.serialize());
-  }, [connection, state.selectedDelegate, state.selectedStakeAccount]);
+  }, [
+    connection,
+    publicKey,
+    state.selectedDelegate,
+    state.selectedStakeAccount,
+    state.validatorMetas,
+  ]);
 
   useEffect(() => {
     if (!connected) {
@@ -340,6 +344,50 @@ function StakeView() {
     });
   }, [connection, connected]);
 
+  const addStakeAccount = useCallback(
+    async (stakeAccountPublicKey: PublicKey, seed: string) => {
+      if (!state.stakeAccounts) {
+        return;
+      }
+      let newStakeAccounts = [...state.stakeAccounts];
+
+      // Try a few times with standoff
+      let parsedAccountInfo: AccountInfo<Buffer | ParsedAccountData> | null =
+        null;
+      for (let i = 0; i < 5; i++) {
+        parsedAccountInfo = (
+          await connection.getParsedAccountInfo(stakeAccountPublicKey)
+        ).value;
+        if (parsedAccountInfo) {
+          break;
+        } else {
+          await sleep(600);
+        }
+      }
+      if (!parsedAccountInfo) {
+        console.log("Did not find new account after retries");
+        return;
+      }
+      const stakeAccount = accountInfoToStakeAccount(parsedAccountInfo);
+      if (!stakeAccount) {
+        return;
+      }
+      newStakeAccounts.push({
+        address: publicKey,
+        seed,
+        lamports: parsedAccountInfo.lamports,
+        stakeAccount,
+        inflationRewards: [],
+      });
+      sortStakeAccountMetas(newStakeAccounts);
+      dispatch({
+        type: "stakeAccounts",
+        payload: { stakeAccounts: newStakeAccounts },
+      });
+    },
+    [connection, publicKey, state.stakeAccounts]
+  );
+
   useEffect(() => {
     if (!connected) {
       return;
@@ -347,7 +395,7 @@ function StakeView() {
     getValidatorScores(cluster).then((validatorScores) =>
       dispatch({ type: "validatorScores", payload: { validatorScores } })
     );
-  }, [connected, cluster]);
+  }, [connected]);
 
   useEffect(() => {
     if (cluster !== "mainnet-beta") {
@@ -357,22 +405,15 @@ function StakeView() {
     getStakeviewApys().then((validatorApys) =>
       dispatch({ type: "validatorApys", payload: { validatorApys } })
     );
-  }, [cluster]);
+  }, []);
 
   const createStakeAccount = useCallback(
     async (amount) => {
       if (!publicKey) {
         return;
       }
-      setAlertState({
-        message: (
-          <>
-            <button className="btn btn-ghost loading">
-              {" "}
-              Creating stake account...
-            </button>
-          </>
-        ),
+      toast("Creating stake account...", {
+        isLoading: true,
       });
       dispatch({
         type: "creatingStakeAccount",
@@ -408,24 +449,23 @@ function StakeView() {
         ).blockhash;
         await connection.sendRawTransaction(transaction.serialize());
         addStakeAccount(newStakeAccountPubkey, state.seed);
-        setAlertState({
-          duration: 3000,
-          message: "Stake account added!",
-          severity: "success",
+        toast.dismiss();
+        toast("Stake account added!", {
+          type: "success",
+          autoClose: 3000,
         });
       } catch (e) {
         dispatch({
           type: "creatingStakeAccount",
           payload: { creatingStakeAccount: false },
         });
-        setAlertState({
-          duration: 10000,
-          message: "An Error occured",
-          severity: "error",
+        toast("An Error occured", {
+          type: "error",
+          autoClose: 3000,
         });
       }
     },
-    [publicKey, state.seed, connection]
+    [publicKey, state.seed, connection, addStakeAccount]
   );
 
   useEffect(() => {
@@ -510,51 +550,7 @@ function StakeView() {
         connection.removeProgramAccountChangeListener(subscriptionId);
       };
     })();
-  }, [connection, publicKey]);
-
-  const addStakeAccount = useCallback(
-    async (stakeAccountPublicKey: PublicKey, seed: string) => {
-      if (!state.stakeAccounts) {
-        return;
-      }
-      let newStakeAccounts = [...state.stakeAccounts];
-
-      // Try a few times with standoff
-      let parsedAccountInfo: AccountInfo<Buffer | ParsedAccountData> | null =
-        null;
-      for (let i = 0; i < 5; i++) {
-        parsedAccountInfo = (
-          await connection.getParsedAccountInfo(stakeAccountPublicKey)
-        ).value;
-        if (parsedAccountInfo) {
-          break;
-        } else {
-          await sleep(600);
-        }
-      }
-      if (!parsedAccountInfo) {
-        console.log("Did not find new account after retries");
-        return;
-      }
-      const stakeAccount = accountInfoToStakeAccount(parsedAccountInfo);
-      if (!stakeAccount) {
-        return;
-      }
-      newStakeAccounts.push({
-        address: publicKey,
-        seed,
-        lamports: parsedAccountInfo.lamports,
-        stakeAccount,
-        inflationRewards: [],
-      });
-      sortStakeAccountMetas(newStakeAccounts);
-      dispatch({
-        type: "stakeAccounts",
-        payload: { stakeAccounts: newStakeAccounts },
-      });
-    },
-    [publicKey]
-  );
+  }, [connection, publicKey, state.stakeAccounts]);
 
   // Batched validator meta building
   // Order is VoteAccountInfo[] order, until validatorScores is available

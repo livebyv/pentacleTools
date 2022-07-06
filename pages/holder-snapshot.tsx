@@ -6,9 +6,9 @@ import { useConnection } from "@solana/wallet-adapter-react";
 
 import { getAddresses, validateSolAddressArray } from "../util/validators";
 import { useModal } from "../contexts/ModalProvider";
-import { useAlert } from "../contexts/AlertProvider";
 import { getOwners } from "../util/holder-snapshot";
 import { download } from "../util/download";
+import { toast } from "react-toastify";
 
 export default function HolderSnapshot() {
   const {
@@ -21,20 +21,12 @@ export default function HolderSnapshot() {
   const [len, setLen] = useState(0);
   const [loading, setLoading] = useState(false);
   const { setModalState } = useModal();
-  const { setAlertState } = useAlert();
   const { connection } = useConnection();
   const fetchHolders = useCallback(
     async ({ mints }: { mints: string }) => {
       try {
         const parsed = getAddresses(mints);
-        setAlertState({
-          message: (
-            <button className="btn btn-ghost loading">
-              Downloading your data.
-            </button>
-          ),
-          open: true,
-        });
+        toast(`Downloading your data.`, { isLoading: true });
         setLen(parsed.length);
         setLoading(true);
 
@@ -55,12 +47,14 @@ export default function HolderSnapshot() {
           message: `Successfully downloaded ${filename}`,
           open: true,
         });
-        setAlertState({ open: false });
+        toast.dismiss();
       } catch (e) {
+        toast("An error occured!", { autoClose: 3000, type: "error" });
         console.error(e);
+        toast.dismiss();
       }
     },
-    [setAlertState, setModalState, connection]
+    [setModalState, connection]
   );
 
   return (

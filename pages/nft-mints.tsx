@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { SOL_ADDRESS_REGEXP } from "../util/validators";
 import { useModal } from "../contexts/ModalProvider";
-import { useAlert } from "../contexts/AlertProvider";
 import { getMints } from "../util/get-mints";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 import { download } from "../util/download";
+import { toast } from "react-toastify";
 
 export default function GibMints() {
   const {
@@ -18,18 +18,10 @@ export default function GibMints() {
   const [loading, setLoading] = useState(false);
   const { setModalState } = useModal();
   const { connection } = useConnection();
-  const { setAlertState } = useAlert();
   const { connected, publicKey } = useWallet();
   const [counter, setCounter] = useState(0);
   const fetchMints = async (val = "") => {
-    setAlertState({
-      message: (
-        <button className="btn btn-ghost loading">
-          Downloading your data.
-        </button>
-      ),
-      open: true,
-    });
+    toast('Downloading your data.', {isLoading: true})
     setLoading(true);
     getMints(val, connection, setCounter)
       .then((mints) => {
@@ -47,10 +39,7 @@ export default function GibMints() {
         }
       })
       .finally(() => {
-        setAlertState({
-          message: "",
-          open: false,
-        });
+        toast.dismiss();
         setLoading(false);
       });
   };

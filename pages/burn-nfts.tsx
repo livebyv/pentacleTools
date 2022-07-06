@@ -7,7 +7,6 @@ import { ParsedAccountData, PublicKey, Transaction } from "@solana/web3.js";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
 
 import { useModal } from "../contexts/ModalProvider";
-import { useAlert } from "../contexts/AlertProvider";
 import Head from "next/head";
 import { fetchMetaForUI } from "../util/token-metadata";
 import {
@@ -86,7 +85,6 @@ const reducer = (state: typeof initState, action: BurnNftAction) => {
 
 export default function BurnNFTs() {
   const { setModalState } = useModal();
-  const { setAlertState } = useAlert();
   const { connection } = useConnection();
   const { publicKey, signTransaction } = useWallet();
   const router = useRouter();
@@ -249,17 +247,8 @@ export default function BurnNFTs() {
       dispatch({ type: "burning" });
       let counter = 1;
       for (const mint of state.selectedNFTs) {
-        setAlertState({
-          message: (
-            <>
-              <button className="mr-2 btn btn-ghost loading" />
-              <div className="flex-1">
-                {" "}
-                Burning {counter} of {state.selectedNFTs.length} NFTs
-              </div>
-            </>
-          ),
-          open: true,
+        toast(`Burning ${counter} of ${state.selectedNFTs.length} NFTs`, {
+          isLoading: true,
         });
         const mintAssociatedAccountAddress = await getAssociatedTokenAddress(
           mint,
@@ -314,11 +303,7 @@ export default function BurnNFTs() {
           }
         }
       }
-
-      setAlertState({
-        message: <></>,
-        open: false,
-      });
+      toast.dismiss();
       setModalState({
         open: true,
         message: "Burned all NFTs!",
@@ -328,9 +313,7 @@ export default function BurnNFTs() {
         message: err.message,
         open: true,
       });
-      setAlertState({
-        open: false,
-      });
+      toast.dismiss();
       dispatch({ type: "burned" });
     }
   }, [
@@ -340,7 +323,6 @@ export default function BurnNFTs() {
     handleNFTUnselect,
     connection,
     signTransaction,
-    setAlertState,
     setModalState,
   ]);
 

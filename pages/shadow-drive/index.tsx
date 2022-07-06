@@ -16,6 +16,7 @@ import { sliceIntoChunks } from "../../util/slice-into-chunks";
 import createFileList from "../../util/create-file-list";
 import { TrashIcon } from "../../components/icons";
 import { BalanceProvider, useBalance } from "../../contexts/BalanceProvider";
+import { toast } from "react-toastify";
 
 const sortStorageAccounts = (a, b) =>
   b.account.creationTime - a.account.creationTime;
@@ -139,7 +140,6 @@ function ShdwDrivePage() {
     initState
   );
   const { register, handleSubmit, getValues, reset } = useForm();
-  const { setAlertState } = useAlert();
   const { connection } = useConnection();
   const { files, setFiles } = useFiles();
   const wallet = useWallet();
@@ -154,19 +154,15 @@ function ShdwDrivePage() {
       try {
         const chunked = sliceIntoChunks(files, 5).map(createFileList);
         let counter = 1;
+        const id = toast(`Sending ${chunked.length} transactions`, {
+          isLoading: true,
+        });
         for (const chunk of chunked) {
-          setAlertState({
-            message: (
-              <div className="flex items-center">
-                <button className="btn btn-ghost loading"></button> Sending{" "}
-                {counter} of {chunked.length} transactions
-              </div>
-            ),
-            open: true,
-          });
           await state.shdwDrive.uploadMultipleFiles(account, chunk);
           counter++;
         }
+
+        toast.dismiss(id);
 
         const storageAccounts = await state.shdwDrive.getStorageAccounts();
         dispatch({
@@ -179,11 +175,9 @@ function ShdwDrivePage() {
           },
         });
       } catch (e) {
-        setAlertState({
-          message: "An error occured. Check Console for more info!",
-          open: true,
-          duration: 10000,
-          severity: "error",
+        toast("An error occured. Check Console for more info!", {
+          type: "error",
+          autoClose: 3000,
         });
         dispatch({
           type: "uploadInProgress",
@@ -192,12 +186,7 @@ function ShdwDrivePage() {
         return;
       }
 
-      setAlertState({
-        message: "Files successfully uploaded",
-        open: true,
-        duration: 10000,
-        severity: "success",
-      });
+      toast("Files successfully uploaded", { autoClose: 3000 });
       setFiles([]);
       dispatch({
         type: "uploading",
@@ -208,7 +197,7 @@ function ShdwDrivePage() {
         payload: { uploadInProgress: false },
       });
     },
-    [state.shdwDrive, files]
+    [state.shdwDrive, files, setFiles]
   );
 
   useEffect(() => {
@@ -246,31 +235,20 @@ function ShdwDrivePage() {
         type: "createStorageLoading",
         payload: { createStorageLoading: true },
       });
-      setAlertState({
-        open: true,
-        message: (
-          <div className="p-3">
-            <button className="btn btn-ghost loading"></button>
-            Storage Account &quot;{storageAccountName}&quot; is being created...
-          </div>
-        ),
-      });
+
+      const id = toast(
+        ` Storage Account &quot;${storageAccountName}&quot; is being created...`
+      );
       try {
         const response = await state.shdwDrive.createStorageAccount(
           storageAccountName,
           storageAccountSize
         );
-        setAlertState({
-          open: false,
-          message: <></>,
+        toast.dismiss(id);
+        toast("Storage account created at " + response.shdw_bucket, {
+          autoClose: 3000,
+          type: "success",
         });
-        setAlertState({
-          message: "Storage account created at " + response.shdw_bucket,
-          open: true,
-          duration: 3000,
-          severity: "success",
-        });
-
         reset();
         dispatch({
           type: "isCreatingStorageAccount",
@@ -289,15 +267,10 @@ function ShdwDrivePage() {
           });
         }, 2000);
       } catch (e) {
-        setAlertState({
-          open: false,
-          message: <></>,
-        });
-        setAlertState({
-          message: "An error occured. Check Console for more info!",
-          duration: 10000,
-          severity: "error",
-          open: true,
+        toast.dismiss();
+        toast("An error occured. Check Console for more info!", {
+          autoClose: 3000,
+          type: "error",
         });
       }
     }
@@ -315,10 +288,8 @@ function ShdwDrivePage() {
     try {
       const response = await state.shdwDrive.deleteStorageAccount(publicKey);
       if (response.txid) {
-        setAlertState({
-          message: "Storage Account is marked for deletion",
-          open: true,
-          duration: 3000,
+        toast("Storage Account is marked for deletion", {
+          autoClose: 3000,
         });
         const updatedArr = [...state.storageAccounts];
         updatedArr[i].account.deleteRequestEpoch =
@@ -372,10 +343,9 @@ function ShdwDrivePage() {
       const response = await state.shdwDrive.cancelDeleteStorageAccount(
         publicKey
       );
-      setAlertState({
-        message: "Storage Account delete request will be cancelled",
-        duration: 3000,
-        open: true,
+
+      toast("Storage Account deletion request will be cancelled", {
+        autoClose: 3000,
       });
 
       const updatedArr = [...state.storageAccounts];
@@ -388,11 +358,9 @@ function ShdwDrivePage() {
         },
       });
     } catch (e) {
-      setAlertState({
-        message: "An error occured. Check Console for more info!",
-        open: true,
-        duration: 10000,
-        severity: "error",
+      toast("An error occured. Check Console for more info!", {
+        autoClose: 3000,
+        type: "error",
       });
       console.log(e);
     }
@@ -411,43 +379,30 @@ function ShdwDrivePage() {
   const onStorageSizeSubmit = async ({ size, unit, publicKey }) => {
     const finalStr = `${size}${unit}`;
     try {
-      setAlertState({
-        message: (
-          <div>
-            <button className="mr-3 btn btn-ghost loading"></button>
-            Sending and confirming transaction...
-          </div>
-        ),
-        open: true,
+      toast(`Sending and confirming transaction...`, {
+        autoClose: 10000,
+        type: "success",
       });
       if (state.increaseOrDecrease === "decrease") {
         await state.shdwDrive.reduceStorage(publicKey, finalStr);
-        setAlertState({
-          message: `Storage succssfully decreased by ${finalStr}!`,
-          open: true,
-          severity: "success",
+        toast(`Storage succssfully decreased by ${finalStr}!`, {
+          autoClose: 3000,
+          type: "success",
         });
       }
       if (state.increaseOrDecrease === "increase") {
         await state.shdwDrive.addStorage(publicKey, finalStr);
-        setAlertState({
-          message: `Storage succssfully increased by ${finalStr}!`,
-          open: true,
-          severity: "success",
+        toast(`Storage succssfully increased by ${finalStr}!`, {
+          autoClose: 3000,
+          type: "success",
         });
       }
     } catch (e) {
-      setAlertState({
-        message: <></>,
-        open: false,
+      toast.dismiss();
+      toast("An error occured. Check Console for more info!", {
+        type: "error",
       });
       console.error(e);
-      setAlertState({
-        message: "An error occured. Check Console for more info!",
-        open: true,
-        duration: 10000,
-        severity: "error",
-      });
     }
   };
 

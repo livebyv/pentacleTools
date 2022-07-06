@@ -4,11 +4,11 @@ import jsonFormat from "json-format";
 import { useModal } from "../contexts/ModalProvider";
 import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { useAlert } from "../contexts/AlertProvider";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { from, mergeMap, tap, toArray } from "rxjs";
 import Head from "next/head";
 import { toPublicKey } from "../util/to-publickey";
+import { toast } from "react-toastify";
 
 export default function GetHolders() {
   const {
@@ -20,21 +20,13 @@ export default function GetHolders() {
   const [counter, setCounter] = useState(0);
   const [len, setLen] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { setAlertState } = useAlert();
   const { setModalState } = useModal();
   const { connection } = useConnection();
 
   const fetchMinters = useCallback(
     async ({ mints }: { mints: string }) => {
       const parsed = getAddresses(mints);
-      setAlertState({
-        message: (
-          <button className="btn btn-ghost loading">
-            Downloading your data.
-          </button>
-        ),
-        open: true,
-      });
+      toast(" Downloading your data.", { isLoading: true });
       setLen(parsed.length);
       setLoading(true);
       let i = 0;
@@ -83,16 +75,22 @@ export default function GetHolders() {
           ),
           toArray()
         )
-        .subscribe(() => {
-          const filename = `Minters-${Date.now()}.json`;
-          download(filename, jsonFormat({ owners: [...owners], errors }));
-          setModalState({
-            message: `Succesfully downloaded ${filename}`,
-            open: true,
-          });
+        .subscribe({
+          next: () => {
+            const filename = `Minters-${Date.now()}.json`;
+            download(filename, jsonFormat({ owners: [...owners], errors }));
+            setModalState({
+              message: `Succesfully downloaded ${filename}`,
+              open: true,
+            });
+            toast.dismiss();
+          },
+          error: (err) => {
+            toast.dismiss();
+          },
         });
     },
-    [setAlertState, connection, setModalState]
+    [connection, setModalState]
   );
 
   return (

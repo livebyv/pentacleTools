@@ -6,7 +6,6 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import FileTile from "../components/file-tile";
 import { URL_MATCHER } from "../util/validators";
-import { useAlert } from "../contexts/AlertProvider";
 import { getRange } from "../util/get-range";
 import { fileToBuffer } from "../util/file-to-buffer";
 import { ShdwDrive } from "@shadow-drive/sdk";
@@ -19,6 +18,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { shortenAddress } from "../util/shorten-address";
 import { sleep } from "../util/sleep";
 import { useBalance } from "../contexts/BalanceProvider";
+import { toast } from "react-toastify";
 
 export default function GibAirdrop() {
   const {
@@ -28,7 +28,6 @@ export default function GibAirdrop() {
     control,
   } = useForm();
   const { setModalState } = useModal();
-  const { setAlertState } = useAlert();
   const [loading, setLoading] = useState(false);
   const wallet = useWallet();
   const [numberOfFiles, setNumberOfFiles] = useState(1);
@@ -53,7 +52,7 @@ export default function GibAirdrop() {
           files={files}
         />
       )),
-    [numberOfFiles, files]
+    [numberOfFiles, files, handleRemoveFile]
   );
 
   const FilesForm = useMemo(
@@ -130,19 +129,13 @@ export default function GibAirdrop() {
         <br />
       </>
     ),
-    [files, numberOfFiles, setNumberOfFiles, handleRemoveFile, register]
+    [numberOfFiles, fileTiles, files, register]
   );
 
   const upload = useCallback(
     async (formData) => {
       setLoading(true);
-      setAlertState!({
-        message: (
-          <button className="loading btn btn-ghost">Starting Upload</button>
-        ),
-        open: true,
-      });
-
+      const id = toast("Starting upload", { isLoading: true });
       const metaplex = new Metaplex(connection).use(
         walletAdapterIdentity(wallet.wallet.adapter)
       );
@@ -209,30 +202,18 @@ export default function GibAirdrop() {
             uri: `https://shdw-drive.genesysgo.net/${shdw_bucket}/${f.name}`,
           };
         });
-
-        setAlertState({
-          message: (
-            <button className="loading btn btn-ghost">
-              Uploading {files.length + 1 /** manifest */} files
-            </button>
-          ),
-          open: true,
-        });
+        toast.dismiss(id);
 
         const manifest = new File([jsonFormat(meta)], "manifest.json", {
           type: "application/json",
         });
 
-        setAlertState({
-          message: (
-            <div className="flex flex-row">
-              <button className="loading btn btn-ghost" />
-              Signing and Minting NFT, check wallet for signature request. There
-              will be several.
-            </div>
-          ),
-          open: true,
-        });
+        toast(
+          `Signing and Minting NFT, check wallet for signature request. There will be several.`,
+          {
+            isLoading: true,
+          }
+        );
         await shdwDrive.uploadMultipleFiles(
           toPublicKey(shdw_bucket),
           createFileList([...files, manifest])
@@ -251,34 +232,15 @@ export default function GibAirdrop() {
 
         let confirmed = false;
         while (!confirmed) {
-          setAlertState({
-            message: (
-              <div className="flex flex-row items-center">
-                <button className="loading btn btn-ghost"></button> Confirming
-                transaction{" "}
-                <a
-                  href={`https://explorer.solana.com/tx/${transactionId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="truncate"
-                >
-                  {shortenAddress(transactionId, 3)}
-                </a>
-              </div>
-            ),
-            open: true,
-          });
           const tx = await connection.getTransaction(transactionId, {
             commitment: "confirmed",
           });
 
           if (tx && tx?.meta?.postTokenBalances[0]?.mint) {
             setMint(tx?.meta?.postTokenBalances[0]?.mint);
-            setAlertState({
-              severity: "success",
-              duration: 5000,
-              message: "Success!",
-              open: true,
+            toast("Sucess!", {
+              type: "success",
+              autoClose: 5000,
             });
             confirmed = true;
           } else {
@@ -288,16 +250,14 @@ export default function GibAirdrop() {
       } catch (e) {
         console.error(e);
         setLoading(false);
-        setAlertState({
-          open: false,
-        });
+        toast.dismiss();
         setModalState({
           message: "An error occured! For info check console!",
           open: true,
         });
       }
     },
-    [wallet, files, connection, setAlertState]
+    [connection, wallet, files, setModalState]
   );
 
   const { solBalance, shdwBalance } = useBalance();

@@ -8,6 +8,7 @@ import { getAddresses, validateSolAddressArray } from "../util/validators";
 import { useAlert } from "../contexts/AlertProvider";
 import Head from "next/head";
 import { useConnection } from "@solana/wallet-adapter-react";
+import { toast } from "react-toastify";
 
 export default function GetMeta() {
   const {
@@ -20,19 +21,9 @@ export default function GetMeta() {
   const [len, setLen] = useState(0);
   const { setModalState } = useModal();
   const { connection } = useConnection();
-  const { setAlertState } = useAlert();
-
   const fetchMeta = ({ mints }: { mints: string }) => {
     const parsed = getAddresses(mints);
-
-    setAlertState({
-      message: (
-        <button className="btn btn-ghost loading">
-          Downloading your data.
-        </button>
-      ),
-      open: true,
-    });
+    const id = toast("Downloading your data.", { isLoading: true });
 
     setLen(parsed.length);
     setLoading(true);
@@ -49,10 +40,7 @@ export default function GetMeta() {
         setLoading(false);
       },
       complete: () => {
-        setAlertState({
-          message: "",
-          open: false,
-        });
+        toast.dismiss(id);
       },
     });
   };

@@ -31,7 +31,6 @@
     "@solana/wallet-adapter-wallets": "^0.16.1",
     "@solana/web3.js": "^1.43.1",
     "abort-controller": "^3.0.0",
-    "arbundles": "0.3.3",
     "bignumber.js": "^9.0.2",
     "bn.js": "^5.2.0",
     "borsh": "^0.6.0",

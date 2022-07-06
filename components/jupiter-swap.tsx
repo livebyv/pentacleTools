@@ -10,7 +10,6 @@ import { TOKEN_LIST_URL, useJupiter } from "@jup-ag/react-hook";
 import fetch from "cross-fetch";
 import { toast } from "react-toastify";
 import { useBalance } from "../contexts/BalanceProvider";
-import { publicKey } from "@metaplex-foundation/beet-solana";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const defaultProps = {
@@ -39,6 +38,7 @@ const SECOND_TO_REFRESH = 30;
 
 const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
   const wallet = useWallet();
+  const { publicKey } = wallet;
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   const [exp, setExp] = useState(new RegExp("", "i"));
   const { fetchBalances } = useBalance();
@@ -284,7 +284,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                       toast("Success!", {
                         autoClose: 3000,
                       });
-                      debugger
+                      debugger;
                       fetchBalances();
                       console.log("Sucess:", swapResult.txid);
                       console.log("Input:", swapResult.inputAmount);

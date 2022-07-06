@@ -677,7 +677,7 @@ export default function SendNFTs() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - Send NFTs</title>
+        <title>🛠️ Pentacle Tools - 📨 Send NFTs</title>
       </Head>
       <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Send NFTs</h1>
@@ -688,11 +688,9 @@ export default function SendNFTs() {
       </p>
       <div className="flex flex-col justify-center items-center my-4 text-sm">
         {publicKey ? (
-          <>
-            <p className="text-center text-white break-all">
-              <WalletMultiButton />
-            </p>
-          </>
+          <p className="text-center text-white break-all">
+            <WalletMultiButton />
+          </p>
         ) : (
           <WalletMultiButton
             style={{
@@ -703,9 +701,9 @@ export default function SendNFTs() {
         )}
       </div>
       <hr className="my-4 opacity-10" />
-      {publicKey ? (
+      {publicKey ?? (
         <div className="p-4 bg-gray-900 shadow card">{nftDisplay}</div>
-      ) : null}
+      )}
       {confirmationModal}
     </>
   );

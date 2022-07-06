@@ -189,9 +189,9 @@ function Context({ children }: { children: React.ReactNode }) {
                 <span>Stake View</span>
               </MenuLink>
 
-              <div className="absolute left-0 bottom-4 w-full">
+              <div className="mt-auto w-full">
                 <div
-                  className={`flex flex-row gap-4 justify-center items-center text-center`}
+                  className={`flex flex-row gap-4 justify-center items-center mt-6 text-center`}
                 >
                   <MadeWithLove />
                 </div>

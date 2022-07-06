@@ -113,7 +113,7 @@ export default function SideMenu() {
 
         <div className="mt-auto w-full">
           <div
-            className={`flex flex-col gap-4 justify-center items-center text-center`}
+            className={`flex flex-col gap-4 justify-center items-center mt-6 text-center`}
           >
             <MadeWithLove />
           </div>

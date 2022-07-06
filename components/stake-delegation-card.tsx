@@ -28,7 +28,7 @@ export function StakeDelegationCard({
   );
   const delegationAddress = useMemo(
     () => account.stakeAccount.info.stake?.delegation?.voter.toBase58(),
-    [account?.address]
+    [account.stakeAccount.info.stake?.delegation?.voter]
   );
   const shortedAddress = useMemo(
     () => shortenAddress(accountAddress, 10),

@@ -149,7 +149,7 @@ export default function BurnNFTs() {
       console.log(err);
       dispatch({ type: "error" });
     }
-  }, [publicKey, dispatch, connection]);
+  }, [publicKey, pubKeyString, connection]);
 
   const itemsPerPage = useMemo(() => state.itemsPerPage, [state]);
 
@@ -381,7 +381,7 @@ export default function BurnNFTs() {
           document.querySelector("body")
         )
       : null;
-  }, [state, handleNFTUnselect, handleBurn]);
+  }, [state, handleBurn]);
 
   const itemsPerPageSelectionDisplay = useMemo(() => {
     const options = [12, 24, 120];

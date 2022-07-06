@@ -32,9 +32,11 @@ const ValidatorCard = ({
             style={{ maxWidth: "calc(100% - 120px)" }}
           >
             {!!meta?.validatorInfo?.info?.keybaseUsername && (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 className="w-16 rounded-full shadow"
                 src={`https://keybase.io/${meta?.validatorInfo?.info?.keybaseUsername}/picture`}
+                alt="Keybase Profile Image"
               />
             )}
             {meta?.validatorInfo?.info?.name} <br />

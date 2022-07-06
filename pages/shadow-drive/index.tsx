@@ -7,7 +7,6 @@ import { ShdwDrive } from "@shadow-drive/sdk";
 import { StorageAccount } from "@shadow-drive/sdk/dist/types";
 import { PublicKey } from "@solana/web3.js";
 
-import { useAlert } from "../../contexts/AlertProvider";
 import { sizeMB } from "../../components/file-tile";
 import { ImageURI } from "../../util/image-uri";
 import { FileUpload } from "../../components/file-upload";
@@ -424,6 +423,7 @@ function ShdwDrivePage() {
       </Head>
       <div className="mb-3 max-w-full text-center">
         <h1 className="text-4xl text-white">
+           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ImageURI.GenesysGo}
             alt=""
@@ -435,6 +435,7 @@ function ShdwDrivePage() {
             }}
           />
           SHDW Drive Console
+           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ImageURI.GenesysGo}
             alt=""

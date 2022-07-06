@@ -631,13 +631,7 @@ function StakeView() {
         />
       );
     });
-  }, [
-    state.filteredValidatorMetas,
-    searchCriteria,
-    selectedValidator,
-    setSelectedValidator,
-    isDelegating,
-  ]);
+  }, [state.filteredValidatorMetas, selectedValidator, isDelegating]);
 
   const handleDelegationClick = useCallback(
     (accountAddress: string) => {

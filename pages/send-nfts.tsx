@@ -164,7 +164,7 @@ export default function SendNFTs() {
       console.log(err);
       dispatch({ type: "error" });
     }
-  }, [publicKey, dispatch]);
+  }, [publicKey, connection]);
 
   const itemsPerPage = useMemo(() => state.itemsPerPage, [state]);
 
@@ -411,11 +411,12 @@ export default function SendNFTs() {
   }, [
     publicKey,
     state,
-    removeNFT,
-    handleNFTUnselect,
     connection,
     setModalState,
-    signAllTransactions
+    signAllTransactions,
+    getValues,
+    createAssociatedTokenAccountsForMints,
+    handleNFTs,
   ]);
 
   const confirmationModal = useMemo(() => {
@@ -474,7 +475,7 @@ export default function SendNFTs() {
           document.querySelector("body")
         )
       : null;
-  }, [state, handleNFTUnselect, handleMultiSned]);
+  }, [state.isModalOpen, state.selectedNFTs.length, state.isSending, getValues, handleMultiSned]);
 
   const itemsPerPageSelectionDisplay = useMemo(() => {
     const options = [12, 24, 120];
@@ -657,6 +658,8 @@ export default function SendNFTs() {
     errors.destination,
     errors.required,
     handleNFTSelect,
+    handleSubmit,
+    register,
   ]);
 
   return (

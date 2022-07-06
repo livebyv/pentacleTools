@@ -2,7 +2,7 @@ import { GithubIcon, HeartIcon, TwitterIcon } from "./icons";
 
 export function MadeWithLove() {
   return (
-    <>
+    <div className="flex flex-row gap-3">
       <a
         target="_blank"
         rel="noopener noreferrer"
@@ -36,6 +36,6 @@ export function MadeWithLove() {
           <TwitterIcon />
         </i>
       </a>
-    </>
+    </div>
   );
 }

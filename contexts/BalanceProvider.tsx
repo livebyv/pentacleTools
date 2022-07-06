@@ -23,11 +23,13 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
   const [shdwBalanceAsNumber, setShdwBalanceAsNumber] = useState(0);
   const [solBalance, setSolBalance] = useState("0");
   const [usdcBalance, setUsdcBalance] = useState('0');
+  const [update, forceUpdate] = useState();
 
   const { publicKey } = useWallet();
   const { connection } = useConnection();
 
   useEffect(() => {
+    console.log(update);
     const fetchBalances = async () => {
       const solBalance = (
         (await connection.getBalance(publicKey)) / LAMPORTS_PER_SOL
@@ -56,7 +58,7 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
       }, 10000);
       return () => clearInterval(iv);
     }
-  }, [connection, publicKey]);
+  }, [connection, publicKey, update]);
 
   return (
     <BalanceContext.Provider
@@ -64,8 +66,9 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
         shdwBalance,
         shdwBalanceAsNumber,
         solBalance,
-        usdcBalance
-      }}
+        usdcBalance,
+        forceUpdate
+      } as any}
     >
       {children}
     </BalanceContext.Provider>

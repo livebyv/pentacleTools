@@ -9,6 +9,7 @@ import { TOKEN_LIST_URL, useJupiter } from "@jup-ag/react-hook";
 //import FeeInfo from "./FeeInfo";
 import fetch from "cross-fetch";
 import { toast } from "react-toastify";
+import { useBalance } from "../contexts/BalanceProvider";
 
 const defaultProps = {
   styles: {
@@ -38,6 +39,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
   const wallet = useWallet();
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   const [exp, setExp] = useState(new RegExp("", "i"));
+  const {forceUpdate} = useBalance();
 
   const [formValue, setFormValue] = useState<UseJupiterProps>({
     amount: 10,
@@ -249,7 +251,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
               className={`w-full btn btn-outline btn-success ${
                 loading && "loading"
               }`}
-              disabled={loading}
+              disabled={loading || !wallet?.publicKey}
               onClick={async () => {
                 try {
                   if (
@@ -277,6 +279,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                       toast("Success!", {
                         autoClose: 3000,
                       });
+                      forceUpdate();
                       console.log("Sucess:", swapResult.txid);
                       console.log("Input:", swapResult.inputAmount);
                       console.log("Output:", swapResult.outputAmount);

@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 import React, { useEffect } from "react";
 
-import { AlertProvider, useAlert } from "../contexts/AlertProvider";
 import { ModalProvider } from "../contexts/ModalProvider";
 import SideMenu from "../components/side-menu";
 import TopMenu from "../components/top-menu";
@@ -28,6 +27,9 @@ import {
   InfoIcon,
   SendIcon,
 } from "../components/icons";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const endpoint = process.env.NEXT_PUBLIC_RPC;
 
 const WalletProvider = dynamic(
@@ -42,18 +44,16 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     <FileProvider>
       {/* @ts-ignore */}
       <WalletProvider>
-        <AlertProvider>
-          <ModalProvider>{children}</ModalProvider>
-        </AlertProvider>
+        <ToastContainer theme="dark" />
+        <ModalProvider>{children}</ModalProvider>
       </WalletProvider>
     </FileProvider>
   );
 };
 
 function Context({ children }: { children: React.ReactNode }) {
-  const { setAlertState } = useAlert();
   if (endpoint === undefined) {
-    throw new Error('Missing NEXT_PUBLIC_RPC in env file');
+    throw new Error("Missing NEXT_PUBLIC_RPC in env file");
   }
 
   return (
@@ -61,7 +61,7 @@ function Context({ children }: { children: React.ReactNode }) {
       endpoint={endpoint}
       config={{
         confirmTransactionInitialTimeout: 120000,
-        commitment: 'finalized'
+        commitment: "finalized",
       }}
     >
       <Head>
@@ -84,6 +84,7 @@ function Context({ children }: { children: React.ReactNode }) {
                 rel="noreferrer noopener"
                 className="hover:bg-opacity-0 focus:bg-opacity-0"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/pentacle.svg"
                   width={221}
@@ -121,6 +122,7 @@ function Context({ children }: { children: React.ReactNode }) {
               NFT Minters
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/shadow-drive">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={ImageURI.GenesysGo}
                 alt="GenesysGo"
@@ -155,10 +157,12 @@ function Context({ children }: { children: React.ReactNode }) {
             </MenuLink>
             <MenuLink activatesDrawer={false} href="/arweave-upload">
               <i className="mr-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
                   width={16}
                   height={16}
+                  alt="Arweave"
                 />
               </i>
               <span>Arweave Upload</span>
@@ -188,10 +192,8 @@ function Context({ children }: { children: React.ReactNode }) {
                   <CopyToClipboard
                     text={"lolfees.sol"}
                     onCopy={() =>
-                      setAlertState({
-                        message: "Copied to clipboard!",
-                        duration: 2000,
-                        open: true,
+                      toast("Copied to clipboard!", {
+                        autoClose: 2000,
                       })
                     }
                   >
@@ -209,9 +211,11 @@ function Context({ children }: { children: React.ReactNode }) {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/1618983297-powered-by-vercel.svg"
                     style={{ width: 120 }}
+                    alt="vercel"
                   />
                 </a>
               </div>
@@ -257,6 +261,7 @@ function Context({ children }: { children: React.ReactNode }) {
               target="_blank"
               rel="noreferrer noopener"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 className="mx-auto w-16"
                 src={ImageURI.GenesysGo}
@@ -285,8 +290,8 @@ Nomad, you drove me to make this site better and better. To make it the best. It
     
 Thanks guys. You made a difference. Even if it's just on my small scale.
     
-    `)
-  }, [])
+    `);
+  }, []);
   return (
     <Providers>
       <Context>
@@ -301,6 +306,7 @@ Thanks guys. You made a difference. Even if it's just on my small scale.
               target="_blank"
               rel="noopener noreferrer"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/1618983297-powered-by-vercel.svg"
                 style={{ width: 120 }}

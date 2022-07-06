@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import jsonFormat from "json-format";
 import { download } from "../util/download";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
@@ -9,7 +9,6 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useAlert } from "../contexts/AlertProvider";
 import IdField from "../components/id-field";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { MEMO_ID } from "../util/accounts";
@@ -20,11 +19,11 @@ import { parseAddresses } from "../util/parse-addresses";
 import { useModal } from "../contexts/ModalProvider";
 import { LinkIcon } from "../components/icons";
 import { useBalance } from "../contexts/BalanceProvider";
+import { toast } from "react-toastify";
 
 export default function Snedmaster() {
   const [loading, setLoading] = useState(false);
   const { connection } = useConnection();
-  const { setAlertState } = useAlert();
   const { setModalState } = useModal();
   const { solBalance } = useBalance();
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
@@ -54,9 +53,9 @@ export default function Snedmaster() {
         setLoading(true);
 
         if (!isSnackbarOpen) {
-          setAlertState({
-            message: "snedsnedsned...",
-            open: true,
+          toast("snedsnedsned", {
+            autoClose: 2000,
+            toastId: 'sned'
           });
           setIsSnackbarOpen(true);
         }
@@ -122,14 +121,6 @@ export default function Snedmaster() {
                 return "failed";
               });
 
-            setAlertState({
-              message: (
-                <>
-                  Confirming {counter} of {txs.length} transactions.
-                </>
-              ),
-              open: true,
-            });
             await connection.confirmTransaction(sig, "confirmed");
             sigs.push({
               txId: sig,
@@ -149,20 +140,20 @@ export default function Snedmaster() {
         });
       } catch (e) {
         console.error(e);
-        setAlertState({
-          severity: "error",
-          message: "An error occured, check log out",
-          duration: 5000,
-        });
+        toast('"An error occured!', {
+          type: 'error',
+          autoClose: 5000
+        })
         setLoading(false);
       }
     },
-    [connection, isSnackbarOpen, setAlertState, setModalState]
+    [connection, isSnackbarOpen, setModalState, publicKey, signAllTransactions]
   );
 
   const clipboardNotification = () =>
-    setAlertState({ message: "Copied to clipboard!", duration: 2000 });
-
+    toast("Copied to clipboard!", {
+      autoClose: 2000,
+    });
   return (
     <>
       <div className="mb-3 w-full max-w-full text-center">

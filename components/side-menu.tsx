@@ -1,7 +1,6 @@
 import { ImageURI } from "../util/image-uri";
 import { MenuLink } from "./menu-link";
 import { CopyToClipboard } from "../components/copy-to-clipboard";
-import { useAlert } from "../contexts/AlertProvider";
 import { MadeWithLove } from "./made-with-love";
 import {
   BankIcon,
@@ -14,9 +13,9 @@ import {
   InfoIcon,
   SendIcon,
 } from "./icons";
+import { toast } from "react-toastify";
 
 export default function SideMenu() {
-  const { setAlertState } = useAlert();
 
   return (
     <div className="drawer-side lg:hidden">
@@ -29,12 +28,8 @@ export default function SideMenu() {
             rel="noreferrer noopener"
             className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
-            <img
-              src="/pentacle.svg"
-              width={221}
-              height={64}
-              alt="Pentacle"
-            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/pentacle.svg" width={221} height={64} alt="Pentacle" />
           </a>
         </li>
         <MenuLink href="/nft-mints">
@@ -67,6 +62,7 @@ export default function SideMenu() {
           <span> NFT Minters</span>
         </MenuLink>
         <MenuLink href="/shadow-drive">
+          {/*  eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ImageURI.GenesysGo}
             alt="GenesysGos"
@@ -98,13 +94,14 @@ export default function SideMenu() {
           </i>
           Send Multiple NFTs
         </MenuLink>
-        {/* <MenuLink href="/find-stuck-sol">Find Stuck SOL</MenuLink> */}
         <MenuLink href="/arweave-upload">
           <i className="mr-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
               width={16}
               height={16}
+              alt="Arweave"
             />
           </i>
           <span>Arweave Upload</span>
@@ -133,10 +130,8 @@ export default function SideMenu() {
               <CopyToClipboard
                 text={"lolfees.sol"}
                 onCopy={() =>
-                  setAlertState({
-                    message: "Copied to clipboard!",
-                    duration: 2000,
-                    open: true,
+                  toast("Copied to clipboard!", {
+                    autoClose: 2000,
                   })
                 }
               >

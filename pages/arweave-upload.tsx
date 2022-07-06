@@ -9,12 +9,10 @@ import { makeArweaveBundleUploadGenerator } from "../util/upload-arweave-bundles
 import { useForm } from "react-hook-form";
 import { getArweave } from "../util/upload-arweave-bundles/reference";
 import { shortenAddress } from "../util/shorten-address";
-import { useAlert } from "../contexts/AlertProvider";
-import { ImageURI } from "../util/image-uri";
 import { useFiles } from "../contexts/FileProvider";
-import { useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 import { DownloadIcon, LinkIcon, TrashIcon } from "../components/icons";
+import { toast } from "react-toastify";
 
 export const generateArweaveWallet = async () => {
   const arweave = getArweave();
@@ -54,8 +52,6 @@ export default function GetARLinks() {
   const { files } = useFiles();
   const [loading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm();
-  const { setAlertState } = useAlert();
-  const wallet = useWallet();
 
   const generate = useCallback(async () => {
     const jwk = await generateArweaveWallet();
@@ -131,39 +127,30 @@ export default function GetARLinks() {
     return () => clearInterval(interval);
   }, [address, balance]);
 
-  const importKey = useCallback(
-    async (key) => {
-      try {
-        const parsed = JSON.parse(key);
-        const addr = await getArweave()?.wallets.jwkToAddress(parsed);
-        setJwk(parsed);
-        setAddress(addr);
-        localStorage.setItem("arweave-key", key);
-        setAlertState({
-          message: "Successfully imported key!",
-          open: true,
-          duration: 3000,
-        });
-      } catch (e) {
-        console.log(e);
-        setAlertState({
-          message: "Key could not be imported!",
-          open: true,
-          duration: 3000,
-          severity: "error",
-        });
-      }
-    },
-    [setAlertState]
-  );
+  const importKey = async (key) => {
+    try {
+      const parsed = JSON.parse(key);
+      const addr = await getArweave()?.wallets.jwkToAddress(parsed);
+      setJwk(parsed);
+      setAddress(addr);
+      localStorage.setItem("arweave-key", key);
+      toast("Successfully imported key!", {
+        autoClose: 3000,
+        type: "error",
+      });
+    } catch (e) {
+      console.log(e);
+      toast("An error occured!", {
+        autoClose: 3000,
+        type: "error",
+      });
+    }
+  };
 
-  const clipboardNotification = useCallback(() => {
-    setAlertState({
-      message: "Copied to clipboard!",
-      duration: 2000,
-      open: true,
+  const clipboardNotification = () =>
+    toast("Copied to clipboard!", {
+      autoClose: 2000,
     });
-  }, [setAlertState]);
 
   const onSubmit = handleSubmit(({ key }) => importKey(key));
 
@@ -206,7 +193,8 @@ export default function GetARLinks() {
           <div className="bg-gray-900 card">
             <div className="card-body">
               <button
-                className={`btn btn-primary rounded-box inline-block mx-auto mb-3 shadow-lg ${loading ? "loading" : ""}`}
+                className={`btn btn-primary rounded-box inline-block mx-auto mb-3 shadow-lg ${
+                  loading ? "loading" : ""}`}
                 onClick={generate}
               >
                 Generate Wallet
@@ -325,7 +313,8 @@ export default function GetARLinks() {
               {!!files.length && (
                 <div className="mt-6 text-center">
                   <button
-                    className={`btn btn-primary rounded-box shadow-lg ${loading ? "loading" : ""}`}
+                    className={`btn btn-primary rounded-box shadow-lg ${
+                      loading ? "loading" : ""}`}
                     disabled={!files.length}
                     onClick={upload}
                   >

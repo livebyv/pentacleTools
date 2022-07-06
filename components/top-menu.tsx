@@ -1,30 +1,13 @@
-import Link from "next/link";
 import React from "react";
 import { useRouter } from "next/router";
 import { MenuIcon } from "./icons";
 
 export default function TopMenu() {
   const router = useRouter();
-  const { asPath } = router;
-  const getClass = (path) => (asPath === path ? "border-b-2" : "");
-
-  const TopMenuLink = ({ path, children }) => {
-    return (
-      <li className={getClass(path) + " border-primary-focus"}>
-        <Link href={{ pathname: path }} passHref>
-          <a className="py-4 border-0">
-            <span className="border-0">{children}</span>
-          </a>
-        </Link>
-      </li>
-    );
-  };
-
   return (
     <div className="w-full text-center">
       <nav
         style={{ gridTemplateColumns: "1fr auto 1fr" }}
-        // TODO: create class for this
         className="top-menu-nav"
       >
         <div
@@ -37,6 +20,7 @@ export default function TopMenu() {
             rel="noreferrer noopener"
             className="grid place-content-center py-2"
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/pentacle.svg"
               width={221}

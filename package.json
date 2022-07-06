@@ -40,6 +40,7 @@
     "react-dom": "npm:@preact/compat",
     "react-hook-form": "^7.20.2",
     "react-ssr-prepass": "npm:preact-ssr-prepass",
+    "react-toastify": "^9.0.5",
     "react-use-pagination": "^2.0.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",

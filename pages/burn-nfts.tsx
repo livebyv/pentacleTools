@@ -20,6 +20,7 @@ import { toPublicKey } from "../util/to-publickey";
 import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { FireIcon, LeftIcon, RightIcon } from "../components/icons";
+import { toast } from "react-toastify";
 const initState: {
   nfts: any[];
   status: string;
@@ -564,10 +565,8 @@ export default function BurnNFTs() {
             <CopyToClipboard
               text={state.publicAddress}
               onCopy={() =>
-                setAlertState({
-                  message: "Copied to clipboard!",
-                  duration: 2000,
-                  open: true,
+                toast("Copied to clipboard!", {
+                  autoClose: 2000,
                 })
               }
             >

@@ -10,7 +10,7 @@ import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import React, { useEffect } from "react";
-
+import SwitchHorizontalIcon from '@heroicons/react/solid/SwitchHorizontalIcon';
 import { ModalProvider } from "../contexts/ModalProvider";
 import SideMenu from "../components/side-menu";
 import TopMenu from "../components/top-menu";
@@ -136,7 +136,7 @@ function Context({ children }: { children: React.ReactNode }) {
                 </i>
                 NFT Minters
               </MenuLink>
-              <MenuLink activatesDrawer={false} href="/shadow-drive">
+              <MenuLink activatesDrawer={false}  href="/shadow-drive">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={ImageURI.GenesysGo}
@@ -151,6 +151,11 @@ function Context({ children }: { children: React.ReactNode }) {
                 />
                 <span> Shadow Drive Console</span>
               </MenuLink>
+              <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <SwitchHorizontalIcon width={16} height={16} />
+                <span>SHDW Swap</span>
+              </MenuLink>
               <MenuLink activatesDrawer={false} href="/burn-nfts">
                 <i className="mr-3">
                   <FireIcon />
@@ -160,7 +165,7 @@ function Context({ children }: { children: React.ReactNode }) {
               <MenuLink activatesDrawer={false} href="/mint-nft">
                 <i className="mr-3">
                   <HammerIcon />
-                </i>
+                </i> 
                 <span> Mint NFT</span>
               </MenuLink>
 

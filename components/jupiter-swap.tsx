@@ -199,13 +199,13 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
               <input
                 disabled
                 id="outputMint"
-                className="border border-r-0 input border-accent disabled"
+                className="flex-1 border border-r-0 input border-success disabled"
                 name="outputMint"
                 defaultValue={"SHDW"}
               />
               <input
                 type={"text"}
-                className="flex-1 border border-l-0 input border-accent disabled"
+                className="flex-1 border border-l-0 input border-success disabled"
                 name="outAmount"
                 id="outAmount"
                 placeholder="0"
@@ -221,15 +221,8 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
             </div>
           </div>
 
-          <div>
-            <span
-              color="primary"
-              style={{
-                marginTop: 20,
-              }}
-            >
-              Best route out of {routes?.length}:
-            </span>
+          <div className="flex flex-col">
+            <span className="my-3">Best route out of {routes?.length}:</span>
             {routes?.[0] &&
               (() => {
                 const route = routes[0];
@@ -269,7 +262,9 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
           <div className="flex justify-center items-center">
             <button
               type="button"
-              className={`w-full btn btn-outline btn-accent ${loading && 'loading'}`}
+              className={`w-full btn btn-outline btn-success ${
+                loading && "loading"
+              }`}
               disabled={loading}
               onClick={async () => {
                 if (
@@ -280,7 +275,6 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                   wallet.sendTransaction &&
                   wallet.publicKey
                 ) {
-
                   const swapResult = await exchange({
                     wallet,
                     routeInfo: routes[0],
@@ -295,9 +289,9 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                     console.log("Error:", swapResult.error);
                   } else if ("txid" in swapResult) {
                     toast.dismiss();
-                    toast('Success!', {
-                      autoClose: 3000
-                    })
+                    toast("Success!", {
+                      autoClose: 3000,
+                    });
                     console.log("Sucess:", swapResult.txid);
                     console.log("Input:", swapResult.inputAmount);
                     console.log("Output:", swapResult.outputAmount);

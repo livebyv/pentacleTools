@@ -12,13 +12,15 @@ import { SHDW_TOKEN } from "../util/accounts";
 const initState = {
   solBalance: "0",
   shdwBalance: "0",
-  usdcBalance: '0'
+  usdcBalance: '0',
+  shdwBalanceAsNumber: 0
 };
 
 const BalanceContext = createContext(initState);
 
 export function BalanceProvider({ children }: { children: JSX.Element }) {
   const [shdwBalance, setShdwBalance] = useState("0");
+  const [shdwBalanceAsNumber, setShdwBalanceAsNumber] = useState(0);
   const [solBalance, setSolBalance] = useState("0");
   const [usdcBalance, setUsdcBalance] = useState('0');
 
@@ -35,8 +37,9 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
         await connection.getTokenAccountBalance(
           await getAssociatedTokenAddress(SHDW_TOKEN, publicKey)
         )
-      ).value.uiAmount.toFixed(4);
-      setShdwBalance(shdwBalance);
+      );
+      setShdwBalanceAsNumber(shdwBalance.value.uiAmount);
+      setShdwBalance(shdwBalance.value.uiAmount.toFixed(4));
       const usdcBalance = (
         await connection.getTokenAccountBalance(
           await getAssociatedTokenAddress(new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'), publicKey)
@@ -59,6 +62,7 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
     <BalanceContext.Provider
       value={{
         shdwBalance,
+        shdwBalanceAsNumber,
         solBalance,
         usdcBalance
       }}

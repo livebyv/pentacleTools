@@ -16,6 +16,7 @@ import createFileList from "../../util/create-file-list";
 import { TrashIcon } from "../../components/icons";
 import { BalanceProvider, useBalance } from "../../contexts/BalanceProvider";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 const sortStorageAccounts = (a, b) =>
   b.account.creationTime - a.account.creationTime;
@@ -452,7 +453,13 @@ function ShdwDrivePage() {
             <span className="ml-3 badge badge-primary">{solBalance} SOL</span>
           </div>
         )}
+         <Link href={{ pathname: "/shadow-drive/swap" }} passHref>
+          <a className="inline-block mt-3">
+            <button className="btn btn-success btn-outline btn-sm">get $SHDW</button>
+          </a>
+        </Link>
         <hr className="my-4 opacity-10" />
+
       </div>
       <div>
         {wallet.connected && !!state.loading && (

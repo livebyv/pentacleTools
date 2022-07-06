@@ -21,6 +21,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { sleep } from "../util/sleep";
 import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 function MintNftPage() {
   const {
@@ -36,6 +37,8 @@ function MintNftPage() {
   const [files, setFiles] = useState<File[]>([]);
   const [mint, setMint] = useState("");
   const { connection } = useConnection();
+  const { solBalance, shdwBalance, shdwBalanceAsNumber } = useBalance();
+
   const handleRemoveFile = useCallback(
     (name: string) => {
       setFiles(files.filter((f) => f.name !== name));
@@ -137,7 +140,9 @@ function MintNftPage() {
   const upload = useCallback(
     async (formData) => {
       setLoading(true);
-      const id = toast("Starting upload", { isLoading: true });
+      const id = toast("Starting upload... this can take a while.", {
+        isLoading: true,
+      });
 
       const shdwDrive = await new ShdwDrive(connection, wallet).init();
 
@@ -171,9 +176,23 @@ function MintNftPage() {
           return (await acc) + (await fileToBuffer(curr)).buffer.byteLength;
         }, Promise.resolve(0));
 
-        const shdwNeeded = ((bytes * 1.2) / LAMPORTS_PER_SOL).toFixed(6);
-
-        alert(`You will need circa ${shdwNeeded} SHDW`);
+        const shdwNeeded = (bytes * 1.2) / LAMPORTS_PER_SOL;
+        if (shdwBalanceAsNumber < shdwNeeded) {
+          setModalState({
+            open: true,
+            message: (
+              <>
+                <div>
+                  You need {shdwNeeded - shdwBalanceAsNumber} more SHDW to mint.
+                  Please go to the{" "}
+                  <Link href={{ pathname: "/shdw-swap" }}>SHDW Swap</Link> and
+                  get some.
+                </div>
+              </>
+            ),
+          });
+          return;
+        }
         const { shdw_bucket } = await shdwDrive.createStorageAccount(
           `NFT-${Date.now()}`,
           `${Math.round((bytes * 1.2) / 1000)}kb`
@@ -208,7 +227,7 @@ function MintNftPage() {
         });
 
         toast(
-          `Signing and Minting NFT, check wallet for signature request. There will be several.`,
+          `Signing and minting NFT, check wallet for signature requests. There will be several.`,
           {
             isLoading: true,
           }
@@ -259,26 +278,31 @@ function MintNftPage() {
         });
       }
     },
-    [connection, wallet, files, setModalState]
+    [connection, wallet, files, shdwBalanceAsNumber, setModalState]
   );
-
-  const { solBalance, shdwBalance } = useBalance();
 
   return wallet?.publicKey ? (
     <div>
       <br />
 
-      <h2 className="text-3xl text-center">
-        NFT Minting - powered by SHDW Drive - BETA
-      </h2>
+      <h2 className="text-3xl text-center">NFT Minting - BETA</h2>
+      <h3 className="mt-2 text-xl text-center text-gray-500">
+        powered by SHDW Drive
+      </h3>
 
-      <div>
+      <div className="text-center">
         {!!shdwBalance && (
-          <div className="mt-3 w-full text-center">
+          <div className="mt-3 text-center">
             <span className="badge badge-success">{shdwBalance} SHDW</span>
             <span className="ml-3 badge badge-primary">{solBalance} SOL</span>
           </div>
         )}
+
+        <Link href={{ pathname: "/shadow-drive/swap" }} passHref>
+          <a className="inline-block mt-3">
+            <button className="btn btn-success btn-outline btn-sm">get $SHDW</button>
+          </a>
+        </Link>
       </div>
 
       <hr className="my-3 opacity-10" />

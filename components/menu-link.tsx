@@ -16,7 +16,7 @@ export const MenuLink = ({
       <label
         htmlFor={activatesDrawer ? "my-drawer" : ""}
         className={
-          (pathname.includes(href) ? "border border-gray-600" : "") +
+          (pathname === href ? "border border-gray-600" : "") +
           " py-4 btn btn-ghost  flex items-center justify-start text-left normal-case"
         }
       >

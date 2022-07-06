@@ -14,9 +14,9 @@ import {
   SendIcon,
 } from "./icons";
 import { toast } from "react-toastify";
+import SwitchHorizontalIcon from '@heroicons/react/solid/SwitchHorizontalIcon';
 
 export default function SideMenu() {
-
   return (
     <div className="drawer-side lg:hidden">
       <label htmlFor="my-drawer" className="drawer-overlay"></label>
@@ -75,6 +75,10 @@ export default function SideMenu() {
             }}
           />
           Shadow Drive Console
+        </MenuLink>
+        <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
+          <SwitchHorizontalIcon width={16} height={16} />
+          <span>SHDW Swap</span>
         </MenuLink>
         <MenuLink href="/burn-nfts">
           <i className="mr-3">

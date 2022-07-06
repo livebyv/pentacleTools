@@ -208,7 +208,6 @@ function ShdwDrivePage() {
           payload: { shdwDrive },
         });
         const storageAccounts = await shdwDrive.getStorageAccounts();
-        debugger;
 
         dispatch({
           type: "storageAccounts",

@@ -255,7 +255,7 @@ export default function SendNFTs() {
 
   const createAssociatedTokenAccountsForMints = useCallback(
     async (mints: PublicKey[], destination: string) => {
-      const resolvedTokenaccountsWithoutBalances = (
+      const resolvedTokenaccountsWithBalances = (
         await Promise.all(
           mints.map(async (mint) => ({
             mint,
@@ -273,12 +273,16 @@ export default function SendNFTs() {
             ),
           }))
         )
-      ).filter((mint) => !mint.balance);
+      ).filter((mint) => !mint.balance || !mint.ata);
       const txs = [];
-      for (const slice of sliceIntoChunks(
-        resolvedTokenaccountsWithoutBalances,
-        5
-      )) {
+      const chunks = sliceIntoChunks(resolvedTokenaccountsWithBalances, 5);
+      toast(
+        `Creating ${resolvedTokenaccountsWithBalances.length} token accounts \n in ${chunks.length} transactions..\nThis can take a while!`,
+        {
+          isLoading: true,
+        }
+      );
+      for (const slice of chunks) {
         const tx = new Transaction().add(
           ...slice.map((acc) =>
             createAssociatedTokenAccountInstruction(
@@ -316,20 +320,16 @@ export default function SendNFTs() {
 
     const { destination } = getValues();
 
-    const id = toast("Creating token accounts..", {
-      isLoading: true,
-    });
-
     await createAssociatedTokenAccountsForMints(
       state.selectedNFTs,
       destination
     );
 
     try {
-      const txs = [];
+      const txChunks = [];
       for (const slice of sliceIntoChunks(state.selectedNFTs, 3)) {
-        txs.push(
-          ...(await Promise.all(
+        txChunks.push(
+          await Promise.all(
             slice.map(async (mint) => {
               const sourceATA = await getAssociatedTokenAddress(
                 mint,
@@ -369,42 +369,47 @@ export default function SendNFTs() {
               transaction.feePayer = publicKey;
               return transaction;
             })
-          ))
+          )
         );
       }
 
-      await signAllTransactions(txs);
-      toast.done(id);
-      const loadingId = toast(`Sending ${txs.length} transactions...`, {
+      await signAllTransactions(txChunks.flat());
+      toast.dismiss();
+      toast(`Sending ${txChunks.flat().length} transactions...`, {
         isLoading: true,
       });
-      const sliced = sliceIntoChunks(
-        txs.map(async (tx, i) => {
+      await Promise.all(
+        txChunks.flat().map(async (tx) => {
           const id = await connection.sendRawTransaction(tx.serialize());
-          await connection.confirmTransaction(id, "finalized").catch(() => {
-            setModalState({
-              message: `Transaction ${id} could not be confirmed in time, please check explorer.`,
-              open: true,
-            });
+          await connection.confirmTransaction(id, "confirmed").catch(() => {
+            toast(
+              `Transaction ${id} could not be confirmed in time, please check explorer.`,
+              {
+                type: "error",
+              }
+            );
           });
           return id;
-        }),
-        3
+        })
       );
 
-      toast.done(loadingId);
-      await handleNFTs();
-      dispatch({ type: "sent" });
-      setModalState({
-        open: true,
-        message: "sent all NFTs!",
+      state.selectedNFTs.forEach((nft) => removeNFT(nft));
+      toast.dismiss();
+      toast(`Sent ${state.selectedNFTs.length} NFTs!`, {
+        type: "success",
       });
+      dispatch({ type: "sent" });
+      dispatch({ type: "selectedNFTs", payload: { selectedNFTs: [] } });
+      handleNFTs();
     } catch (err) {
       console.error(err);
       toast.dismiss();
       setModalState({
         message: err.message,
         open: true,
+      });
+      toast(`An error occured!`, {
+        type: "error",
       });
       dispatch({ type: "sent" });
     }
@@ -475,7 +480,13 @@ export default function SendNFTs() {
           document.querySelector("body")
         )
       : null;
-  }, [state.isModalOpen, state.selectedNFTs.length, state.isSending, getValues, handleMultiSned]);
+  }, [
+    state.isModalOpen,
+    state.selectedNFTs.length,
+    state.isSending,
+    getValues,
+    handleMultiSned,
+  ]);
 
   const itemsPerPageSelectionDisplay = useMemo(() => {
     const options = [12, 24, 120];
@@ -678,9 +689,7 @@ export default function SendNFTs() {
         {publicKey ? (
           <>
             <p className="text-center text-white break-all">
-              <span>Connected Address:</span>
-              <br />
-              {state.publicAddress}
+              <WalletMultiButton />
             </p>
           </>
         ) : (

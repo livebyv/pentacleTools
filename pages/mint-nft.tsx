@@ -185,7 +185,7 @@ function MintNftPage() {
                 <div>
                   You need {shdwNeeded - shdwBalanceAsNumber} more SHDW to mint.
                   Please go to the{" "}
-                  <Link href={{ pathname: "/shdw-swap" }}>SHDW Swap</Link> and
+                  <Link href={{ pathname: "/shadow-drive/swap" }}>SHDW Swap</Link> and
                   get some.
                 </div>
               </>

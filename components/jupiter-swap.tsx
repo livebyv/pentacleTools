@@ -256,59 +256,60 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
           <div className="flex justify-center items-center">
             {!publicKey && <WalletMultiButton />}
           </div>
-          <div className="flex justify-center items-center">
-            <button
-              type="button"
-              className={`w-full btn btn-outline btn-success ${
-                loading && "loading"
-              }`}
-              disabled={loading || !wallet?.publicKey}
-              onClick={async () => {
-                try {
-                  if (
-                    !loading &&
-                    routes?.[0] &&
-                    wallet.signAllTransactions &&
-                    wallet.signTransaction &&
-                    wallet.sendTransaction &&
-                    wallet.publicKey
-                  ) {
-                    const swapResult = await exchange({
-                      wallet,
-                      routeInfo: routes[0],
-                      onTransaction: async () => {
-                        toast("sending transaction", { isLoading: true });
-                      },
-                    });
-
-                    console.log({ swapResult });
-
-                    if ("error" in swapResult) {
-                      console.log("Error:", swapResult.error);
-                    } else if ("txid" in swapResult) {
-                      toast.dismiss();
-                      toast("Success!", {
-                        autoClose: 3000,
+          {!!publicKey && (
+            <div className="flex justify-center items-center">
+              <button
+                type="button"
+                className={`w-full btn btn-outline btn-success ${
+                  loading && "loading"
+                }`}
+                disabled={loading || !wallet?.publicKey}
+                onClick={async () => {
+                  try {
+                    if (
+                      !loading &&
+                      routes?.[0] &&
+                      wallet.signAllTransactions &&
+                      wallet.signTransaction &&
+                      wallet.sendTransaction &&
+                      wallet.publicKey
+                    ) {
+                      const swapResult = await exchange({
+                        wallet,
+                        routeInfo: routes[0],
+                        onTransaction: async () => {
+                          toast("sending transaction", { isLoading: true });
+                        },
                       });
-                      debugger;
-                      fetchBalances();
-                      console.log("Sucess:", swapResult.txid);
-                      console.log("Input:", swapResult.inputAmount);
-                      console.log("Output:", swapResult.outputAmount);
+
+                      console.log({ swapResult });
+
+                      if ("error" in swapResult) {
+                        console.log("Error:", swapResult.error);
+                      } else if ("txid" in swapResult) {
+                        toast.dismiss();
+                        toast("Success!", {
+                          autoClose: 3000,
+                        });
+                        fetchBalances();
+                        console.log("Sucess:", swapResult.txid);
+                        console.log("Input:", swapResult.inputAmount);
+                        console.log("Output:", swapResult.outputAmount);
+                      }
                     }
+                  } catch (e) {
+                    console.error(e);
+                    toast("An error occurred!", {
+                      autoClose: 3000,
+                      type: "error",
+                    });
                   }
-                } catch (e) {
-                  console.error(e);
-                  toast("An error occurred!", {
-                    autoClose: 3000,
-                    type: "error",
-                  });
-                }
-              }}
-            >
-              Swap best route
-            </button>
-          </div>
+                }}
+              >
+                Swap best route
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -276,12 +276,14 @@ export default function SendNFTs() {
       ).filter((mint) => !mint.balance || !mint.ata);
       const txs = [];
       const chunks = sliceIntoChunks(resolvedTokenaccountsWithBalances, 5);
-      toast(
-        `Creating ${resolvedTokenaccountsWithBalances.length} token accounts \n in ${chunks.length} transactions..\nThis can take a while!`,
-        {
-          isLoading: true,
-        }
-      );
+      if (chunks.length) {
+        toast(
+          `Creating ${resolvedTokenaccountsWithBalances.length} token accounts \n in ${chunks.length} transactions..\nThis can take a while!`,
+          {
+            isLoading: true,
+          }
+        );
+      } 
       for (const slice of chunks) {
         const tx = new Transaction().add(
           ...slice.map((acc) =>
@@ -401,7 +403,6 @@ export default function SendNFTs() {
       });
       dispatch({ type: "sent" });
       dispatch({ type: "selectedNFTs", payload: { selectedNFTs: [] } });
-      handleNFTs();
     } catch (err) {
       console.error(err);
       toast.dismiss();
@@ -423,6 +424,7 @@ export default function SendNFTs() {
     getValues,
     createAssociatedTokenAccountsForMints,
     handleNFTs,
+    removeNFT
   ]);
 
   const confirmationModal = useMemo(() => {

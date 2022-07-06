@@ -123,22 +123,6 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
     return () => clearInterval(intervalId);
   }, [lastRefreshTimestamp, loading, refresh]);
 
-  const Option = React.memo(({ value }: { value: any }) => {
-    const found = tokenMap.get(value);
-
-    return (
-      <div key={value} className="flex flex-row gap-5 items-center p-8">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          alt={found?.symbol}
-          src={found?.logoURI}
-          style={{ width: "30px", borderRadius: "2rem" }}
-        />
-        <span>{found?.symbol}</span>
-      </div>
-    );
-  });
-
   return (
     <div className="mx-auto my-6 max-w-md border border-primary card">
       <div className="card-body">
@@ -267,35 +251,43 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
               }`}
               disabled={loading}
               onClick={async () => {
-                if (
-                  !loading &&
-                  routes?.[0] &&
-                  wallet.signAllTransactions &&
-                  wallet.signTransaction &&
-                  wallet.sendTransaction &&
-                  wallet.publicKey
-                ) {
-                  const swapResult = await exchange({
-                    wallet,
-                    routeInfo: routes[0],
-                    onTransaction: async () => {
-                      toast("sending transaction");
-                    },
-                  });
-
-                  console.log({ swapResult });
-
-                  if ("error" in swapResult) {
-                    console.log("Error:", swapResult.error);
-                  } else if ("txid" in swapResult) {
-                    toast.dismiss();
-                    toast("Success!", {
-                      autoClose: 3000,
+                try {
+                  if (
+                    !loading &&
+                    routes?.[0] &&
+                    wallet.signAllTransactions &&
+                    wallet.signTransaction &&
+                    wallet.sendTransaction &&
+                    wallet.publicKey
+                  ) {
+                    const swapResult = await exchange({
+                      wallet,
+                      routeInfo: routes[0],
+                      onTransaction: async () => {
+                        toast("sending transaction");
+                      },
                     });
-                    console.log("Sucess:", swapResult.txid);
-                    console.log("Input:", swapResult.inputAmount);
-                    console.log("Output:", swapResult.outputAmount);
+
+                    console.log({ swapResult });
+
+                    if ("error" in swapResult) {
+                      console.log("Error:", swapResult.error);
+                    } else if ("txid" in swapResult) {
+                      toast.dismiss();
+                      toast("Success!", {
+                        autoClose: 3000,
+                      });
+                      console.log("Sucess:", swapResult.txid);
+                      console.log("Input:", swapResult.inputAmount);
+                      console.log("Output:", swapResult.outputAmount);
+                    }
                   }
+                } catch (e) {
+                  console.error(e);
+                  toast("An error occurred!", {
+                    autoClose: 3000,
+                    type: "error",
+                  });
                 }
               }}
             >

@@ -78,7 +78,6 @@ export default function IdField({ sned, loading }) {
           placeholder={`GoThgFHS5W9jCLX7JoWnCHtL5RMJEBWL3HVuhGjVntyg\nBiRdzfdUcssYAzMnpnFvcqP8BeTxLtZ8RqAd8cKhVD6u`}
           {...register("ids", { validate: validate })}
         ></textarea>
-        {errors?.ids?.type === "validate" && "Invalid address"}
       </div>
 
       <div className="w-full text-center">

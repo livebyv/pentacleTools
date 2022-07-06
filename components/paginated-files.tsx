@@ -1,9 +1,13 @@
 import React, { useMemo } from "react";
 import { usePagination } from "react-use-pagination";
-import { sizeMB } from "../util/upload-arweave-bundles/upload-generator";
+
 import FileTile from "./file-tile";
 import { TrashIcon, UploadIcon } from "./icons";
 import { Pagination } from "./pagination";
+
+export function sizeMB(bytes: number): number {
+  return bytes / (1000 * 1000);
+}
 
 interface PaginateFilesProps {
   addMore: (e: any) => void;

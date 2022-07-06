@@ -1,0 +1,12 @@
+import { PublicKey } from '@solana/web3.js';
+import { BigNumber, Pda } from "../../types";
+export declare const findAuctionHousePda: (creator: PublicKey, treasuryMint: PublicKey, programId?: PublicKey) => Pda;
+export declare const findAuctioneerPda: (auctionHouse: PublicKey, auctioneerAuthority: PublicKey, programId?: PublicKey) => Pda;
+export declare const findAuctionHouseProgramAsSignerPda: (programId?: PublicKey) => Pda;
+export declare const findAuctionHouseFeePda: (auctionHouse: PublicKey, programId?: PublicKey) => Pda;
+export declare const findAuctionHouseTreasuryPda: (auctionHouse: PublicKey, programId?: PublicKey) => Pda;
+export declare const findAuctionHouseBuyerEscrowPda: (auctionHouse: PublicKey, buyer: PublicKey, programId?: PublicKey) => Pda;
+export declare const findAuctionHouseTradeStatePda: (auctionHouse: PublicKey, wallet: PublicKey, tokenAccount: PublicKey, treasuryMint: PublicKey, tokenMint: PublicKey, buyPrice: BigNumber, tokenSize: BigNumber, programId?: PublicKey) => Pda;
+export declare const findListingReceiptPda: (tradeState: PublicKey, programId?: PublicKey) => Pda;
+export declare const findBidReceiptPda: (tradeState: PublicKey, programId?: PublicKey) => Pda;
+export declare const findPurchaseReceiptPda: (sellerTradeState: PublicKey, buyerTradeState: PublicKey, programId?: PublicKey) => Pda;

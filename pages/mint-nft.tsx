@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
 import jsonFormat from "json-format";
 import { Controller, useForm } from "react-hook-form";
@@ -13,14 +13,17 @@ import { toPublicKey } from "../util/to-publickey";
 import createFileList from "../util/create-file-list";
 import { useModal } from "../contexts/ModalProvider";
 import { Creator } from "../util/metadata-schema";
-import { Metaplex, walletAdapterIdentity } from "@metaplex-foundation/js-next";
+import {
+  Metaplex,
+  walletAdapterIdentity,
+} from "../lib/metaplex/dist/esm/index.mjs";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
-import { shortenAddress } from "../util/shorten-address";
 import { sleep } from "../util/sleep";
-import { useBalance } from "../contexts/BalanceProvider";
+import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
-export default function GibAirdrop() {
+function MintNftPage() {
   const {
     register,
     handleSubmit,
@@ -34,6 +37,8 @@ export default function GibAirdrop() {
   const [files, setFiles] = useState<File[]>([]);
   const [mint, setMint] = useState("");
   const { connection } = useConnection();
+  const { solBalance, shdwBalance, shdwBalanceAsNumber } = useBalance();
+
   const handleRemoveFile = useCallback(
     (name: string) => {
       setFiles(files.filter((f) => f.name !== name));
@@ -135,10 +140,9 @@ export default function GibAirdrop() {
   const upload = useCallback(
     async (formData) => {
       setLoading(true);
-      const id = toast("Starting upload", { isLoading: true });
-      const metaplex = new Metaplex(connection).use(
-        walletAdapterIdentity(wallet.wallet.adapter)
-      );
+      const id = toast("Starting upload... this can take a while.", {
+        isLoading: true,
+      });
 
       const shdwDrive = await new ShdwDrive(connection, wallet).init();
 
@@ -172,9 +176,23 @@ export default function GibAirdrop() {
           return (await acc) + (await fileToBuffer(curr)).buffer.byteLength;
         }, Promise.resolve(0));
 
-        const shdwNeeded = ((bytes * 1.2) / LAMPORTS_PER_SOL).toFixed(6);
-
-        alert(`You will need circa ${shdwNeeded} SHDW`);
+        const shdwNeeded = (bytes * 1.2) / LAMPORTS_PER_SOL;
+        if (shdwBalanceAsNumber < shdwNeeded) {
+          setModalState({
+            open: true,
+            message: (
+              <>
+                <div>
+                  You need {shdwNeeded - shdwBalanceAsNumber} more SHDW to mint.
+                  Please go to the{" "}
+                  <Link href={{ pathname: "/shdw-swap" }}>SHDW Swap</Link> and
+                  get some.
+                </div>
+              </>
+            ),
+          });
+          return;
+        }
         const { shdw_bucket } = await shdwDrive.createStorageAccount(
           `NFT-${Date.now()}`,
           `${Math.round((bytes * 1.2) / 1000)}kb`
@@ -209,7 +227,7 @@ export default function GibAirdrop() {
         });
 
         toast(
-          `Signing and Minting NFT, check wallet for signature request. There will be several.`,
+          `Signing and minting NFT, check wallet for signature requests. There will be several.`,
           {
             isLoading: true,
           }
@@ -218,7 +236,10 @@ export default function GibAirdrop() {
           toPublicKey(shdw_bucket),
           createFileList([...files, manifest])
         );
-
+        const metaplex = new Metaplex(connection).use(
+          walletAdapterIdentity(wallet.wallet.adapter)
+        );
+        // @ts-ignore
         const { transactionId } = await metaplex.nfts().create({
           symbol: meta.symbol || "",
           name: meta.name || "",
@@ -257,28 +278,31 @@ export default function GibAirdrop() {
         });
       }
     },
-    [connection, wallet, files, setModalState]
+    [connection, wallet, files, shdwBalanceAsNumber, setModalState]
   );
-
-  const { solBalance, shdwBalance } = useBalance();
 
   return wallet?.publicKey ? (
     <div>
       <br />
 
-      <h2 className="text-3xl text-center">
-        NFT Minting - powered by SHDW Drive - BETA
-      </h2>
+      <h2 className="text-3xl text-center">NFT Minting - BETA</h2>
+      <h3 className="mt-2 text-xl text-center text-gray-500">
+        powered by SHDW Drive
+      </h3>
 
-      <div>
+      <div className="text-center">
         {!!shdwBalance && (
-          <div className="mt-3 w-full text-center">
+          <div className="mt-3 text-center">
             <span className="badge badge-success">{shdwBalance} SHDW</span>
-            <span className="ml-3 badge badge-primary">
-              {solBalance}BalashdwBalance SOL
-            </span>
+            <span className="ml-3 badge badge-primary">{solBalance} SOL</span>
           </div>
         )}
+
+        <Link href={{ pathname: "/shadow-drive/swap" }} passHref>
+          <a className="inline-block mt-3">
+            <button className="btn btn-success btn-outline btn-sm">get $SHDW</button>
+          </a>
+        </Link>
       </div>
 
       <hr className="my-3 opacity-10" />
@@ -325,7 +349,9 @@ export default function GibAirdrop() {
                     style={{ position: "absolute", bottom: 0 }}
                   >
                     <span className="text-red-400 label-text-alt">
+                      {/* @ts-ignore */}
                       {errors.name.type === "maxLength" && "Max 32 characters!"}
+                      {/* @ts-ignore */}
                       {errors.name.type === "required" && "Field is required!"}
                     </span>
                   </label>
@@ -517,3 +543,12 @@ export default function GibAirdrop() {
     </>
   );
 }
+const Wrapped = () => {
+  return (
+    <BalanceProvider>
+      <MintNftPage />
+    </BalanceProvider>
+  );
+};
+
+export default Wrapped;

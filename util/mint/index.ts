@@ -12,7 +12,7 @@ import {
   createAssociatedTokenAccountInstruction,
   createMintToInstruction,
   createInitializeMintInstruction,
-} from "@solana/spl-token";
+} from "@solana/spl-token-v2";
 import {
   Data,
   CreateMetadataArgs,

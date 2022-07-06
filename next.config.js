@@ -61,7 +61,7 @@ const config = {
       },
       {
         source: "/get-ar-links",
-        destination: "/arweave-upload",
+        destination: "/",
         permanent: true,
       },
       {

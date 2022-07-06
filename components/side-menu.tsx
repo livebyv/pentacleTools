@@ -14,9 +14,9 @@ import {
   SendIcon,
 } from "./icons";
 import { toast } from "react-toastify";
+import SwitchHorizontalIcon from '@heroicons/react/solid/SwitchHorizontalIcon';
 
 export default function SideMenu() {
-
   return (
     <div className="drawer-side lg:hidden">
       <label htmlFor="my-drawer" className="drawer-overlay"></label>
@@ -76,6 +76,10 @@ export default function SideMenu() {
           />
           Shadow Drive Console
         </MenuLink>
+        <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
+          <SwitchHorizontalIcon width={16} height={16} />
+          <span>SHDW Swap</span>
+        </MenuLink>
         <MenuLink href="/burn-nfts">
           <i className="mr-3">
             <FireIcon />
@@ -93,18 +97,6 @@ export default function SideMenu() {
             <SendIcon />
           </i>
           Send Multiple NFTs
-        </MenuLink>
-        <MenuLink href="/arweave-upload">
-          <i className="mr-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
-              width={16}
-              height={16}
-              alt="Arweave"
-            />
-          </i>
-          <span>Arweave Upload</span>
         </MenuLink>
         <MenuLink href="/snedmaster">
           <i className="mr-3">

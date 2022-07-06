@@ -10,7 +10,7 @@ import {
   createTransferInstruction,
   getAssociatedTokenAddress,
   TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+} from "@solana/spl-token-v2";
 import { useForm } from "react-hook-form";
 
 import { useModal } from "../contexts/ModalProvider";
@@ -283,7 +283,7 @@ export default function SendNFTs() {
             isLoading: true,
           }
         );
-      } 
+      }
       for (const slice of chunks) {
         const tx = new Transaction().add(
           ...slice.map((acc) =>
@@ -375,12 +375,12 @@ export default function SendNFTs() {
           )
         );
       }
-
-      await signAllTransactions(txChunks.flat());
       toast.dismiss();
       toast(`Sending ${txChunks.flat().length} transactions...`, {
         isLoading: true,
       });
+      await signAllTransactions(txChunks.flat());
+
       await Promise.all(
         txChunks.flat().map(async (tx) => {
           const id = await connection.sendRawTransaction(tx.serialize());
@@ -423,8 +423,7 @@ export default function SendNFTs() {
     signAllTransactions,
     getValues,
     createAssociatedTokenAccountsForMints,
-    handleNFTs,
-    removeNFT
+    removeNFT,
   ]);
 
   const confirmationModal = useMemo(() => {
@@ -444,8 +443,7 @@ export default function SendNFTs() {
                 <br />
                 <br />
                 <strong>
-                  It cannot be undone and they will be destroyed!!! Make sure
-                  you know what you are doing!
+                  This cannot be undone! Make sure you know what you are doing!
                 </strong>
               </p>
 
@@ -656,7 +654,7 @@ export default function SendNFTs() {
                   : "selecc to sned"
               }
               className="mt-2 rounded-full shadow btn btn-primary"
-              disabled={!state.selectedNFTs.length || errors.destination}
+              disabled={!state.selectedNFTs.length || !!errors.destination}
             />
           </div>
         </form>
@@ -679,7 +677,7 @@ export default function SendNFTs() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - Send NFTs</title>
+        <title>🛠️ Pentacle Tools - 📨 Send NFTs</title>
       </Head>
       <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Send NFTs</h1>
@@ -690,11 +688,9 @@ export default function SendNFTs() {
       </p>
       <div className="flex flex-col justify-center items-center my-4 text-sm">
         {publicKey ? (
-          <>
-            <p className="text-center text-white break-all">
-              <WalletMultiButton />
-            </p>
-          </>
+          <p className="text-center text-white break-all">
+            <WalletMultiButton />
+          </p>
         ) : (
           <WalletMultiButton
             style={{
@@ -705,9 +701,9 @@ export default function SendNFTs() {
         )}
       </div>
       <hr className="my-4 opacity-10" />
-      {publicKey ? (
+      {publicKey && (
         <div className="p-4 bg-gray-900 shadow card">{nftDisplay}</div>
-      ) : null}
+      )}
       {confirmationModal}
     </>
   );

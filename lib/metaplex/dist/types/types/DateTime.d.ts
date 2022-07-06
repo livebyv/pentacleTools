@@ -1,0 +1,10 @@
+import BN from 'bn.js';
+import { Opaque, Option } from "../utils";
+import { BigNumberValues } from './BigNumber';
+export declare type DateTimeString = string;
+export declare type DateTimeValues = DateTimeString | BigNumberValues | Date;
+export declare type DateTime = Opaque<BN, 'DateTime'>;
+export declare const toDateTime: (value: DateTimeValues) => DateTime;
+export declare const toOptionDateTime: (value: Option<DateTimeValues>) => Option<DateTime>;
+export declare const isDateTime: (value: any) => value is DateTime;
+export declare const assertDateTime: (value: any) => asserts value is DateTime;

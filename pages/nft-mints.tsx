@@ -7,6 +7,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 import { download } from "../util/download";
 import { toast } from "react-toastify";
+import JupiterForm from "../components/jupiter-swap";
 
 export default function GibMints() {
   const {
@@ -154,7 +155,7 @@ export default function GibMints() {
               <button
                 className={`btn btn-primary rounded-box shadow-lg ${
                   loading ? "loading" : ""}`}
-                disabled={errors?.address}
+                disabled={!!errors?.address}
                 type="submit"
               >
                 {loading ? `Getting Mints.. ${counter} so far ` : "Get Mints!"}
@@ -182,6 +183,7 @@ export default function GibMints() {
             </div>
           </div>
         </form>
+        <JupiterForm />
       </div>
     </>
   );

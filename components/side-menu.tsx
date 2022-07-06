@@ -116,7 +116,7 @@ export default function SideMenu() {
             <MadeWithLove />
           </div>
           <div>
-            <div className="text-sm text-center">
+            <div className="text-sm text-center transition-colors hover:text-primary">
               <CopyToClipboard
                 text={"lolfees.sol"}
                 onCopy={() =>

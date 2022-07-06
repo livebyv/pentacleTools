@@ -6,6 +6,7 @@ export function MadeWithLove() {
       <a
         target="_blank"
         rel="noopener noreferrer"
+        className="transition-colors hover:text-primary"
         href="https://github.com/21e8/pentacle.tools/"
       >
         <i>
@@ -31,6 +32,7 @@ export function MadeWithLove() {
         target="_blank"
         rel="noopener noreferrer"
         href="https://twitter.com/@0xAlice_"
+        className="transition-colors hover:text-primary"
       >
         <i>
           <TwitterIcon />

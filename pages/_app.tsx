@@ -91,7 +91,7 @@ function Context({ children }: { children: React.ReactNode }) {
             <div className="lg:hidden">
               <TopMenu />
             </div>
-            <ul className="hidden overflow-y-auto relative top-0 bottom-0 left-0 p-4 space-y-2 w-64 lg:inline-block lg:fixed menu bg-base-300 text-base-content">
+            <ul className="hidden overflow-y-auto relative top-0 bottom-0 left-0 flex-col gap-2 p-4 w-64 lg:inline-flex lg:fixed menu bg-base-300 text-base-content">
               <li>
                 <a
                   href="https://pentacle.xyz"

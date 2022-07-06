@@ -39,7 +39,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
   const wallet = useWallet();
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   const [exp, setExp] = useState(new RegExp("", "i"));
-  const {forceUpdate} = useBalance();
+  const { forceUpdate } = useBalance();
 
   const [formValue, setFormValue] = useState<UseJupiterProps>({
     amount: 10,

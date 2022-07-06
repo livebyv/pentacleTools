@@ -13,7 +13,8 @@ const initState = {
   solBalance: "0",
   shdwBalance: "0",
   usdcBalance: '0',
-  shdwBalanceAsNumber: 0
+  shdwBalanceAsNumber: 0,
+  forceUpdate: () => {}
 };
 
 const BalanceContext = createContext(initState);

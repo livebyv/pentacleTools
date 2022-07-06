@@ -1,9 +1,9 @@
-import { Connection, ParsedAccountData, PublicKey } from "@solana/web3.js";
+import { Connection, ParsedAccountData } from "@solana/web3.js";
 import { from, lastValueFrom } from "rxjs";
 import { mergeMap } from "rxjs/operators";
 import { toPublicKey } from "./to-publickey";
 
-const CONCURRENCY = 3;
+const CONCURRENCY = 2;
 
 export async function getOwners(
   mints: string[],

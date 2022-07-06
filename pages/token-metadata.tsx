@@ -5,7 +5,6 @@ import jsonFormat from "json-format";
 import { useModal } from "../contexts/ModalProvider";
 import { useForm } from "react-hook-form";
 import { getAddresses, validateSolAddressArray } from "../util/validators";
-import { useAlert } from "../contexts/AlertProvider";
 import Head from "next/head";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { toast } from "react-toastify";

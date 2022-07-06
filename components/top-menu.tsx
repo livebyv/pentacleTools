@@ -1,9 +1,7 @@
 import React from "react";
-import { useRouter } from "next/router";
 import { MenuIcon } from "./icons";
 
 export default function TopMenu() {
-  const router = useRouter();
   return (
     <div className="w-full text-center">
       <nav
@@ -30,7 +28,7 @@ export default function TopMenu() {
           </a>
         </div>
         <div className="flex col-start-4 w-1/4 xl:hidden">
-          <label htmlFor="my-drawer" id="app" className="btn">
+          <label htmlFor="my-drawer" id="app" className="btn btn-outline">
             <i>
               <MenuIcon />
             </i>

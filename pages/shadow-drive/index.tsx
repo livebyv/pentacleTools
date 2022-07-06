@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
@@ -16,7 +16,16 @@ import createFileList from "../../util/create-file-list";
 import { TrashIcon } from "../../components/icons";
 import { BalanceProvider, useBalance } from "../../contexts/BalanceProvider";
 import { toast } from "react-toastify";
-import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const JupiterSwap = dynamic(() => import("../../components/jupiter-swap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-row justify-center items-center my-3">
+      <button className="btn btn-primary btn-outline loading" />
+    </div>
+  ),
+});
 
 const sortStorageAccounts = (a, b) =>
   b.account.creationTime - a.account.creationTime;
@@ -144,6 +153,7 @@ function ShdwDrivePage() {
   const { files, setFiles } = useFiles();
   const wallet = useWallet();
   const { solBalance, shdwBalance } = useBalance();
+  const [showingForm, setShowingForm] = useState(false);
 
   const uploadFiles = useCallback(
     async (account: PublicKey) => {
@@ -423,7 +433,7 @@ function ShdwDrivePage() {
       </Head>
       <div className="mb-3 max-w-full text-center">
         <h1 className="text-4xl text-white">
-           {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ImageURI.GenesysGo}
             alt=""
@@ -435,7 +445,7 @@ function ShdwDrivePage() {
             }}
           />
           SHDW Drive Console
-           {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={ImageURI.GenesysGo}
             alt=""
@@ -453,13 +463,13 @@ function ShdwDrivePage() {
             <span className="ml-3 badge badge-primary">{solBalance} SOL</span>
           </div>
         )}
-         <Link href={{ pathname: "/shadow-drive/swap" }} passHref>
-          <a className="inline-block mt-3">
-            <button className="btn btn-success btn-outline btn-sm">get $SHDW</button>
-          </a>
-        </Link>
+        <button
+          className="mt-3 btn btn-success btn-outline btn-sm"
+          onClick={() => setShowingForm(!showingForm)}
+        >
+          {showingForm ? "Close Swap" : "Get $SHDW"}
+        </button>
         <hr className="my-4 opacity-10" />
-
       </div>
       <div>
         {wallet.connected && !!state.loading && (
@@ -471,6 +481,12 @@ function ShdwDrivePage() {
         {!wallet.connected && (
           <div className="flex justify-center items-center w-full">
             <WalletMultiButton />
+          </div>
+        )}
+
+        {showingForm && (
+          <div className="my-3">
+            <JupiterSwap />
           </div>
         )}
 

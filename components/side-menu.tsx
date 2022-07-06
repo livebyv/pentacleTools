@@ -77,7 +77,7 @@ export default function SideMenu() {
           Shadow Drive Console
         </MenuLink>
         <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
-          <SwitchHorizontalIcon width={16} height={16} />
+          <SwitchHorizontalIcon className="mr-3" width={16} height={16} />
           <span>SHDW Swap</span>
         </MenuLink>
         <MenuLink href="/burn-nfts">

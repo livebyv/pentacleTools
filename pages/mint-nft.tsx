@@ -21,7 +21,16 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { sleep } from "../util/sleep";
 import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
-import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const JupiterSwap = dynamic(() => import("../components/jupiter-swap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex flex-row justify-center items-center my-3">
+      <button className="btn btn-primary btn-outline loading" />
+    </div>
+  ),
+});
 
 function MintNftPage() {
   const {
@@ -38,6 +47,7 @@ function MintNftPage() {
   const [mint, setMint] = useState("");
   const { connection } = useConnection();
   const { solBalance, shdwBalance, shdwBalanceAsNumber } = useBalance();
+  const [showingForm, setShowingForm] = useState(false);
 
   const handleRemoveFile = useCallback(
     (name: string) => {
@@ -178,15 +188,15 @@ function MintNftPage() {
 
         const shdwNeeded = (bytes * 1.2) / LAMPORTS_PER_SOL;
         if (shdwBalanceAsNumber < shdwNeeded) {
+          setShowingForm(true);
           setModalState({
             open: true,
             message: (
               <>
                 <div>
-                  You need {shdwNeeded - shdwBalanceAsNumber} more SHDW to mint.
-                  Please go to the{" "}
-                  <Link href={{ pathname: "/shadow-drive/swap" }}>SHDW Swap</Link> and
-                  get some.
+                  You need {shdwNeeded - shdwBalanceAsNumber} more SHDW to mint.{" "}
+                  <br />
+                  Purchase some in the widget.
                 </div>
               </>
             ),
@@ -298,12 +308,19 @@ function MintNftPage() {
           </div>
         )}
 
-        <Link href={{ pathname: "/shadow-drive/swap" }} passHref>
-          <a className="inline-block mt-3">
-            <button className="btn btn-success btn-outline btn-sm">get $SHDW</button>
-          </a>
-        </Link>
+        {/* <Link href={{ pathname: "/shadow-drive/swap" }} passHref>
+          <a className="inline-block mt-3"> */}
+        <button
+          className="mt-3 btn btn-success btn-outline btn-sm"
+          onClick={() => setShowingForm(!showingForm)}
+        >
+          {showingForm ? "Close Swap" : "Get $SHDW"}
+        </button>
+        {/* </a>
+        </Link> */}
       </div>
+
+      {showingForm && <JupiterSwap />}
 
       <hr className="my-3 opacity-10" />
 

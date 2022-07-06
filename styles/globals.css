@@ -58,7 +58,7 @@ a {
   @apply py-1;
   @apply xl:py-0;
   @apply px-4;
-  @apply bg-base-300;
+  @apply bg-gray-900;
   @apply rounded-box;
   @apply items-center;
   @apply justify-between;

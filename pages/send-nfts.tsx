@@ -443,8 +443,7 @@ export default function SendNFTs() {
                 <br />
                 <br />
                 <strong>
-                  It cannot be undone and they will be destroyed!!! Make sure
-                  you know what you are doing!
+                  This cannot be undone! Make sure you know what you are doing!
                 </strong>
               </p>
 

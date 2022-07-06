@@ -3,6 +3,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -12,9 +13,9 @@ import { SHDW_TOKEN } from "../util/accounts";
 const initState = {
   solBalance: "0",
   shdwBalance: "0",
-  usdcBalance: '0',
+  usdcBalance: "0",
   shdwBalanceAsNumber: 0,
-  forceUpdate: () => {}
+  fetchBalances: () => {},
 };
 
 const BalanceContext = createContext(initState);
@@ -23,34 +24,37 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
   const [shdwBalance, setShdwBalance] = useState("0");
   const [shdwBalanceAsNumber, setShdwBalanceAsNumber] = useState(0);
   const [solBalance, setSolBalance] = useState("0");
-  const [usdcBalance, setUsdcBalance] = useState('0');
-  const [update, forceUpdate] = useState();
+  const [usdcBalance, setUsdcBalance] = useState("0");
 
   const { publicKey } = useWallet();
   const { connection } = useConnection();
 
-  useEffect(() => {
-    console.log(update);
-    const fetchBalances = async () => {
-      const solBalance = (
-        (await connection.getBalance(publicKey)) / LAMPORTS_PER_SOL
-      ).toFixed(4);
-      setSolBalance(solBalance);
-      const shdwBalance = (
-        await connection.getTokenAccountBalance(
-          await getAssociatedTokenAddress(SHDW_TOKEN, publicKey)
+  const fetchBalances = useCallback(async () => {
+  
+    const solBalance = (
+      (await connection.getBalance(publicKey)) / LAMPORTS_PER_SOL
+    ).toFixed(4);
+    setSolBalance(solBalance);
+    const shdwBalance = await connection.getTokenAccountBalance(
+      await getAssociatedTokenAddress(SHDW_TOKEN, publicKey)
+    );
+    setShdwBalanceAsNumber(shdwBalance.value.uiAmount);
+    setShdwBalance(shdwBalance.value.uiAmount.toFixed(4));
+  
+    const usdcBalance = (
+      await connection.getTokenAccountBalance(
+        await getAssociatedTokenAddress(
+          new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+          publicKey
         )
-      );
-      setShdwBalanceAsNumber(shdwBalance.value.uiAmount);
-      setShdwBalance(shdwBalance.value.uiAmount.toFixed(4));
-      const usdcBalance = (
-        await connection.getTokenAccountBalance(
-          await getAssociatedTokenAddress(new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'), publicKey)
-        )
-      ).value.uiAmount.toFixed(4);
-      setUsdcBalance(usdcBalance);
-    };
+      )
+    ).value.uiAmount.toFixed(4);
+  
 
+    setUsdcBalance(usdcBalance);
+  }, [connection, publicKey]);
+
+  useEffect(() => {
     if (publicKey) {
       fetchBalances();
 
@@ -59,17 +63,19 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
       }, 10000);
       return () => clearInterval(iv);
     }
-  }, [connection, publicKey, update]);
+  }, [connection, fetchBalances, publicKey]);
 
   return (
     <BalanceContext.Provider
-      value={{
-        shdwBalance,
-        shdwBalanceAsNumber,
-        solBalance,
-        usdcBalance,
-        forceUpdate
-      } as any}
+      value={
+        {
+          shdwBalance,
+          shdwBalanceAsNumber,
+          solBalance,
+          usdcBalance,
+          fetchBalances,
+        } as any
+      }
     >
       {children}
     </BalanceContext.Provider>

@@ -10,6 +10,8 @@ import { TOKEN_LIST_URL, useJupiter } from "@jup-ag/react-hook";
 import fetch from "cross-fetch";
 import { toast } from "react-toastify";
 import { useBalance } from "../contexts/BalanceProvider";
+import { publicKey } from "@metaplex-foundation/beet-solana";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 const defaultProps = {
   styles: {
@@ -39,11 +41,11 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
   const wallet = useWallet();
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   const [exp, setExp] = useState(new RegExp("", "i"));
-  const { forceUpdate } = useBalance();
+  const { fetchBalances } = useBalance();
 
   const [formValue, setFormValue] = useState<UseJupiterProps>({
-    amount: 10,
-    inputMint: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+    amount: 0.1,
+    inputMint: new PublicKey("So11111111111111111111111111111111111111112"),
     outputMint: new PublicKey("SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y"),
     slippage: 5, // 0.5%
   });
@@ -74,8 +76,8 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
 
   const allTokenMints = useMemo(
     () => [
-      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       "So11111111111111111111111111111111111111112",
+      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     ],
     []
   );
@@ -246,6 +248,9 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
           </div>
 
           <div className="flex justify-center items-center">
+            {!publicKey && <WalletMultiButton />}
+          </div>
+          <div className="flex justify-center items-center">
             <button
               type="button"
               className={`w-full btn btn-outline btn-success ${
@@ -266,7 +271,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                       wallet,
                       routeInfo: routes[0],
                       onTransaction: async () => {
-                        toast("sending transaction");
+                        toast("sending transaction", { isLoading: true });
                       },
                     });
 
@@ -279,7 +284,8 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                       toast("Success!", {
                         autoClose: 3000,
                       });
-                      forceUpdate();
+                      debugger
+                      fetchBalances();
                       console.log("Sucess:", swapResult.txid);
                       console.log("Input:", swapResult.inputAmount);
                       console.log("Output:", swapResult.outputAmount);

@@ -73,10 +73,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           connection={connection}
           cluster="mainnet-beta"
           userPublicKey={publicKey}
-          platformFeeAndAccounts={{
-            feeBps: 50,
-            feeAccounts: platformFeeAndAccounts,
-          }}
+          platformFeeAndAccounts={platformFeeAndAccounts}
         >
           {children}
         </JupiterProvider>

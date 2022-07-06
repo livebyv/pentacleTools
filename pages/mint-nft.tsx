@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
 import jsonFormat from "json-format";
 import { Controller, useForm } from "react-hook-form";
@@ -13,13 +13,13 @@ import { toPublicKey } from "../util/to-publickey";
 import createFileList from "../util/create-file-list";
 import { useModal } from "../contexts/ModalProvider";
 import { Creator } from "../util/metadata-schema";
-import { Metaplex, walletAdapterIdentity } from "/Users/madbook/git/metaplex-js/dist/esm/index.mjs";
+import { Metaplex, walletAdapterIdentity } from "../lib/metaplex/dist/esm/index.mjs";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { sleep } from "../util/sleep";
-import { useBalance } from "../contexts/BalanceProvider";
+import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
 
-export default function GibAirdrop() {
+function MintNftPage() {
   const {
     register,
     handleSubmit,
@@ -131,13 +131,23 @@ export default function GibAirdrop() {
     [numberOfFiles, fileTiles, files, register]
   );
 
+  useEffect(() => {
+    if (wallet?.wallet?.adapter) {
+      const metaplex = new Metaplex(connection).use(
+          walletAdapterIdentity(wallet.wallet.adapter)
+        );
+
+        debugger
+    }
+  }, [connection, wallet])
+
   const upload = useCallback(
     async (formData) => {
       setLoading(true);
       const id = toast("Starting upload", { isLoading: true });
-      const metaplex = new Metaplex(connection).use(
-        walletAdapterIdentity(wallet.wallet.adapter)
-      );
+     
+
+
 
       const shdwDrive = await new ShdwDrive(connection, wallet).init();
 
@@ -217,7 +227,7 @@ export default function GibAirdrop() {
           toPublicKey(shdw_bucket),
           createFileList([...files, manifest])
         );
-
+        // @ts-ignore
         const { transactionId } = await metaplex.nfts().create({
           symbol: meta.symbol || "",
           name: meta.name || "",
@@ -274,7 +284,7 @@ export default function GibAirdrop() {
           <div className="mt-3 w-full text-center">
             <span className="badge badge-success">{shdwBalance} SHDW</span>
             <span className="ml-3 badge badge-primary">
-              {solBalance}BalashdwBalance SOL
+              {solBalance} SOL
             </span>
           </div>
         )}
@@ -518,3 +528,12 @@ export default function GibAirdrop() {
     </>
   );
 }
+const Wrapped = () => {
+  return (
+    <BalanceProvider>
+      <MintNftPage />
+    </BalanceProvider>
+  );
+};
+
+export default Wrapped;

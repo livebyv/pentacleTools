@@ -94,18 +94,6 @@ export default function SideMenu() {
           </i>
           Send Multiple NFTs
         </MenuLink>
-        <MenuLink href="/arweave-upload">
-          <i className="mr-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://shdw-drive.genesysgo.net/FihpNAwDm8i6gBsqeZjV9fn8SkkpYFgcWt5BSszPusnq/arweave.png"
-              width={16}
-              height={16}
-              alt="Arweave"
-            />
-          </i>
-          <span>Arweave Upload</span>
-        </MenuLink>
         <MenuLink href="/snedmaster">
           <i className="mr-3">
             <GetCashIcon width={16} height={16} />

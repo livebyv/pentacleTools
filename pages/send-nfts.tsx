@@ -701,7 +701,7 @@ export default function SendNFTs() {
         )}
       </div>
       <hr className="my-4 opacity-10" />
-      {publicKey ?? (
+      {publicKey && (
         <div className="p-4 bg-gray-900 shadow card">{nftDisplay}</div>
       )}
       {confirmationModal}

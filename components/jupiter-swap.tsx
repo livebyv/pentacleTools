@@ -41,7 +41,8 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
   const { publicKey } = wallet;
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
   const [exp, setExp] = useState(new RegExp("", "i"));
-  const { fetchBalances } = useBalance();
+  const { fetchBalances, usdcBalanceAsNumber, solBalanceAsNumber } =
+    useBalance();
 
   const [formValue, setFormValue] = useState<UseJupiterProps>({
     amount: 0.1,
@@ -128,7 +129,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
   }, [lastRefreshTimestamp, loading, refresh]);
 
   return (
-    <div className="mx-auto my-6 max-w-md border border-primary card">
+    <div className="mx-auto my-6 max-w-md ring ring-primary card">
       <div className="card-body">
         <div className="grid grid-cols-1 gap-6">
           <div className="w-full form-control">
@@ -163,11 +164,16 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                   })}
               </select>
               <input
-                type={"text"}
+                type={"number"}
                 name="amount"
                 className="flex-1 input"
                 id="amount"
                 placeholder="0"
+                max={
+                  formValue.inputMint.toBase58() === allTokenMints[0]
+                    ? solBalanceAsNumber
+                    : usdcBalanceAsNumber
+                }
                 style={{ height: "100%" }}
                 defaultValue={formValue.amount}
                 onInput={(e: any) => {

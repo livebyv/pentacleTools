@@ -9,8 +9,8 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-import React, { useEffect } from "react";
-import SwitchHorizontalIcon from '@heroicons/react/solid/SwitchHorizontalIcon';
+import React, { useEffect, useState } from "react";
+import SwitchHorizontalIcon from "@heroicons/react/solid/SwitchHorizontalIcon";
 import { ModalProvider } from "../contexts/ModalProvider";
 import SideMenu from "../components/side-menu";
 import TopMenu from "../components/top-menu";
@@ -34,6 +34,8 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { JupiterProvider } from "@jup-ag/react-hook";
+import { getPlatformFeeAccounts } from "@jup-ag/core";
+import { PublicKey } from "@solana/web3.js";
 
 const endpoint = process.env.NEXT_PUBLIC_RPC;
 
@@ -47,6 +49,20 @@ const WalletProvider = dynamic(
 const Providers = ({ children }: { children: React.ReactNode }) => {
   const { connection } = useConnection();
   const { publicKey } = useWallet();
+  const [platformFeeAndAccounts, setPlatformFeeAndAccounts] =
+    useState(undefined);
+  useEffect(() => {
+    (async () => {
+      const feeAccs = await getPlatformFeeAccounts(
+        connection,
+        new PublicKey("9B9bvFT5JSFfGRcx4fTX1cpiiHMLAZn5vzUSTKnRtxLL") // The platform fee account owner
+      );
+      setPlatformFeeAndAccounts({
+        feeBps: 50,
+        feeAccounts: feeAccs,
+      });
+    })();
+  }, [connection]);
   return (
     <FileProvider>
       {/* @ts-ignore */}
@@ -57,6 +73,10 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           connection={connection}
           cluster="mainnet-beta"
           userPublicKey={publicKey}
+          platformFeeAndAccounts={{
+            feeBps: 50,
+            feeAccounts: platformFeeAndAccounts,
+          }}
         >
           {children}
         </JupiterProvider>
@@ -136,7 +156,7 @@ function Context({ children }: { children: React.ReactNode }) {
                 </i>
                 NFT Minters
               </MenuLink>
-              <MenuLink activatesDrawer={false}  href="/shadow-drive">
+              <MenuLink activatesDrawer={false} href="/shadow-drive">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={ImageURI.GenesysGo}
@@ -165,7 +185,7 @@ function Context({ children }: { children: React.ReactNode }) {
               <MenuLink activatesDrawer={false} href="/mint-nft">
                 <i className="mr-3">
                   <HammerIcon />
-                </i> 
+                </i>
                 <span> Mint NFT</span>
               </MenuLink>
 
@@ -235,30 +255,6 @@ function Context({ children }: { children: React.ReactNode }) {
               style={{ maxWidth: "100%" }}
             >
               <div className="px-6 mx-auto max-w-full" style={{ width: 1200 }}>
-                {/* <div className="mb-8 alert alert-warning">
-                <div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="flex-shrink-0 w-6 h-6 stroke-current"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                  <span className="ml-3">
-                    {" "}
-                    Solana has pushed out some changes which affect many of the
-                    tools here. Errors are expected.
-                    <br/>
-                    <strong>There is no support for these tools, they are open source and free to use!</strong>
-                  </span>
-                </div>
-              </div> */}
                 {children}
               </div>
             </main>

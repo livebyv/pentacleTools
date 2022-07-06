@@ -13,7 +13,10 @@ import { toPublicKey } from "../util/to-publickey";
 import createFileList from "../util/create-file-list";
 import { useModal } from "../contexts/ModalProvider";
 import { Creator } from "../util/metadata-schema";
-import { Metaplex, walletAdapterIdentity } from "../lib/metaplex/dist/esm/index.mjs";
+import {
+  Metaplex,
+  walletAdapterIdentity,
+} from "../lib/metaplex/dist/esm/index.mjs";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { sleep } from "../util/sleep";
 import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
@@ -131,23 +134,10 @@ function MintNftPage() {
     [numberOfFiles, fileTiles, files, register]
   );
 
-  useEffect(() => {
-    if (wallet?.wallet?.adapter) {
-      const metaplex = new Metaplex(connection).use(
-          walletAdapterIdentity(wallet.wallet.adapter)
-        );
-
-        debugger
-    }
-  }, [connection, wallet])
-
   const upload = useCallback(
     async (formData) => {
       setLoading(true);
       const id = toast("Starting upload", { isLoading: true });
-     
-
-
 
       const shdwDrive = await new ShdwDrive(connection, wallet).init();
 
@@ -227,6 +217,9 @@ function MintNftPage() {
           toPublicKey(shdw_bucket),
           createFileList([...files, manifest])
         );
+        const metaplex = new Metaplex(connection).use(
+          walletAdapterIdentity(wallet.wallet.adapter)
+        );
         // @ts-ignore
         const { transactionId } = await metaplex.nfts().create({
           symbol: meta.symbol || "",
@@ -283,9 +276,7 @@ function MintNftPage() {
         {!!shdwBalance && (
           <div className="mt-3 w-full text-center">
             <span className="badge badge-success">{shdwBalance} SHDW</span>
-            <span className="ml-3 badge badge-primary">
-              {solBalance} SOL
-            </span>
+            <span className="ml-3 badge badge-primary">{solBalance} SOL</span>
           </div>
         )}
       </div>

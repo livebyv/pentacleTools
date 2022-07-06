@@ -283,7 +283,7 @@ export default function SendNFTs() {
             isLoading: true,
           }
         );
-      } 
+      }
       for (const slice of chunks) {
         const tx = new Transaction().add(
           ...slice.map((acc) =>
@@ -375,12 +375,12 @@ export default function SendNFTs() {
           )
         );
       }
-
-      await signAllTransactions(txChunks.flat());
       toast.dismiss();
       toast(`Sending ${txChunks.flat().length} transactions...`, {
         isLoading: true,
       });
+      await signAllTransactions(txChunks.flat());
+
       await Promise.all(
         txChunks.flat().map(async (tx) => {
           const id = await connection.sendRawTransaction(tx.serialize());
@@ -423,8 +423,7 @@ export default function SendNFTs() {
     signAllTransactions,
     getValues,
     createAssociatedTokenAccountsForMints,
-    handleNFTs,
-    removeNFT
+    removeNFT,
   ]);
 
   const confirmationModal = useMemo(() => {

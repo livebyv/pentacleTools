@@ -542,18 +542,19 @@ export default function BurnNFTs() {
         {publicKey ? (
           <p className="text-center text-white break-all">
             <span>Connected Address:</span>
-            <br />
-
-            <CopyToClipboard
-              text={state.publicAddress}
-              onCopy={() =>
-                toast("Copied to clipboard!", {
-                  autoClose: 2000,
-                })
-              }
-            >
-              <span className={`cursor-pointer`}>{state.publicAddress}</span>
-            </CopyToClipboard>
+            <br />{" "}
+            {state.publicAddress && (
+              <CopyToClipboard
+                text={state.publicAddress}
+                onCopy={() =>
+                  toast("Copied to clipboard!", {
+                    autoClose: 2000,
+                  })
+                }
+              >
+                <span className={`cursor-pointer`}>{state.publicAddress}</span>
+              </CopyToClipboard>
+            )}
           </p>
         ) : (
           <WalletMultiButton

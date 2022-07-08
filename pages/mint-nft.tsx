@@ -21,16 +21,7 @@ import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { sleep } from "../util/sleep";
 import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
-import dynamic from "next/dynamic";
-
-const JupiterSwap = dynamic(() => import("../components/jupiter-swap"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex flex-row justify-center items-center my-3">
-      <button className="btn btn-primary btn-outline loading" />
-    </div>
-  ),
-});
+import JupiterForm from "../components/jupiter-swap";
 
 function MintNftPage() {
   const {
@@ -321,7 +312,7 @@ function MintNftPage() {
         </Link> */}
       </div>
 
-      {showingForm && <JupiterSwap />}
+      {showingForm && <JupiterForm />}
 
       <hr className="my-3 opacity-10" />
 

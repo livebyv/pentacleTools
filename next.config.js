@@ -1,5 +1,4 @@
 const withPlugins = require("next-compose-plugins");
-const withPreact = require('next-plugin-preact');
 
 /** eslint-disable @typescript-eslint/no-var-requires */
 const withTM = require("next-transpile-modules")([
@@ -80,6 +79,6 @@ const config = {
 
 
 module.exports = withPlugins(
-  [withTM, withPreact, withBundleAnalyzer],
+  [withTM, withBundleAnalyzer],
   config
 )

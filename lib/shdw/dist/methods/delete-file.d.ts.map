@@ -1,1 +1,0 @@
-{"version":3,"file":"delete-file.d.ts","sourceRoot":"","sources":["../../src/methods/delete-file.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,MAAM,uBAAuB,CAAC;AAEhD,OAAO,EAAE,mBAAmB,EAAE,MAAM,UAAU,CAAC;AAI/C;;;;;;GAMG;AAEH,wBAA8B,UAAU,CACtC,GAAG,EAAE,MAAM,CAAC,IAAI,CAAC,SAAS,EAC1B,GAAG,EAAE,MAAM,EACX,OAAO,EAAE,MAAM,GACd,OAAO,CAAC,mBAAmB,CAAC,CA4D9B"}

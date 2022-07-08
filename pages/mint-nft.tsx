@@ -8,7 +8,7 @@ import FileTile from "../components/file-tile";
 import { URL_MATCHER } from "../util/validators";
 import { getRange } from "../util/get-range";
 import { fileToBuffer } from "../util/file-to-buffer";
-import { ShdwDrive } from "../lib/shdw/dist";
+import { ShdwDrive } from "@shadow-drive/sdk";
 import { toPublicKey } from "../util/to-publickey";
 import createFileList from "../util/create-file-list";
 import { useModal } from "../contexts/ModalProvider";

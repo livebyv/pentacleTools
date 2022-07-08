@@ -1,4 +1,4 @@
-import { ShdwDrive } from "../lib/shdw/dist";
+import { ShdwDrive } from "@shadow-drive/sdk";
 
 export const getAccounts = async (shdw: ShdwDrive) =>
   await Promise.all(

@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import Head from "next/head";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { ShdwDrive } from "../../lib/shdw/dist";
-import { StorageAccount } from "../../lib/shdw/dist";
+import { ShdwDrive } from "@shadow-drive/sdk";
+import { StorageAccount } from "@shadow-drive/sdk/dist/types";
 import { PublicKey } from "@solana/web3.js";
 
 import { sizeMB } from "../../components/file-tile";

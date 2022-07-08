@@ -9,14 +9,12 @@ import { PublicKey } from "@solana/web3.js";
 
 import { sizeMB } from "../../components/file-tile";
 import { ImageURI } from "../../util/image-uri";
-import { FileUpload } from "../../components/file-upload";
-import { useFiles } from "../../contexts/FileProvider";
-import { sliceIntoChunks } from "../../util/slice-into-chunks";
-import createFileList from "../../util/create-file-list";
-import { TrashIcon } from "../../components/icons";
 import { BalanceProvider, useBalance } from "../../contexts/BalanceProvider";
 import { toast } from "react-toastify";
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { TrashIcon } from "../../components/icons";
+import { getAccounts, isValidUnit, sortStorageAccounts } from "../../util/shdw";
 
 const JupiterSwap = dynamic(() => import("../../components/jupiter-swap"), {
   ssr: false,
@@ -27,24 +25,8 @@ const JupiterSwap = dynamic(() => import("../../components/jupiter-swap"), {
   ),
 });
 
-const sortStorageAccounts = (a, b) =>
-  b.account.creationTime - a.account.creationTime;
-
-const isValidUnit = (str: string) => {
-  const num = parseFloat(str);
-  if (isNaN(num)) {
-    return false;
-  }
-  const unit = str.split(`${num}`)[1].toUpperCase();
-  if (!["MB", "KB", "GB"].includes(unit)) {
-    return false;
-  }
-  return true;
-};
 function ShdwDrivePage() {
   const initState: {
-    totalFileSize: number;
-    uploading: string;
     isResizing: string;
     increaseOrDecrease: "increase" | "decrease";
     uploadInProgress: boolean;
@@ -55,11 +37,9 @@ function ShdwDrivePage() {
     isCreatingStorageAccount: boolean;
     loading: boolean;
   } = {
-    totalFileSize: 0,
     isResizing: "",
     uploadInProgress: false,
     increaseOrDecrease: "increase",
-    uploading: "",
     createStorageLoading: false,
     shdwDrive: null,
     storageAccounts: [],
@@ -71,7 +51,6 @@ function ShdwDrivePage() {
     (
       state: typeof initState,
       action:
-        | { type: "totalFileSize"; payload?: { totalFileSize: number } }
         | {
             type: "increaseOrDecrease";
             payload?: { increaseOrDecrease: "increase" | "decrease" };
@@ -79,7 +58,6 @@ function ShdwDrivePage() {
         | { type: "isResizing"; payload?: { isResizing: string } }
         | { type: "loading"; payload?: { loading: boolean } }
         | { type: "uploadInProgress"; payload?: { uploadInProgress: boolean } }
-        | { type: "uploading"; payload?: { uploading: string } }
         | {
             type: "createStorageLoading";
             payload?: { createStorageLoading: boolean };
@@ -106,8 +84,6 @@ function ShdwDrivePage() {
       switch (action.type) {
         case "loading":
           return { ...state, loading: action.payload.loading };
-        case "totalFileSize":
-          return { ...state, totalFileSize: action.payload.totalFileSize };
         case "isResizing":
           return { ...state, isResizing: action.payload.isResizing };
         case "increaseOrDecrease":
@@ -115,8 +91,6 @@ function ShdwDrivePage() {
             ...state,
             increaseOrDecrease: action.payload.increaseOrDecrease,
           };
-        case "uploading":
-          return { ...state, uploading: action.payload.uploading };
         case "uploadInProgress":
           return {
             ...state,
@@ -150,65 +124,9 @@ function ShdwDrivePage() {
   );
   const { register, handleSubmit, getValues, reset } = useForm();
   const { connection } = useConnection();
-  const { files, setFiles } = useFiles();
   const wallet = useWallet();
   const { solBalance, shdwBalance } = useBalance();
   const [showingForm, setShowingForm] = useState(false);
-
-  const uploadFiles = useCallback(
-    async (account: PublicKey) => {
-      dispatch({
-        type: "uploadInProgress",
-        payload: { uploadInProgress: true },
-      });
-      try {
-        const chunked = sliceIntoChunks(files, 5).map(createFileList);
-        let counter = 1;
-        const id = toast(`Sending ${chunked.length} transactions`, {
-          isLoading: true,
-        });
-        for (const chunk of chunked) {
-          await state.shdwDrive.uploadMultipleFiles(account, chunk);
-          counter++;
-        }
-
-        toast.dismiss(id);
-
-        const storageAccounts = await state.shdwDrive.getStorageAccounts();
-        dispatch({
-          type: "storageAccounts",
-          payload: {
-            storageAccounts: storageAccounts.sort(sortStorageAccounts) as {
-              account: StorageAccount;
-              publicKey: PublicKey;
-            }[],
-          },
-        });
-      } catch (e) {
-        toast("An error occured. Check Console for more info!", {
-          type: "error",
-          autoClose: 3000,
-        });
-        dispatch({
-          type: "uploadInProgress",
-          payload: { uploadInProgress: false },
-        });
-        return;
-      }
-
-      toast("Files successfully uploaded", { autoClose: 3000 });
-      setFiles([]);
-      dispatch({
-        type: "uploading",
-        payload: { uploading: "" },
-      });
-      dispatch({
-        type: "uploadInProgress",
-        payload: { uploadInProgress: false },
-      });
-    },
-    [state.shdwDrive, files, setFiles]
-  );
 
   useEffect(() => {
     (async () => {
@@ -218,15 +136,13 @@ function ShdwDrivePage() {
           type: "shdwDrive",
           payload: { shdwDrive },
         });
-        const storageAccounts = await shdwDrive.getStorageAccounts();
+        const storageAccounts = await getAccounts(shdwDrive);
+        debugger
 
         dispatch({
           type: "storageAccounts",
           payload: {
-            storageAccounts: storageAccounts.sort(sortStorageAccounts) as {
-              account: StorageAccount;
-              publicKey: PublicKey;
-            }[],
+            storageAccounts: storageAccounts,
           },
         });
 
@@ -265,7 +181,7 @@ function ShdwDrivePage() {
           payload: { isCreatingStorageAccount: false },
         });
         setTimeout(async () => {
-          const storageAccounts = await state.shdwDrive.getStorageAccounts();
+          const storageAccounts = await getAccounts(state.shdwDrive);
           dispatch({
             type: "storageAccounts",
             payload: {
@@ -286,6 +202,9 @@ function ShdwDrivePage() {
     }
   );
   const handleDeleteStorageAccount = async ({ publicKey, pubKeyString, i }) => {
+    const acc = state.storageAccounts.find((account) =>
+      account.publicKey.equals(publicKey)
+    );
     dispatch({
       type: "buttonsLoading",
       payload: {
@@ -296,7 +215,10 @@ function ShdwDrivePage() {
       },
     });
     try {
-      const response = await state.shdwDrive.deleteStorageAccount(publicKey);
+      const response = await state.shdwDrive.deleteStorageAccount(
+        publicKey,
+        (acc as any).version
+      );
       if (response.txid) {
         toast("Storage Account is marked for deletion", {
           autoClose: 3000,
@@ -313,6 +235,9 @@ function ShdwDrivePage() {
         });
       }
     } catch (e) {
+      toast("An error occured! Check console for more info.", {
+        type: "error",
+      });
       console.log(e);
     }
     dispatch({
@@ -326,20 +251,15 @@ function ShdwDrivePage() {
     });
   };
 
-  useEffect(() => {
-    dispatch({
-      type: "totalFileSize",
-      payload: {
-        totalFileSize: files.reduce((acc, curr) => acc + curr.size, 0),
-      },
-    });
-  }, [files]);
-
   const handleCancelDeleteStorageAccountRequest = async ({
     publicKey,
     pubKeyString,
     i,
   }) => {
+    const acc = state.storageAccounts.find((account) =>
+      account.publicKey.equals(publicKey)
+    );
+
     dispatch({
       type: "buttonsLoading",
       payload: {
@@ -351,7 +271,8 @@ function ShdwDrivePage() {
     });
     try {
       const response = await state.shdwDrive.cancelDeleteStorageAccount(
-        publicKey
+        publicKey,
+        (acc as any).version
       );
 
       toast("Storage Account deletion request will be cancelled", {
@@ -387,21 +308,33 @@ function ShdwDrivePage() {
   };
 
   const onStorageSizeSubmit = async ({ size, unit, publicKey }) => {
+    const acc = state.storageAccounts.find((account) =>
+      account.publicKey.equals(publicKey)
+    );
     const finalStr = `${size}${unit}`;
     try {
       toast(`Sending and confirming transaction...`, {
-        autoClose: 10000,
-        type: "success",
+        isLoading: true,
       });
       if (state.increaseOrDecrease === "decrease") {
-        await state.shdwDrive.reduceStorage(publicKey, finalStr);
+        await state.shdwDrive.reduceStorage(
+          publicKey,
+          finalStr,
+          (acc as any).version
+        );
+        toast.dismiss();
         toast(`Storage succssfully decreased by ${finalStr}!`, {
           autoClose: 3000,
           type: "success",
         });
       }
       if (state.increaseOrDecrease === "increase") {
-        await state.shdwDrive.addStorage(publicKey, finalStr);
+        await state.shdwDrive.addStorage(
+          publicKey,
+          finalStr,
+          (acc as any).version
+        );
+        toast.dismiss();
         toast(`Storage succssfully increased by ${finalStr}!`, {
           autoClose: 3000,
           type: "success",
@@ -562,9 +495,13 @@ function ShdwDrivePage() {
                     {
                       account,
                       publicKey,
+                      current_usage,
+                      reserved_bytes
                     }: {
                       account: StorageAccount;
                       publicKey: PublicKey;
+                      current_usage: number;
+                      reserved_bytes: number;
                     },
                     i
                   ) => {
@@ -609,52 +546,30 @@ function ShdwDrivePage() {
                               </a>
                               <br />
                               <div className="flex w-full">
-                                {!(state.uploading === pubKeyString) && (
-                                  <a
-                                    target="_blank"
-                                    href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
-                                    rel="noopener noreferrer"
-                                  >
-                                    <button className="my-2 btn btn-sm btn-primary">
-                                      See files
+                                <a
+                                  target="_blank"
+                                  href={`/shadow-drive/files?storageAccount=${pubKeyString}`}
+                                  rel="noopener noreferrer"
+                                >
+                                  <button className="my-2 btn btn-sm btn-primary">
+                                    See files
+                                  </button>
+                                </a>
+                                <Link
+                                  href={{
+                                    pathname: "/shadow-drive/sned",
+                                    query: { storageAccount: pubKeyString },
+                                  }}
+                                  passHref
+                                >
+                                  <a>
+                                    <button
+                                      className={`m-2 btn btn-sm btn-primary`}
+                                    >
+                                      Upload files
                                     </button>
                                   </a>
-                                )}
-                                <button
-                                  className={`btn btn-sm m-2 ${
-                                    state.uploading === pubKeyString
-                                      ? "btn-error btn-outline"
-                                      : "btn-primary"
-                                  }`}
-                                  onClick={() => {
-                                    if (state.uploading === pubKeyString) {
-                                      setFiles([]);
-                                      dispatch({
-                                        type: "isResizing",
-                                        payload: {
-                                          isResizing: "",
-                                        },
-                                      });
-                                      dispatch({
-                                        type: "uploading",
-                                        payload: {
-                                          uploading: "",
-                                        },
-                                      });
-                                      return;
-                                    }
-                                    dispatch({
-                                      type: "uploading",
-                                      payload: {
-                                        uploading: pubKeyString,
-                                      },
-                                    });
-                                  }}
-                                >
-                                  {state.uploading === pubKeyString
-                                    ? "Cancel Upload"
-                                    : "Upload files"}
-                                </button>
+                                </Link>
 
                                 <button
                                   className={`btn btn-primary btn-sm my-2 ${
@@ -669,31 +584,30 @@ function ShdwDrivePage() {
                                     : "Cancel"}
                                 </button>
 
-                                {!account.deleteRequestEpoch &&
-                                  !(state.uploading === pubKeyString) && (
-                                    <button
-                                      className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${
-                                        !!state.buttonsLoading[pubKeyString]
-                                          ? "loading"
-                                          : ""
-                                      } `}
-                                      onClick={() =>
-                                        handleDeleteStorageAccount({
-                                          pubKeyString,
-                                          publicKey,
-                                          i,
-                                        })
-                                      }
-                                    >
-                                      {!!state.buttonsLoading[pubKeyString] ? (
-                                        ""
-                                      ) : (
-                                        <>
-                                          <TrashIcon width={16} /> delet
-                                        </>
-                                      )}
-                                    </button>
-                                  )}
+                                {!account.deleteRequestEpoch && (
+                                  <button
+                                    className={`btn gap-2 btn-error btn-sm ml-auto w-32 ${
+                                      !!state.buttonsLoading[pubKeyString]
+                                        ? "loading"
+                                        : ""
+                                    } `}
+                                    onClick={() =>
+                                      handleDeleteStorageAccount({
+                                        pubKeyString,
+                                        publicKey,
+                                        i,
+                                      })
+                                    }
+                                  >
+                                    {!!state.buttonsLoading[pubKeyString] ? (
+                                      ""
+                                    ) : (
+                                      <>
+                                        <TrashIcon width={16} /> delet
+                                      </>
+                                    )}
+                                  </button>
+                                )}
                                 {!!account.deleteRequestEpoch && (
                                   <button
                                     className={`btn btn-error btn-sm w-32 btn-outline ml-auto ${
@@ -712,38 +626,15 @@ function ShdwDrivePage() {
                                   </button>
                                 )}
                               </div>
-                              <div>
-                                {state.uploading === pubKeyString && (
-                                  <FileUpload />
-                                )}
-                              </div>
-
-                              {!!files.length &&
-                                pubKeyString === state.uploading && (
-                                  <div className="flex flex-col mb-2">
-                                    <button
-                                      className={`btn btn-primary btn-sm ml-auto ${
-                                        state.uploadInProgress ? "loading" : ""
-                                      }`}
-                                      onClick={() => uploadFiles(publicKey)}
-                                    >
-                                      {/* @TODO */}
-                                      Upload {files.length} files
-                                    </button>
-                                    <hr className="my-2 w-full opacity-10" />
-                                  </div>
-                                )}
                               <div className="badge badge-ghost">
                                 Free:{" "}
                                 {sizeMB(
-                                  +(account.storageAvailable as any)
-                                    ?.toNumber()
+                                  +(reserved_bytes - current_usage)
                                     ?.toFixed(2)
                                 ).toFixed(2)}{" "}
                                 MB /
                                 {sizeMB(
-                                  +(account.storage as any)
-                                    ?.toNumber()
+                                  +(reserved_bytes as any)
                                     ?.toFixed(2)
                                 ).toFixed(2)}{" "}
                                 MB
@@ -831,7 +722,7 @@ function ShdwDrivePage() {
                         )}
                         <progress
                           className="progress progress-primary"
-                          value={account.storageAvailable / account.storage}
+                          value={1 - current_usage/ reserved_bytes}
                         ></progress>
 
                         {i !== state.storageAccounts.length - 1 && (

@@ -14,7 +14,9 @@ const initState = {
   solBalance: "0",
   shdwBalance: "0",
   usdcBalance: "0",
-  shdwBalanceAsNumber: 0,solBalanceAsNumber:0,usdcBalanceAsNumber:0,
+  shdwBalanceAsNumber: 0,
+  solBalanceAsNumber: 0,
+  usdcBalanceAsNumber: 0,
   fetchBalances: () => {},
 };
 
@@ -32,33 +34,48 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
   const { connection } = useConnection();
 
   const fetchBalances = useCallback(async () => {
-    connection
-      .getBalance(publicKey)
-      .then((solBalance) => solBalance / LAMPORTS_PER_SOL)
-      .then((solBalance) => {
-        setSolBalance(solBalance.toFixed(4));
-        setSolBalanceAsNumber(solBalance);
-      });
-    connection
-      .getTokenAccountBalance(
-        await getAssociatedTokenAddress(SHDW_TOKEN, publicKey)
-      )
-      .then((shdwBalance) => {
-        setShdwBalanceAsNumber(shdwBalance.value.uiAmount);
-        setShdwBalance(shdwBalance.value.uiAmount.toFixed(4));
-      });
-
-    connection
-      .getTokenAccountBalance(
-        await getAssociatedTokenAddress(
-          new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-          publicKey
-        )
-      )
-      .then((usdcBalance) => {
-        setUsdcBalance(usdcBalance.value.uiAmount.toFixed(4));
-        setUsdcBalanceAsNumber(usdcBalance.value.uiAmount);
-      });
+    try {
+      connection
+        .getBalance(publicKey)
+        .then((solBalance) => solBalance / LAMPORTS_PER_SOL)
+        .then((solBalance) => {
+          setSolBalance(solBalance.toFixed(4));
+          setSolBalanceAsNumber(solBalance);
+        })
+        .catch();
+    } catch {}
+    try {
+      const addy = await getAssociatedTokenAddress(SHDW_TOKEN, publicKey);
+      if (addy) {
+        connection
+          .getTokenAccountBalance(addy)
+          .then((shdwBalance) => {
+            setShdwBalanceAsNumber(shdwBalance.value.uiAmount);
+            setShdwBalance(shdwBalance.value.uiAmount.toFixed(4));
+          })
+          .catch();
+      }
+    } catch {}
+    try {
+      const addy = await getAssociatedTokenAddress(
+        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+        publicKey
+      );
+      if (addy) {
+        connection
+          .getTokenAccountBalance(
+            await getAssociatedTokenAddress(
+              new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+              publicKey
+            )
+          )
+          .then((usdcBalance) => {
+            setUsdcBalance(usdcBalance.value.uiAmount.toFixed(4));
+            setUsdcBalanceAsNumber(usdcBalance.value.uiAmount);
+          })
+          .catch();
+      }
+    } catch {}
   }, [connection, publicKey]);
 
   useEffect(() => {

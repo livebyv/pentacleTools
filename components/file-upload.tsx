@@ -3,7 +3,7 @@ import { useFiles } from "../contexts/FileProvider";
 import { UploadIcon } from "./icons";
 import PaginatedFiles from "./paginated-files";
 
-export function FileUpload() {
+export function FileUpload({ disabled }: { disabled?: boolean }) {
   const { setFiles, files } = useFiles();
 
   const handleAddFiles = (e) => {

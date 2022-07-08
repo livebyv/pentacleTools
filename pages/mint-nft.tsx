@@ -337,12 +337,12 @@ function MintNftPage() {
               <div className="text-center">
                 The metadata standard is defined{" "}
                 <a
-                  href="https://docs.phantom.app/integrating/tokens/non-fungible-tokens"
+                  href="https://docs.metaplex.com/programs/token-metadata/token-standard#token-standards"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ textDecoration: "underline" }}
                 >
-                  here by Phantom
+                  here by Metaplex
                 </a>
               </div>
               <br />

@@ -15,6 +15,7 @@ import {
 } from "./icons";
 import { toast } from "react-toastify";
 import SwitchHorizontalIcon from "@heroicons/react/solid/SwitchHorizontalIcon";
+import CloudUploadIcon from "@heroicons/react/solid/CloudUploadIcon";
 
 export default function SideMenu() {
   return (
@@ -73,6 +74,12 @@ export default function SideMenu() {
             }}
           />
           Shadow Drive Console
+        </MenuLink>
+        <MenuLink href="/shadow-drive/sned">
+          {/*  eslint-disable-next-line @next/next/no-img-element */}
+
+          <CloudUploadIcon className="mr-3" width={16} height={16} />
+          SHDW Sned 9000
         </MenuLink>
         <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
           <SwitchHorizontalIcon className="mr-3" width={16} height={16} />

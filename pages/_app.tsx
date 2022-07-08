@@ -36,6 +36,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { JupiterProvider } from "@jup-ag/react-hook";
 import { getPlatformFeeAccounts } from "@jup-ag/core";
 import { PublicKey } from "@solana/web3.js";
+import CloudUploadIcon from "@heroicons/react/solid/CloudUploadIcon";
 
 const endpoint = process.env.NEXT_PUBLIC_RPC;
 
@@ -166,6 +167,11 @@ function Context({ children }: { children: React.ReactNode }) {
                   }}
                 />
                 <span> Shadow Drive Console</span>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/shadow-drive/sned">
+                {/*  eslint-disable-next-line @next/next/no-img-element */}
+                <CloudUploadIcon className="mr-3" width={16} height={16} />
+                SHDW Sned 9000
               </MenuLink>
               <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
                 {/* eslint-disable-next-line @next/next/no-img-element */}

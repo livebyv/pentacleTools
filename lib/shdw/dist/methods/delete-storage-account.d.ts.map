@@ -1,0 +1,1 @@
+{"version":3,"file":"delete-storage-account.d.ts","sourceRoot":"","sources":["../../src/methods/delete-storage-account.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,MAAM,uBAAuB,CAAC;AAEhD,OAAO,EAAE,mBAAmB,EAAE,MAAM,UAAU,CAAC;AAG/C;;;;;GAKG;AAEH,wBAA8B,oBAAoB,CAChD,GAAG,EAAE,MAAM,CAAC,IAAI,CAAC,SAAS,EAC1B,OAAO,EAAE,MAAM,GACd,OAAO,CAAC,mBAAmB,CAAC,CAyD9B"}

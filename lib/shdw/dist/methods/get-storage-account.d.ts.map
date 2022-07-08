@@ -1,0 +1,1 @@
+{"version":3,"file":"get-storage-account.d.ts","sourceRoot":"","sources":["../../src/methods/get-storage-account.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,IAAI,EAAE,MAAM,uBAAuB,CAAC;AAE7C,OAAO,EAAE,kBAAkB,EAAE,MAAM,UAAU,CAAC;AAE9C;;;;;GAKG;AACH,wBAA8B,aAAa,CACzC,GAAG,EAAE,IAAI,CAAC,SAAS,GAClB,OAAO,CAAC,kBAAkB,CAAC,CA6B7B"}

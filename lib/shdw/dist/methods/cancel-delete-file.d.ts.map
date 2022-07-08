@@ -1,0 +1,1 @@
+{"version":3,"file":"cancel-delete-file.d.ts","sourceRoot":"","sources":["../../src/methods/cancel-delete-file.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,MAAM,uBAAuB,CAAC;AAGhD,OAAO,EAAE,mBAAmB,EAAE,MAAM,UAAU,CAAC;AAE/C;;;;;GAKG;AAEH,wBAA8B,gBAAgB,CAC5C,GAAG,EAAE,MAAM,CAAC,IAAI,CAAC,SAAS,EAC1B,GAAG,EAAE,MAAM,GACV,OAAO,CAAC,mBAAmB,CAAC,CAuD9B"}

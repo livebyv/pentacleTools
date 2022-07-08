@@ -1,0 +1,1 @@
+{"version":3,"file":"claim-stake.d.ts","sourceRoot":"","sources":["../../src/methods/claim-stake.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,MAAM,MAAM,uBAAuB,CAAC;AAIhD,OAAO,EAAE,mBAAmB,EAAE,MAAM,UAAU,CAAC;AAE/C;;;;;GAKG;AAEH,wBAA8B,UAAU,CACtC,GAAG,EAAE,MAAM,CAAC,IAAI,CAAC,SAAS,EAC1B,OAAO,EAAE,MAAM,GACd,OAAO,CAAC,mBAAmB,CAAC,CA8E9B"}

@@ -1,4 +1,4 @@
-import { ShdwDrive, StorageAccountResponse } from "@shadow-drive/sdk";
+import { ShdwDrive, StorageAccountResponse } from "../../lib/shdw/dist";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
@@ -156,7 +156,8 @@ function Sned() {
     setUploadLoading(true);
     const res = await shdwDrive.current.uploadMultipleFiles(
       new PublicKey(selectedAccount),
-      createFileList(files)
+      createFileList(files),
+      5
     );
 
     download(`shdw-upload-${Date.now()}`, jsonFormat(res));

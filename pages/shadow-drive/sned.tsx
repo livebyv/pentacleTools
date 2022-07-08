@@ -157,7 +157,7 @@ function Sned() {
     const res = await shdwDrive.current.uploadMultipleFiles(
       new PublicKey(selectedAccount),
       createFileList(files),
-      10
+      5
     );
 
     download(`shdw-upload-${Date.now()}`, jsonFormat(res));

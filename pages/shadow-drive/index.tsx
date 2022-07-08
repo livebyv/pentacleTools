@@ -251,7 +251,8 @@ function ShdwDrivePage() {
       try {
         const response = await state.shdwDrive.createStorageAccount(
           storageAccountName,
-          storageAccountSize
+          storageAccountSize,
+          "v2"
         );
         toast.dismiss(id);
         toast("Storage account created at " + response.shdw_bucket, {

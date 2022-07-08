@@ -205,7 +205,8 @@ function MintNftPage() {
         }
         const { shdw_bucket } = await shdwDrive.createStorageAccount(
           `NFT-${Date.now()}`,
-          `${Math.round((bytes * 1.2) / 1000)}kb`
+          `${Math.round((bytes * 1.2) / 1000)}kb`,
+          "v2"
         );
 
         const animFile = files.find(

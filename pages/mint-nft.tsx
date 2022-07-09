@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
 import jsonFormat from "json-format";
 import { Controller, useForm } from "react-hook-form";
@@ -299,17 +299,12 @@ function MintNftPage() {
             <span className="ml-3 badge badge-primary">{solBalance} SOL</span>
           </div>
         )}
-
-        {/* <Link href={{ pathname: "/shadow-drive/swap" }} passHref>
-          <a className="inline-block mt-3"> */}
         <button
           className="mt-3 btn btn-success btn-outline btn-sm"
           onClick={() => setShowingForm(!showingForm)}
         >
           {showingForm ? "Close Swap" : "Get $SHDW"}
         </button>
-        {/* </a>
-        </Link> */}
       </div>
 
       {showingForm && <JupiterForm />}

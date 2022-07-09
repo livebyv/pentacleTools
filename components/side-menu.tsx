@@ -51,20 +51,15 @@ export default function SideMenu() {
           <hr className="p-0 my-2 opacity-20"></hr>
         </li>
         <MenuLink href="/nft-mints">
-          <div>
-            <i className="mr-3">
-              <FingerPrintIcon />
-            </i>
-            Get NFT Mints
-          </div>
+          <i className="mr-3">
+            <FingerPrintIcon />
+          </i>
+          <span> Get NFT Mints</span>
         </MenuLink>
         <MenuLink href="/token-metadata">
-          <div
-            style={{ width: 14 }}
-            className="inline-flex justify-center items-center mr-3"
-          >
+          <i className="mr-3">
             <InfoIcon />
-          </div>
+          </i>
           Token Metadata
         </MenuLink>
         <MenuLink href="/holder-snapshot">

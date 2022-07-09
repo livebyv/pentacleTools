@@ -113,7 +113,7 @@ export default function SideMenu() {
         </li>
         <MenuLink href="/shadow-drive">
           <TerminalIcon width={16} height={16} className="mr-3" />
-          Shadow Drive Console
+          SHDW Drive Console
         </MenuLink>
         <MenuLink href="/shadow-drive/sned">
           <CloudUploadIcon className="mr-3" width={16} height={16} />

@@ -211,7 +211,7 @@ function Context({ children }: { children: React.ReactNode }) {
                   </li>
                   <MenuLink activatesDrawer={false} href="/shadow-drive">
                     <TerminalIcon width={16} height={16} className="mr-3" />
-                    <span> Shadow Drive Console</span>
+                    <span> SHDW Drive Console</span>
                   </MenuLink>
                   <MenuLink activatesDrawer={false} href="/shadow-drive/sned">
                     <CloudUploadIcon className="mr-3" width={16} height={16} />

@@ -2,7 +2,6 @@ import { ShdwDrive, StorageAccountResponse } from "@shadow-drive/sdk";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { PublicKey } from "@solana/web3.js";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import jsonFormat from "json-format";
@@ -18,6 +17,7 @@ import { shortenAddress } from "../../util/shorten-address";
 import {  useBalance } from "../../contexts/BalanceProvider";
 import { ImageURI } from "../../util/image-uri";
 import JupiterSwap from "../../components/jupiter-swap";
+import { toPublicKey } from "../../util/to-publickey";
 
 interface StorageAccountResponseWithVersion extends StorageAccountResponse {
   version: string;
@@ -155,7 +155,7 @@ function Sned() {
   const upload = useCallback(async () => {
     setUploadLoading(true);
     const res = await shdwDrive.current.uploadMultipleFiles(
-      new PublicKey(selectedAccount),
+      toPublicKey(selectedAccount),
       createFileList(files)
     );
 

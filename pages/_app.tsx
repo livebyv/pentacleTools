@@ -58,14 +58,16 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
     useState(undefined);
   useEffect(() => {
     (async () => {
-      const feeAccs = await getPlatformFeeAccounts(
-        connection,
-        new PublicKey("9B9bvFT5JSFfGRcx4fTX1cpiiHMLAZn5vzUSTKnRtxLL") // The platform fee account owner
-      );
-      setPlatformFeeAndAccounts({
-        feeBps: 50,
-        feeAccounts: feeAccs,
-      });
+      if (process.env.NEXT_PUBLIC_JUPITER_FEE_DESTINATION) {
+        const feeAccs = await getPlatformFeeAccounts(
+          connection,
+          new PublicKey(process.env.NEXT_PUBLIC_JUPITER_FEE_DESTINATION)
+        );
+        setPlatformFeeAndAccounts({
+          feeBps: +(process.env.NEXT_PUBLIC_JUPITER_FEE_AMOUNT || 0),
+          feeAccounts: feeAccs,
+        });
+      }
     })();
   }, [connection]);
   return (

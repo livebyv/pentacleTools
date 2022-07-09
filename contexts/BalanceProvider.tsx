@@ -1,6 +1,6 @@
 import { getAssociatedTokenAddress } from "@solana/spl-token-v2";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import {
   createContext,
   useCallback,
@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { SHDW_TOKEN } from "../util/accounts";
+import { toPublicKey } from "../util/to-publickey";
 
 const initState = {
   solBalance: "0",
@@ -58,14 +59,14 @@ export function BalanceProvider({ children }: { children: JSX.Element }) {
     } catch {}
     try {
       const addy = await getAssociatedTokenAddress(
-        new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+        toPublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
         publicKey
       );
       if (addy) {
         connection
           .getTokenAccountBalance(
             await getAssociatedTokenAddress(
-              new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+              toPublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
               publicKey
             )
           )

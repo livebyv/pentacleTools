@@ -6,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { PublicKey } from "@solana/web3.js";
 import { TokenInfo } from "@solana/spl-token-registry";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
@@ -24,6 +23,7 @@ import { useBalance } from "../contexts/BalanceProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import useOnClickOutside from "../hooks/use-click-outside";
 import { Jupiter, RouteInfo } from "@jup-ag/core";
+import { toPublicKey } from "../util/to-publickey";
 
 const defaultProps = {
   styles: {
@@ -62,8 +62,8 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
 
   const [formValue, setFormValue] = useState<UseJupiterProps>({
     amount: 0.1,
-    inputMint: new PublicKey("So11111111111111111111111111111111111111112"),
-    outputMint: new PublicKey("SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y"),
+    inputMint: toPublicKey("So11111111111111111111111111111111111111112"),
+    outputMint: toPublicKey("SHDWyBxihqiCj6YekG2GUr7wqKLeLAMK1gHZck9pL6y"),
     slippage: 5, // 0.5%
   });
 
@@ -179,7 +179,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
       ) {
         setFormValue((val) => ({
           ...val,
-          outputMint: new PublicKey(possibleOutputs[0]),
+          outputMint: toPublicKey(possibleOutputs[0]),
         }));
       }
     }
@@ -207,7 +207,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
               onClick={() => {
                 setFormValue({
                   ...formValue,
-                  inputMint: new PublicKey(value.address),
+                  inputMint: toPublicKey(value.address),
                 });
                 (
                   document.getElementById("inputMint") as HTMLInputElement

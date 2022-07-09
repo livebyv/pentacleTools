@@ -1,16 +1,29 @@
 /* eslint-disable react/display-name */
-import React, { FunctionComponent, useEffect, useMemo, useState } from "react";
+import React, {
+  FunctionComponent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { PublicKey } from "@solana/web3.js";
 import { TokenInfo } from "@solana/spl-token-registry";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 
 import { TOKEN_LIST_URL, useJupiter } from "@jup-ag/react-hook";
+
+const preferred = [
+  "So11111111111111111111111111111111111111112",
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+];
 
 //import FeeInfo from "./FeeInfo";
 import fetch from "cross-fetch";
 import { toast } from "react-toastify";
 import { useBalance } from "../contexts/BalanceProvider";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import useOnClickOutside from "../hooks/use-click-outside";
+import { Jupiter, RouteInfo } from "@jup-ag/core";
 
 const defaultProps = {
   styles: {
@@ -35,14 +48,17 @@ interface IJupiterFormProps {
 type UseJupiterProps = Parameters<typeof useJupiter>[0];
 
 const SECOND_TO_REFRESH = 30;
-
+const exp = new RegExp("", "i");
 const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
+  const ref = useRef();
   const wallet = useWallet();
   const { publicKey } = wallet;
   const [tokenMap, setTokenMap] = useState<Map<string, TokenInfo>>(new Map());
-  const [exp, setExp] = useState(new RegExp("", "i"));
+  const [focussed, setFocussed] = useState(false);
   const { fetchBalances, usdcBalanceAsNumber, solBalanceAsNumber } =
     useBalance();
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [formValue, setFormValue] = useState<UseJupiterProps>({
     amount: 0.1,
@@ -76,31 +92,87 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
   }, [inputTokenInfo, formValue.amount]);
 
   const allTokenMints = useMemo(
-    () => [
-      "So11111111111111111111111111111111111111112",
-      "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
-    ],
-    []
+    () => Array.from(tokenMap.values()).map((entry) => entry.address),
+    [tokenMap]
   );
 
-  const {
-    routeMap,
-    routes,
-    loading,
-    exchange,
-    //error,
-    refresh,
-    lastRefreshTimestamp,
-  } = useJupiter({
-    ...formValue,
-    amount: amountInDecimal,
-  });
+  const filteredTokens = useMemo(
+    () =>
+      searchQuery
+        ? Array.from(tokenMap.values())
+            .filter(
+              (item) =>
+                item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                item.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((entry) => entry.address)
+            .sort((token) => (preferred.includes(token) ? 1 : -1))
+        : allTokenMints,
+    [allTokenMints, searchQuery, tokenMap]
+  );
+
+  const sortedFilteredItems = useMemo(() => {
+    return [
+      ...preferred.map((p) => filteredTokens.find((tok) => tok === p)),
+      ...filteredTokens.filter((p) => !preferred.includes(p)),
+    ];
+  }, [filteredTokens]);
+
+  const [routeMap, setRouteMap] = useState<Map<string, string[]>>();
+  const [routes, setRoutes] = useState<RouteInfo[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [jupiter, setJupiter] = useState<Jupiter>(null);
+
+  const { connection } = useConnection();
+  useEffect(() => {
+    setLoading(true);
+    if (jupiter) {
+      setRouteMap(jupiter.getRouteMap());
+      jupiter
+        .computeRoutes({
+          inputMint: formValue.inputMint,
+          outputMint: formValue.outputMint,
+          inputAmount:
+            formValue.amount *
+            10 ** tokenMap.get(formValue.inputMint.toBase58())?.decimals,
+          slippage: 5,
+        })
+        .then((routes) => {
+          setRoutes(routes.routesInfos);
+          setLoading(false);
+        });
+      return;
+    }
+    Jupiter.load({ cluster: "mainnet-beta", connection }).then((res) => {
+      setJupiter(res);
+      setRouteMap(res.getRouteMap());
+      res
+        .computeRoutes({
+          inputMint: formValue.inputMint,
+          outputMint: formValue.outputMint,
+          inputAmount:
+            formValue.amount *
+            10 ** tokenMap.get(formValue.inputMint.toBase58())?.decimals,
+          slippage: 5,
+        })
+        .then((routes) => {
+          setRoutes(routes.routesInfos);
+          setLoading(false);
+        });
+    });
+  }, [
+    connection,
+    formValue.amount,
+    formValue.inputMint,
+    formValue.outputMint,
+    jupiter,
+    tokenMap,
+  ]);
 
   // ensure outputMint can be swapable to inputMint
   useEffect(() => {
-    if (formValue.inputMint) {
+    if (formValue.inputMint && routeMap) {
       const possibleOutputs = routeMap.get(formValue.inputMint.toBase58());
-
       if (
         possibleOutputs &&
         !possibleOutputs?.includes(formValue.outputMint?.toBase58() || "")
@@ -113,60 +185,91 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
     }
   }, [formValue.inputMint, formValue.outputMint, routeMap]);
 
-  const [, setTimeDiff] = useState(lastRefreshTimestamp);
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (loading) return;
+  useOnClickOutside(ref, (e) => {
+    if (!e.target.isEqualNode(document.getElementById("inputMint"))) {
+      setFocussed(false);
+    }
+  });
 
-      const diff = (new Date().getTime() - lastRefreshTimestamp) / 1000;
-      setTimeDiff((diff / SECOND_TO_REFRESH) * 100);
+  // const bestRouteTemp = useMemo(() => {})
 
-      if (diff >= SECOND_TO_REFRESH) {
-        refresh();
-      }
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, [lastRefreshTimestamp, loading, refresh]);
+  const tokenListTempl = useMemo(
+    () =>
+      sortedFilteredItems
+        .filter((o) => exp.test(o) && tokenMap.get(o)?.symbol)
+        .map((opt) => {
+          const value = tokenMap.get(opt);
+          return (
+            <li
+              className="px-3 py-2 cursor-pointer hover:bg-slate-700"
+              key={opt}
+              value={value?.address}
+              onClick={() => {
+                setFormValue({
+                  ...formValue,
+                  inputMint: new PublicKey(value.address),
+                });
+                (
+                  document.getElementById("inputMint") as HTMLInputElement
+                ).value = value.symbol;
+                setFocussed(false);
+              }}
+            >
+              <div
+                className="grid items-center"
+                style={{ gridTemplateColumns: "32px auto" }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={value.logoURI}
+                  alt={""}
+                  className="w-5 h-5"
+                  loading="lazy"
+                />
+                <span>{value?.symbol}</span>
+              </div>
+            </li>
+          );
+        }),
+    [filteredTokens, formValue, tokenMap]
+  );
 
   return (
-    <div className="mx-auto my-6 max-w-md ring ring-primary card">
+    <div className="overflow-y-auto mx-auto my-6 max-w-md ring ring-primary card">
       <div className="card-body">
-        <div className="grid grid-cols-1 gap-6">
-          <div className="w-full form-control">
+        <div className="grid grid-cols-1">
+          <div className="relative z-20 w-full form-control">
             <span className="mb-3 label-text">You pay</span>
-            <label className="w-full input-group">
-              <select
+            <label className="relative z-20 w-full input-group">
+              <button className="flex justify-center items-center px-6 input">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={tokenMap.get(formValue.inputMint.toBase58())?.logoURI}
+                  alt={""}
+                  className="absolute z-10 w-5 h-5 rounded-full"
+                />
+              </button>
+              <input
                 id="inputMint"
-                className="flex-1 border select"
-                name="inputMint"
-                defaultValue={allTokenMints[0]}
+                className={`flex-1 border select rounded-none ${
+                  focussed && "rounded-bl-none"
+                }`}
                 onChange={(e) => {
-                  console.log("e", e);
-                  console.log("e.value.key", e.target.value);
-                  const pbKey = new PublicKey(e.target.value);
-                  if (pbKey) {
-                    setFormValue((val) => ({
-                      ...val,
-                      inputMint: pbKey,
-                    }));
+                  if (!focussed) {
+                    setFocussed(true);
                   }
+                  setSearchQuery(e.target.value);
                 }}
-              >
-                {allTokenMints
-                  .filter((o) => exp.test(o) && tokenMap.get(o)?.symbol)
-                  .map((opt) => {
-                    const value = tokenMap.get(opt);
-                    return (
-                      <option key={opt} value={value?.address}>
-                        {value?.symbol}
-                      </option>
-                    );
-                  })}
-              </select>
+                name="inputMint"
+                defaultValue={
+                  tokenMap.get(formValue.inputMint.toBase58())?.symbol
+                }
+                onFocus={() => setFocussed(true)}
+              />
               <input
                 type={"number"}
                 name="amount"
-                className="flex-1 input"
+                className={`flex-1 input`}
                 id="amount"
                 placeholder="0"
                 max={
@@ -187,7 +290,23 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
               />
             </label>
           </div>
-          <div className="form-control">
+          <div
+            className="relative z-10"
+            style={{ transform: "translateY(-0.5rem)" }}
+          >
+            <div className="absolute bottom-0 w-2/3">
+              {focussed && (
+                <ul
+                  ref={ref}
+                  className="overflow-y-auto absolute top-0 right-0 left-3 pt-4 bg-gray-800 rounded-b-lg border-r border-b border-l shadow-lg border-slate-500"
+                  style={{ maxHeight: 250 }}
+                >
+                  {tokenListTempl}
+                </ul>
+              )}
+            </div>
+          </div>
+          <div className="mt-3 form-control">
             <span className="mb-3 label-text">You get</span>
             <div className="input-group">
               <input
@@ -207,7 +326,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                 style={{ height: "100%" }}
                 value={
                   routes
-                    ? routes[0].outAmount /
+                    ? routes[0]?.outAmount /
                       10 ** (outputTokenInfo?.decimals || 1)
                     : 0
                 }
@@ -215,14 +334,21 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <span className="my-3">Best route out of {routes?.length}:</span>
-            {routes?.[0] &&
+          <div className="flex flex-col mt-3">
+            {!!routes.length && (
+              <span className="my-3">Best route out of {routes?.length}:</span>
+            )}
+            {!routes.length && !loading && (
+              <span className="my-3 w-full badge badge-error">
+                No routes found!
+              </span>
+            )}
+            {/* {routes?.[0] &&
               (() => {
                 const route = routes[0];
                 return (
                   <div
-                    className="flex flex-row gap-3 p-3 border border-primary"
+                    className="flex flex-row p-3 border border-primary"
                     style={{
                       marginBottom: 10,
                       borderRadius: "1rem",
@@ -250,10 +376,10 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                     </div>
                   </div>
                 );
-              })()}
+              })()} */}
           </div>
 
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center mt-3">
             {!publicKey && <WalletMultiButton />}
           </div>
           {!!publicKey && (
@@ -263,24 +389,22 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                 className={`w-full btn btn-outline btn-success ${
                   loading && "loading"
                 }`}
-                disabled={loading || !wallet?.publicKey}
+                disabled={loading || !wallet?.publicKey || !routes?.length}
                 onClick={async () => {
                   try {
                     if (
                       !loading &&
-                      routes?.[0] &&
+                      routes?.length &&
                       wallet.signAllTransactions &&
                       wallet.signTransaction &&
                       wallet.sendTransaction &&
                       wallet.publicKey
                     ) {
-                      const swapResult = await exchange({
-                        wallet,
-                        routeInfo: routes[0],
-                        onTransaction: async () => {
-                          toast("sending transaction", { isLoading: true });
-                        },
-                      });
+                      const swapResult = await (
+                        await jupiter.exchange({
+                          routeInfo: routes[0],
+                        })
+                      ).execute();
 
                       console.log({ swapResult });
 

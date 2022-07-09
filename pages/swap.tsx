@@ -1,6 +1,6 @@
 import Head from "next/head";
 import JupiterForm from "../components/jupiter-swap";
-import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
+import { useBalance } from "../contexts/BalanceProvider";
 import { ImageURI } from "../util/image-uri";
 
 function ShdwSwapPage() {
@@ -50,12 +50,5 @@ function ShdwSwapPage() {
   );
 }
 
-const Wrapped = () => {
-  return (
-    <BalanceProvider>
-      <ShdwSwapPage />
-    </BalanceProvider>
-  );
-};
 
-export default Wrapped;
+export default ShdwSwapPage;

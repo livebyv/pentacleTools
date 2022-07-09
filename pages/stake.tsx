@@ -42,7 +42,7 @@ import { SearchIcon } from "../components/icons";
 import { ValidatorMeta, validatorBatcher } from "../util/validator-batcher";
 import { toPublicKey } from "../util/to-publickey";
 import { StakeDelegationCard } from "../components/stake-delegation-card";
-import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
+import { useBalance } from "../contexts/BalanceProvider";
 import ValidatorCard from "../components/validator-card";
 import { getStakeviewApys, ValidatorApy } from "../util/stakeviewApp";
 import { getValidatorScores, ValidatorScore } from "../util/validatorsApp";
@@ -776,10 +776,8 @@ function StakeView() {
 }
 
 const Wrapped = () => (
-  <BalanceProvider>
     <AccountsProvider>
       <StakeView />
     </AccountsProvider>
-  </BalanceProvider>
 );
 export default Wrapped;

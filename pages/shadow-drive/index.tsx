@@ -9,7 +9,7 @@ import { PublicKey } from "@solana/web3.js";
 
 import { sizeMB } from "../../components/file-tile";
 import { ImageURI } from "../../util/image-uri";
-import { BalanceProvider, useBalance } from "../../contexts/BalanceProvider";
+import { useBalance } from "../../contexts/BalanceProvider";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { TrashIcon } from "../../components/icons";
@@ -730,13 +730,4 @@ function ShdwDrivePage() {
     </>
   );
 }
-
-const Wrapped = () => {
-  return (
-    <BalanceProvider>
-      <ShdwDrivePage />
-    </BalanceProvider>
-  );
-};
-
-export default Wrapped;
+export default ShdwDrivePage;

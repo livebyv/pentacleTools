@@ -15,7 +15,7 @@ import { useFiles } from "../../contexts/FileProvider";
 import createFileList from "../../util/create-file-list";
 import { download } from "../../util/download";
 import { shortenAddress } from "../../util/shorten-address";
-import { BalanceProvider, useBalance } from "../../contexts/BalanceProvider";
+import {  useBalance } from "../../contexts/BalanceProvider";
 import { ImageURI } from "../../util/image-uri";
 import JupiterSwap from "../../components/jupiter-swap";
 
@@ -413,10 +413,4 @@ function Sned() {
   );
 }
 
-// export default Sned;
-const Wrapper = () => (
-  <BalanceProvider>
-    <Sned />
-  </BalanceProvider>
-);
-export default Wrapper;
+export default Sned;

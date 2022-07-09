@@ -19,7 +19,7 @@ import {
 } from "../lib/metaplex/dist/esm/index.mjs";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { sleep } from "../util/sleep";
-import { BalanceProvider, useBalance } from "../contexts/BalanceProvider";
+import { useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
 import JupiterForm from "../components/jupiter-swap";
 
@@ -547,12 +547,6 @@ function MintNftPage() {
     </>
   );
 }
-const Wrapped = () => {
-  return (
-    <BalanceProvider>
-      <MintNftPage />
-    </BalanceProvider>
-  );
-};
 
-export default Wrapped;
+
+export default MintNftPage;

@@ -16,6 +16,9 @@ import {
 import { toast } from "react-toastify";
 import SwitchHorizontalIcon from "@heroicons/react/solid/SwitchHorizontalIcon";
 import CloudUploadIcon from "@heroicons/react/solid/CloudUploadIcon";
+import DotsHorizontalIcon from "@heroicons/react/solid/DotsHorizontalIcon";
+import PhotographIcon from "@heroicons/react/solid/PhotographIcon";
+import TerminalIcon from "@heroicons/react/solid/TerminalIcon";
 
 export default function SideMenu() {
   return (
@@ -30,8 +33,22 @@ export default function SideMenu() {
             className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img className="mb-6" src="/pentacle.svg" width={221} height={64} alt="Pentacle" />
+            <img
+              className="mb-6"
+              src="/pentacle.svg"
+              width={221}
+              height={64}
+              alt="Pentacle"
+            />
           </a>
+        </li>
+        <li className="px-1 pb-3">
+          <hr className="p-0 my-2 opacity-20"></hr>
+          <div className="flex gap-3 items-center px-2 py-0">
+            <PhotographIcon width={16} height={16} className="mr-3" />
+            <span>NFT</span>
+          </div>
+          <hr className="p-0 my-2 opacity-20"></hr>
         </li>
         <MenuLink href="/nft-mints">
           <div>
@@ -62,29 +79,6 @@ export default function SideMenu() {
           </i>
           <span> NFT Minters</span>
         </MenuLink>
-        <MenuLink href="/shadow-drive">
-          {/*  eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={ImageURI.GenesysGo}
-            alt="GenesysGo"
-            className="inline mr-2 grayscale"
-            style={{
-              width: 16,
-              height: 16,
-            }}
-          />
-          Shadow Drive Console
-        </MenuLink>
-        <MenuLink href="/shadow-drive/sned">
-          {/*  eslint-disable-next-line @next/next/no-img-element */}
-
-          <CloudUploadIcon className="mr-3" width={16} height={16} />
-          SHDW Sned 9000
-        </MenuLink>
-        <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
-          <SwitchHorizontalIcon className="mr-3" width={16} height={16} />
-          <span>SHDW Swap</span>
-        </MenuLink>
         <MenuLink href="/burn-nfts">
           <i className="mr-3">
             <FireIcon />
@@ -103,6 +97,49 @@ export default function SideMenu() {
           </i>
           Send Multiple NFTs
         </MenuLink>
+
+        <li className="px-1">
+          <hr className="p-0 my-2 opacity-20"></hr>
+
+          <div className="flex gap-3 items-center px-2 py-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={ImageURI.GenesysGo}
+              alt="GenesysGo"
+              className="inline mr-2 grayscale"
+              style={{
+                width: 16,
+                height: 16,
+              }}
+            />
+            <span>Shadow</span>
+          </div>
+          <hr className="p-0 my-2 opacity-20"></hr>
+        </li>
+        <MenuLink href="/shadow-drive">
+          <TerminalIcon width={16} height={16} className="mr-3" />
+          Shadow Drive Console
+        </MenuLink>
+        <MenuLink href="/shadow-drive/sned">
+          <CloudUploadIcon className="mr-3" width={16} height={16} />
+          SHDW Sned 9000
+        </MenuLink>
+        <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
+          <SwitchHorizontalIcon className="mr-3" width={16} height={16} />
+          <span>SHDW Swap</span>
+        </MenuLink>
+
+        <li className="px-1">
+          <hr className="p-0 my-2 opacity-20"></hr>
+
+          <div className="flex gap-3 items-center px-2 py-0">
+            <DotsHorizontalIcon className="mr-3" width={16} height={16} />
+
+            <span>Misc</span>
+          </div>
+          <hr className="p-0 my-2 opacity-20"></hr>
+        </li>
+
         <MenuLink href="/snedmaster">
           <i className="mr-3">
             <GetCashIcon width={16} height={16} />

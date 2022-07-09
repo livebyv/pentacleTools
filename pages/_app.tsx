@@ -10,7 +10,10 @@ import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
+import DotsHorizontalIcon from "@heroicons/react/solid/DotsHorizontalIcon";
 import SwitchHorizontalIcon from "@heroicons/react/solid/SwitchHorizontalIcon";
+import PhotographIcon from "@heroicons/react/solid/PhotographIcon";
+import TerminalIcon from "@heroicons/react/solid/TerminalIcon";
 import { ModalProvider } from "../contexts/ModalProvider";
 import SideMenu from "../components/side-menu";
 import TopMenu from "../components/top-menu";
@@ -127,6 +130,15 @@ function Context({ children }: { children: React.ReactNode }) {
                   />
                 </a>
               </li>
+
+              <li className="px-1">
+                <hr className="my-2 opacity-20"></hr>
+                <div className="flex gap-3 items-center px-2">
+                  <PhotographIcon width={16} height={16} className="mr-3"/>
+                  <span>NFT</span>
+                </div>
+                <hr className="my-2 opacity-20"></hr>
+              </li>
               <MenuLink activatesDrawer={false} href="/nft-mints">
                 <div>
                   <i className="mr-3">
@@ -155,29 +167,6 @@ function Context({ children }: { children: React.ReactNode }) {
                 </i>
                 NFT Minters
               </MenuLink>
-              <MenuLink activatesDrawer={false} href="/shadow-drive">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={ImageURI.GenesysGo}
-                  alt="GenesysGo"
-                  className="inline mr-2 grayscale"
-                  style={{
-                    width: 16,
-                    height: 16,
-                  }}
-                />
-                <span> Shadow Drive Console</span>
-              </MenuLink>
-              <MenuLink activatesDrawer={false} href="/shadow-drive/sned">
-                {/*  eslint-disable-next-line @next/next/no-img-element */}
-                <CloudUploadIcon className="mr-3" width={16} height={16} />
-                SHDW Sned 9000
-              </MenuLink>
-              <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <SwitchHorizontalIcon className="mr-3" width={16} height={16} />
-                <span>SHDW Swap</span>
-              </MenuLink>
               <MenuLink activatesDrawer={false} href="/burn-nfts">
                 <i className="mr-3">
                   <FireIcon />
@@ -197,6 +186,47 @@ function Context({ children }: { children: React.ReactNode }) {
                 </i>
                 Send Multiple NFTs
               </MenuLink>
+              <li className="px-1">
+                <hr className="my-2 opacity-20"></hr>
+
+                <div className="flex gap-3 items-center px-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={ImageURI.GenesysGo}
+                    alt="GenesysGo"
+                    className="inline mr-2 grayscale"
+                    style={{
+                      width: 16,
+                      height: 16,
+                    }}
+                  />
+                  <span>Shadow</span>
+                </div>
+                <hr className="my-2 opacity-20"></hr>
+              </li>
+              <MenuLink activatesDrawer={false} href="/shadow-drive">
+                <TerminalIcon width={16} height={16} className="mr-3" />
+                <span> Shadow Drive Console</span>
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/shadow-drive/sned">
+                <CloudUploadIcon className="mr-3" width={16} height={16} />
+                SHDW Sned 9000
+              </MenuLink>
+              <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
+                <SwitchHorizontalIcon className="mr-3" width={16} height={16} />
+                <span>SHDW Swap</span>
+              </MenuLink>
+
+              <li className="px-1">
+                <hr className="my-2 opacity-20"></hr>
+
+                <div className="flex gap-3 items-center px-2">
+                  <DotsHorizontalIcon className="mr-3" width={16} height={16} />
+                  <span>Misc</span>
+                </div>
+                <hr className="my-2 opacity-20"></hr>
+              </li>
+
               <MenuLink activatesDrawer={false} href="/snedmaster">
                 <i className="mr-3">
                   <GetCashIcon width={16} height={16} />

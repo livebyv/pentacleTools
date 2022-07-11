@@ -24,6 +24,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import useOnClickOutside from "../hooks/use-click-outside";
 import { Jupiter, RouteInfo } from "@jup-ag/core";
 import { toPublicKey } from "../util/to-publickey";
+import { PublicKey } from "@solana/web3.js";
 
 const defaultProps = {
   styles: {
@@ -403,6 +404,10 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                       const swapResult = await (
                         await jupiter.exchange({
                           routeInfo: routes[0],
+                          userPublicKey: publicKey,
+                          feeAccount: new PublicKey(
+                            process.env.NEXT_PUBLIC_JUPITER_FEE_AMOUNT
+                          ),
                         })
                       ).execute();
 

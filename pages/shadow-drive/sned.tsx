@@ -14,7 +14,7 @@ import { useFiles } from "../../contexts/FileProvider";
 import createFileList from "../../util/create-file-list";
 import { download } from "../../util/download";
 import { shortenAddress } from "../../util/shorten-address";
-import {  useBalance } from "../../contexts/BalanceProvider";
+import { useBalance } from "../../contexts/BalanceProvider";
 import { ImageURI } from "../../util/image-uri";
 import JupiterSwap from "../../components/jupiter-swap";
 import { toPublicKey } from "../../util/to-publickey";
@@ -23,7 +23,19 @@ interface StorageAccountResponseWithVersion extends StorageAccountResponse {
   version: string;
 }
 
-const CreateWidget = ({ callback, onCancel, shdwDrive, hasCancel = true }) => {
+interface CreateWidgetProps {
+  callback: (...args: any) => void;
+  onCancel?: (...args: any) => void;
+  shdwDrive: ShdwDrive;
+  hasCancel?: boolean;
+}
+
+const CreateWidget = ({
+  callback = (...args: any) => {},
+  onCancel = (...args: any) => {},
+  shdwDrive,
+  hasCancel = true,
+}: CreateWidgetProps) => {
   const { register, handleSubmit, reset } = useForm();
   const onSubmit = handleSubmit(
     async ({ storageAccountName, storageAccountSize }) => {
@@ -234,6 +246,14 @@ function Sned() {
       </>
     );
   }
+
+  const handleSelectedAccountChange = (e) => {
+    const found = accounts.find(
+      (acc) => acc.publicKey.toBase58() === e.currentTarget.value
+    );
+    setSelectedAccount(found.publicKey.toBase58());
+  };
+
   return (
     <>
       <div className="mb-3 max-w-full text-center">
@@ -297,13 +317,7 @@ function Sned() {
                     <select
                       className="mb-3 select"
                       {...register("selectedAccount")}
-                      onChange={(e) => {
-                        const found = accounts.find(
-                          (acc) =>
-                            acc.publicKey.toBase58() === e.currentTarget.value
-                        );
-                        setSelectedAccount(found.publicKey.toBase58());
-                      }}
+                      onChange={handleSelectedAccountChange}
                       value={selectedAccount}
                     >
                       {accounts.map((account) => (
@@ -395,7 +409,6 @@ function Sned() {
                     <CreateWidget
                       shdwDrive={shdwDrive.current}
                       callback={onStorageCreateSuccess}
-                      onCancel={() => {}}
                       hasCancel={false}
                     />
                   </div>

@@ -24,7 +24,6 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import useOnClickOutside from "../hooks/use-click-outside";
 import { Jupiter, RouteInfo } from "@jup-ag/core";
 import { toPublicKey } from "../util/to-publickey";
-import { PublicKey } from "@solana/web3.js";
 
 const defaultProps = {
   styles: {
@@ -119,56 +118,18 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
     ];
   }, [filteredTokens]);
 
-  const [routeMap, setRouteMap] = useState<Map<string, string[]>>();
-  const [routes, setRoutes] = useState<RouteInfo[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [jupiter, setJupiter] = useState<Jupiter>(null);
-
-  const { connection } = useConnection();
-  useEffect(() => {
-    setLoading(true);
-    if (jupiter) {
-      setRouteMap(jupiter.getRouteMap());
-      jupiter
-        .computeRoutes({
-          inputMint: formValue.inputMint,
-          outputMint: formValue.outputMint,
-          inputAmount:
-            formValue.amount *
-            10 ** tokenMap.get(formValue.inputMint.toBase58())?.decimals,
-          slippage: 5,
-        })
-        .then((routes) => {
-          setRoutes(routes.routesInfos);
-          setLoading(false);
-        });
-      return;
-    }
-    Jupiter.load({ cluster: "mainnet-beta", connection }).then((res) => {
-      setJupiter(res);
-      setRouteMap(res.getRouteMap());
-      res
-        .computeRoutes({
-          inputMint: formValue.inputMint,
-          outputMint: formValue.outputMint,
-          inputAmount:
-            formValue.amount *
-            10 ** tokenMap.get(formValue.inputMint.toBase58())?.decimals,
-          slippage: 5,
-        })
-        .then((routes) => {
-          setRoutes(routes.routesInfos);
-          setLoading(false);
-        });
-    });
-  }, [
-    connection,
-    formValue.amount,
-    formValue.inputMint,
-    formValue.outputMint,
-    jupiter,
-    tokenMap,
-  ]);
+  const {
+    routeMap,
+    routes,
+    loading,
+    exchange,
+    //error,
+    refresh,
+    lastRefreshTimestamp,
+  } = useJupiter({
+    ...formValue,
+    amount: amountInDecimal,
+  });
 
   // ensure outputMint can be swapable to inputMint
   useEffect(() => {
@@ -191,6 +152,10 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
       setFocussed(false);
     }
   });
+
+  useEffect(() => {
+    console.log(routes && routes[0])
+  }, [routes])
 
   // const bestRouteTemp = useMemo(() => {})
 
@@ -232,7 +197,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
             </li>
           );
         }),
-    [filteredTokens, formValue, tokenMap]
+    [formValue, sortedFilteredItems, tokenMap]
   );
 
   return (
@@ -326,7 +291,7 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                 disabled
                 style={{ height: "100%" }}
                 value={
-                  routes
+                  routes?.length
                     ? routes[0]?.outAmount /
                       10 ** (outputTokenInfo?.decimals || 1)
                     : 0
@@ -336,10 +301,10 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
           </div>
 
           <div className="flex flex-col mt-3">
-            {!!routes.length && (
+            {!!routes?.length && (
               <span className="my-3">Best route out of {routes?.length}:</span>
             )}
-            {!routes.length && !loading && (
+            {!routes?.length && !loading && (
               <span className="my-3 w-full badge badge-error">
                 No routes found!
               </span>
@@ -401,16 +366,10 @@ const JupiterForm: FunctionComponent<IJupiterFormProps> = ({}) => {
                       wallet.sendTransaction &&
                       wallet.publicKey
                     ) {
-                      const swapResult = await (
-                        await jupiter.exchange({
-                          routeInfo: routes[0],
-                          userPublicKey: publicKey,
-                          feeAccount: new PublicKey(
-                            process.env.NEXT_PUBLIC_JUPITER_FEE_AMOUNT
-                          ),
-                        })
-                      ).execute();
-
+                      const swapResult = await exchange({
+                        routeInfo: routes[0],
+                        wallet
+                      });
                       console.log({ swapResult });
 
                       if ("error" in swapResult) {

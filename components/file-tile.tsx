@@ -26,6 +26,7 @@ interface FileTileState {
   remove: (name: string) => void;
   setFiles?: Function;
   files?: File[];
+  sizeLimit?: number;
 }
 
 export default function FileTile({
@@ -33,6 +34,7 @@ export default function FileTile({
   remove,
   setFiles,
   files,
+  sizeLimit = 1000,
 }: FileTileState) {
   const [base64, setBase64] = useState("");
   useEffect(() => {
@@ -70,11 +72,12 @@ export default function FileTile({
           </span>
           <div className="flex flex-wrap gap-3 justify-between mt-auto">
             <span
-              className={`${size > 150 ? "border border-error" : ""
-                } bg-gray-900 text-white px-2 inline rounded-box text-xs truncate shadow-md whitespace-nowrap`}
+              className={`${
+                size > sizeLimit ? "border border-error" : ""
+              } bg-gray-900 text-white px-2 inline rounded-box text-xs truncate shadow-md whitespace-nowrap`}
               style={{ maxWidth: "50%", letterSpacing: 1.25 }}
             >
-              {size > 150 ? "Too large!" : `${size.toFixed(2)} MB`}
+              {size > sizeLimit ? "Too large!" : `${size.toFixed(2)} MB`}
             </span>
 
             {!!file.type.trim() && (

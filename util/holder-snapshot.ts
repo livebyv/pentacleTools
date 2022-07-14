@@ -3,7 +3,7 @@ import { from, lastValueFrom } from "rxjs";
 import { mergeMap } from "rxjs/operators";
 import { toPublicKey } from "./to-publickey";
 
-const CONCURRENCY = 2;
+const CONCURRENCY = 1;
 
 export async function getOwners(
   mints: string[],

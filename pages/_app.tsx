@@ -352,7 +352,7 @@ Thanks guys. You made a difference. Even if it's just on my small scale.
       <Providers>
         <div className="mb-8 alert">
           <div className="block">
-            Hello dear dev! pentacle.tools is a fully open-source and free
+            Hello dear creator! pentacle.tools is a fully open-source and free
             website with MIT license. Feel free to use and modify at will, link can be found in the menu.
             Contrary to the belief of many this is a one-man effort with zero
             funding, if it helps you, consider donating to{" "}

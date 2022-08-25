@@ -168,7 +168,7 @@ export default function GibMints() {
                     setValue("address", pubkeyString);
                     fetchMints(pubkeyString);
                   }}
-                  className="btn btn-primary rounded-box"
+                  className="btn btn-primary rounded-box f"
                 >
                   {" "}
                   Use Wallet <br />

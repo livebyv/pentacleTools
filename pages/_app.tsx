@@ -276,22 +276,6 @@ function Context({ children }: { children: React.ReactNode }) {
                         </CopyToClipboard>
                       </div>
                     </div>
-
-                    <div className="flex justify-center items-center my-2 w-full">
-                      <a
-                        className="inline-block mx-auto"
-                        href="https://vercel.com?utm_source=madteaparty&utm_campaign=oss"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src="/1618983297-powered-by-vercel.svg"
-                          style={{ width: 120 }}
-                          alt="vercel"
-                        />
-                      </a>
-                    </div>
                   </div>
                 </ul>
 
@@ -333,20 +317,7 @@ function Context({ children }: { children: React.ReactNode }) {
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
-  useEffect(() => {
-    console.log(`
 
-
-Thank you to the community, and in special to Pentacle and Nomad for inspiring me to make this site what it is today.
-A beloved tool in the Solana community. Most the energy I put into it is largely in tribute to both of you.
-
-Pentacle, you pulled me into the boat and gave me clout. You reminded me of what good UI design means. Thank you, you are the most valuable of friends.
-Nomad, you drove me to make this site better and better. To make it the best. It is sometimes still wonky but I am giving her all I got, promise. I wish to meet you one day.
-    
-Thanks guys. You made a difference. Even if it's just on my small scale.
-    
-    `);
-  }, []);
   return (
     <Context>
       <Providers>
@@ -374,22 +345,6 @@ Thanks guys. You made a difference. Even if it's just on my small scale.
         <PerformanceProvider>
           {/* @ts-ignore */}
           <Component {...pageProps} />
-
-          <div className="mt-8 text-center lg:hidden">
-            <a
-              className="inline-block mx-auto"
-              href="https://vercel.com?utm_source=madteaparty&utm_campaign=oss"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/1618983297-powered-by-vercel.svg"
-                style={{ width: 120 }}
-                alt=""
-              />
-            </a>
-          </div>
         </PerformanceProvider>
       </Providers>
     </Context>

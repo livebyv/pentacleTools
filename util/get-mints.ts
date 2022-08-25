@@ -42,12 +42,14 @@ export async function getMints(
       .pipe(
         mergeMap(async (chunk) => {
           let retries = 0;
+          debugger
           let parsedTxs = await connection.getParsedTransactions(
             chunk.map((tx) => tx.signature)
           );
           while (retries < 5) {
             if (!parsedTxs?.every((tx) => !!tx)) {
               retries++;
+              return [];
             } else {
               return parsedTxs.filter((tx) => !!tx);
             }

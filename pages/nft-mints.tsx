@@ -21,7 +21,7 @@ export default function GibMints() {
   const { connected, publicKey } = useWallet();
   const [counter, setCounter] = useState(0);
   const fetchMints = async (val = "") => {
-    toast('Downloading your data.', {isLoading: true})
+    toast("Downloading your data.", { isLoading: true });
     setLoading(true);
     getMints(val, connection, setCounter)
       .then((mints) => {
@@ -157,7 +157,9 @@ export default function GibMints() {
                 disabled={!!errors?.address}
                 type="submit"
               >
-                {loading ? `Getting Mints.. ${counter} so far ` : "Get Mints!"}
+                {loading && counter === 0 && `Getting transactions`}
+                {loading && counter > 0 && `Getting Mints.. ${counter} so far `}
+                {!loading && "Get Mints!"}
               </button>
               {connected ? (
                 <button

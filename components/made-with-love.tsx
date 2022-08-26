@@ -1,43 +1,36 @@
+import { toast } from "react-toastify";
 import { GithubIcon, HeartIcon, TwitterIcon } from "./icons";
+import { CopyToClipboard } from "../components/copy-to-clipboard";
 
 export function MadeWithLove() {
   return (
-    <div className="flex flex-row gap-3">
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        className="transition-colors hover:text-primary"
-        href="https://github.com/21e8/pentacle.tools/"
-      >
-        <i>
-          <GithubIcon />
-        </i>
-      </a>
+    <div className="flex flex-col">
       <div className="flex flex-col justify-center items-center text-center">
-        <span>
-          Made with{" "}
-          <i className="inline ml-1">
-            <HeartIcon width={16} height={16} />
-          </i>
-        </span>
         <a
-          href="https://twitter.com/@0xAlice_"
           target="_blank"
           rel="noopener noreferrer"
+          className="transition-colors hover:text-primary"
+          href="https://github.com/21e8/pentacle.tools/"
         >
-          by 0xAlice
+          <i>
+            <GithubIcon />
+          </i>
         </a>
+        <div className="text-sm text-center transition-colors hover:text-primary">
+          <CopyToClipboard
+            text={"lolfees.sol"}
+            onCopy={() =>
+              toast("Copied to clipboard!", {
+                autoClose: 2000,
+              })
+            }
+          >
+            <span className={`ml-1 cursor-pointer`}>
+              Donations: GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR
+            </span>
+          </CopyToClipboard>
+        </div>
       </div>
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://twitter.com/@0xAlice_"
-        className="transition-colors hover:text-primary"
-      >
-        <i>
-          <TwitterIcon />
-        </i>
-      </a>
     </div>
   );
 }

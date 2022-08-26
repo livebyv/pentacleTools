@@ -253,30 +253,6 @@ function Context({ children }: { children: React.ReactNode }) {
                     </i>
                     <span>Stake View</span>
                   </MenuLink>
-
-                  <div className="mt-auto w-full">
-                    <div
-                      className={`flex flex-row gap-4 justify-center items-center mt-6 text-center`}
-                    >
-                      <MadeWithLove />
-                    </div>
-                    <div>
-                      <div className="text-sm text-center transition-colors hover:text-primary">
-                        <CopyToClipboard
-                          text={"lolfees.sol"}
-                          onCopy={() =>
-                            toast("Copied to clipboard!", {
-                              autoClose: 2000,
-                            })
-                          }
-                        >
-                          <span className={`ml-1 cursor-pointer`}>
-                            Donations: lolfees.sol
-                          </span>
-                        </CopyToClipboard>
-                      </div>
-                    </div>
-                  </div>
                 </ul>
 
                 <main
@@ -317,7 +293,6 @@ function Context({ children }: { children: React.ReactNode }) {
 }
 
 function MyApp({ Component, pageProps }: AppProps) {
-
   return (
     <Context>
       <Providers>
@@ -345,6 +320,16 @@ function MyApp({ Component, pageProps }: AppProps) {
         <PerformanceProvider>
           {/* @ts-ignore */}
           <Component {...pageProps} />
+
+          <hr className="mt-8 opacity-10" />
+
+          <div className="mt-auto w-full">
+            <div
+              className={`flex flex-row gap-4 justify-center items-center mt-6 text-center`}
+            >
+              <MadeWithLove />
+            </div>
+          </div>
         </PerformanceProvider>
       </Providers>
     </Context>

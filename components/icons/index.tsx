@@ -12,7 +12,7 @@ export function MenuIcon({ width = 24, height = 24, ...props }) {
     </svg>
   );
 }
-export function GithubIcon({ width = 24, height = 24, ...props }) {
+export function GithubIcon({ width = 48, height = 48, ...props }) {
   return (
     <svg
       fill="currentColor"

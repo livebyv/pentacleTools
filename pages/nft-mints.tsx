@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { SOL_ADDRESS_REGEXP } from "../util/validators";
 import { useModal } from "../contexts/ModalProvider";
@@ -20,12 +20,38 @@ export default function GibMints() {
   const { connection } = useConnection();
   const { connected, publicKey } = useWallet();
   const [counter, setCounter] = useState(0);
+  const [localStorageItems, setLocalStorageItems] = useState([]);
+  const [selectedStorageItem, setSelectedStorageitem] = useState(null);
+
+  useEffect(() => {
+    const items = localStorage.getItem("previous-jobs_get-mints");
+    if (items) {
+      const parsed = JSON.parse(items);
+      setLocalStorageItems(parsed);
+      setSelectedStorageitem(parsed[0]);
+    }
+  }, []);
+
   const fetchMints = async (val = "") => {
     toast("Downloading your data.", { isLoading: true });
     setLoading(true);
     getMints(val, connection, setCounter)
       .then((mints) => {
-        download(`mints-cmid-${val}.json`, JSON.stringify(mints));
+        const output = {
+          name: `mints-cmid-${val}`,
+          timestamp: new Date(),
+          items: mints,
+        };
+        const outputAsString = JSON.stringify(output);
+        download(`mints-cmid-${val}.json`, outputAsString);
+        const updatedItems = localStorageItems
+          ? [...localStorageItems, output]
+          : [output];
+        const updatedItemsAsString = JSON.stringify(
+          localStorageItems ? [...localStorageItems, output] : [output]
+        );
+        localStorage.setItem("previous-jobs_get-mints", updatedItemsAsString);
+        setLocalStorageItems(updatedItems);
         setLoading(false);
       })
       .catch((e) => {
@@ -55,135 +81,119 @@ export default function GibMints() {
         <h1 className="text-3xl text-white">Get NFT Mints</h1>
         <hr className="my-4 opacity-10" />
       </div>
-      {/* <div className="alert">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="flex-shrink-0 w-6 h-6 stroke-current"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-        <div className="block">
-          <div>
-            Due to changes in Solanas software this tool no longer functions.
-            Head over to
-            <a href="https://magiceden.io/mintlist-tool">
-              https://magiceden.io/mintlist-tool
-            </a>{" "}
-            for a working version.
-          </div>
-        </div>
-      </div> */}
       <p className="text-center">
         This tool gets all mint IDs associated with the given address.
       </p>
-      {/* <hr className="my-4 opacity-10" />
-      <div className="text-center">
-        <div className="alert">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="flex-shrink-0 w-6 h-6 stroke-current"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
-          <div className="block">
-            <div>
-              Be aware: One of the more recent updates to Solana included a size
-              filter for certain calls, which is why we can no longer query as
-              we used to. Right now this site is implementing experimental
-              crawling. Usually takes 3-4 minutes.
-            </div>
-            <div>
-              <strong>
-                This can be used with both, Verified Creator ID as well as CM
-                ID!
-              </strong>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <hr className="my-4 opacity-10" />
       <div className="bg-gray-900 card">
-        <form
-          onSubmit={handleSubmit(({ address }) => fetchMints(address))}
-          className={`flex flex-col w-full`}
-        >
-          <div className="card-body">
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
-              <div className="md:col-start-2 md:col-span-3">
-                <label className="justify-center mb-4 label">
-                  Please enter CM ID or Verified Creator
+        <div className="card-body">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-5">
+            <div className="md:col-start-2 md:col-span-3">
+              <label className="justify-center mb-4 label">
+                Please enter CM ID or Verified Creator
+              </label>
+              <input
+                {...register("address", {
+                  required: "This field is required!",
+                  pattern: {
+                    value: SOL_ADDRESS_REGEXP,
+                    message: "Invalid address",
+                  },
+                })}
+                required
+                type="text"
+                className={`input shadow-lg w-full ${
+                  !!errors?.address?.message && "input-error"
+                }`}
+                id="address-field"
+                autoComplete="on"
+              />
+              {!!errors?.address?.message && (
+                <label className="label text-error">
+                  {errors?.address?.message}
                 </label>
-                <input
-                  {...register("address", {
-                    required: "This field is required!",
-                    pattern: {
-                      value: SOL_ADDRESS_REGEXP,
-                      message: "Invalid address",
-                    },
-                  })}
-                  required
-                  type="text"
-                  className={`input shadow-lg w-full ${
-                    !!errors?.address?.message && "input-error"
-                  }`}
-                  id="address-field"
-                  autoComplete="on"
-                />
-                {!!errors?.address?.message && (
-                  <label className="label text-error">
-                    {errors?.address?.message}
-                  </label>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-4 justify-center items-center mt-6">
-              <button
-                className={`btn btn-primary rounded-box shadow-lg ${
-                  loading ? "loading" : ""}`}
-                disabled={!!errors?.address}
-                type="submit"
-              >
-                {loading && counter === 0 && `Getting transactions`}
-                {loading && counter > 0 && `Getting Mints.. ${counter} so far `}
-                {!loading && "Get Mints!"}
-              </button>
-              {connected ? (
-                <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setValue("address", pubkeyString);
-                    fetchMints(pubkeyString);
-                  }}
-                  className="btn btn-primary rounded-box f"
-                >
-                  {" "}
-                  Use Wallet <br />
-                  {pubkeyString.slice(0, 3)}...
-                  {pubkeyString.slice(
-                    pubkeyString.length - 3,
-                    pubkeyString.length
-                  )}
-                </button>
-              ) : (
-                <></>
               )}
             </div>
           </div>
-        </form>
+          <div className="flex flex-col gap-4 justify-center items-center mt-6">
+            <form
+              onSubmit={handleSubmit(({ address }) => fetchMints(address))}
+              className={`flex flex-col w-full`}
+            >
+              <div className="text-center">
+                <button
+                  className={`btn btn-primary rounded-box shadow-lg ${
+                    loading ? "loading" : ""}`}
+                  disabled={!!errors?.address}
+                  type="submit"
+                >
+                  {loading && counter === 0 && `Getting transactions...`}
+                  {loading &&
+                    counter > 0 &&
+                    `Getting Mints.. ${counter} so far `}
+                  {!loading && "Get Mints!"}
+                </button>
+              </div>
+
+              {connected ? (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setValue("address", pubkeyString);
+                      fetchMints(pubkeyString);
+                    }}
+                    className="btn btn-primary rounded-box"
+                  >
+                    {" "}
+                    Use Wallet <br />
+                    {pubkeyString.slice(0, 3)}...
+                    {pubkeyString.slice(
+                      pubkeyString.length - 3,
+                      pubkeyString.length
+                    )}
+                  </button>
+                </>
+              ) : (
+                <></>
+              )}
+            </form>
+
+            {!!localStorageItems?.length && (
+              <>
+                <label className="label">Previous Downloads</label>
+                <div
+                  className="flex flex-row gap-3 justify-center"
+                  style={{ flexWrap: "wrap" }}
+                >
+                  <select className="select">
+                    {localStorageItems.map((item) => (
+                      <>
+                        <option>
+                          CM-ID: {item.name.split(`mints-cmid-`)[1]} -
+                          {new Date(item.timestamp).toLocaleString()} -{" "}
+                          {item.items.length} mints
+                        </option>
+                      </>
+                    ))}
+                  </select>
+                  <button
+                    className="shadow-lg btn btn-primary rounded-box"
+                    onClick={() => {
+                      download(
+                        `${selectedStorageItem.name}.json`,
+                        JSON.stringify(selectedStorageItem)
+                      );
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/download-icon.png" alt="" />
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </>
   );

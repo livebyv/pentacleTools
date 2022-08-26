@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchMetaForUI } from "../util/token-metadata";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
@@ -8,18 +8,36 @@ import { getAddresses, validateSolAddressArray } from "../util/validators";
 import Head from "next/head";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 export default function GetMeta() {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm();
   const [loading, setLoading] = useState(false);
   const [counter, setCounter] = useState(0);
   const [len, setLen] = useState(0);
   const { setModalState } = useModal();
   const { connection } = useConnection();
+  const {
+    query: { jobName },
+  } = useRouter();
+  useEffect(() => setModalState({ open: false, message: "" }), [setModalState]);
+  useEffect(() => {
+    try {
+      const localStorageItems = localStorage.getItem("user-mint-lists");
+      if (localStorageItems) {
+        const asObj = JSON.parse(localStorageItems);
+        const items = asObj.find((obj) => obj.name === jobName)?.items;
+        setValue("mints", items);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [jobName, setValue]);
   const fetchMeta = ({ mints }: { mints: string }) => {
     const parsed = getAddresses(mints);
     const id = toast("Downloading your data.", { isLoading: true });
@@ -28,7 +46,10 @@ export default function GetMeta() {
     setLoading(true);
     fetchMetaForUI(parsed, setCounter, connection).subscribe({
       next: (e) => {
-        download("gib-meta.json", jsonFormat(e, { size: 1, type: "tab" }));
+        download(
+          `nft-metadata-${Date.now()}.json`,
+          jsonFormat(e, { size: 1, type: "tab" })
+        );
         setLoading(false);
       },
       error: (e) => {

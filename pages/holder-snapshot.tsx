@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import jsonFormat from "json-format";
 import { useForm } from "react-hook-form";
 import Head from "next/head";
@@ -9,12 +9,15 @@ import { useModal } from "../contexts/ModalProvider";
 import { getOwners } from "../util/holder-snapshot";
 import { download } from "../util/download";
 import { toast } from "react-toastify";
+import DownloadHistory from "../components/download-history";
+import { useRouter } from "next/router";
 
 export default function HolderSnapshot() {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm();
 
   const [counter, setCounter] = useState(0);
@@ -22,6 +25,25 @@ export default function HolderSnapshot() {
   const [loading, setLoading] = useState(false);
   const { setModalState } = useModal();
   const { connection } = useConnection();
+  const [localStorageItems, setLocalStorageItems] = useState<
+    { name: string; timestamp: number; items: any[] }[]
+  >([]);
+  const {
+    query: { jobName },
+  } = useRouter();
+  useEffect(() => setModalState({ open: false, message: "" }), [setModalState]);
+  useEffect(() => {
+    try {
+      const localStorageItems = localStorage.getItem("user-mint-lists");
+      if (localStorageItems) {
+        const asObj = JSON.parse(localStorageItems);
+        const items = asObj.find((obj) => obj.name === jobName)?.items;
+        setValue("mints", items);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [jobName, setValue]);
   const fetchHolders = useCallback(
     async ({ mints }: { mints: string }) => {
       try {
@@ -120,6 +142,14 @@ export default function HolderSnapshot() {
             </div>
           </div>
         </form>
+
+        {!!localStorageItems?.length && (
+          <DownloadHistory
+            localstorageId="nft-holders"
+            localStorageItems={localStorageItems}
+            setLocalStorageItems={setLocalStorageItems}
+          />
+        )}
       </div>
     </>
   );

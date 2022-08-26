@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { download } from "../util/download";
 import jsonFormat from "json-format";
 import { useModal } from "../contexts/ModalProvider";
@@ -9,12 +9,15 @@ import { from, mergeMap, tap, toArray } from "rxjs";
 import Head from "next/head";
 import { toPublicKey } from "../util/to-publickey";
 import { toast } from "react-toastify";
+import DownloadHistory from "../components/download-history";
+import { useRouter } from "next/router";
 
 export default function GetHolders() {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm();
 
   const [counter, setCounter] = useState(0);
@@ -22,6 +25,22 @@ export default function GetHolders() {
   const [loading, setLoading] = useState(false);
   const { setModalState } = useModal();
   const { connection } = useConnection();
+  const {
+    query: { jobName },
+  } = useRouter();
+  useEffect(() => setModalState({ open: false, message: "" }), [setModalState]);
+  useEffect(() => {
+    try {
+      const localStorageItems = localStorage.getItem("user-mint-lists");
+      if (localStorageItems) {
+        const asObj = JSON.parse(localStorageItems);
+        const items = asObj.find((obj) => obj.name === jobName)?.items;
+        setValue("mints", items);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [jobName, setValue]);
 
   const fetchMinters = useCallback(
     async ({ mints }: { mints: string }) => {
@@ -153,6 +172,14 @@ export default function GetHolders() {
             </div>
           </div>
         </form>
+
+        {/* {!!localStorageItems?.length && (
+          <DownloadHistory
+            localstorageId="nft-minters"
+            localStorageItems={localStorageItems}
+            setLocalStorageItems={setLocalStorageItems}
+          />
+        )} */}
       </div>
     </>
   );

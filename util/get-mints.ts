@@ -42,7 +42,6 @@ export async function getMints(
       .pipe(
         mergeMap(async (chunk) => {
           let retries = 0;
-          debugger
           let parsedTxs = await connection.getParsedTransactions(
             chunk.map((tx) => tx.signature)
           );

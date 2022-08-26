@@ -18,7 +18,7 @@ export function MadeWithLove() {
         </a>
         <div className="text-sm text-center transition-colors hover:text-primary">
           <CopyToClipboard
-            text={"lolfees.sol"}
+            text={"GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR"}
             onCopy={() =>
               toast("Copied to clipboard!", {
                 autoClose: 2000,

@@ -149,40 +149,38 @@ function Context({ children }: { children: React.ReactNode }) {
                       <i className="mr-3">
                         <FingerPrintIcon />
                       </i>
-                      Get NFT Mints
+                      <span>Get NFT Mints</span>
                     </div>
                   </MenuLink>
                   <MenuLink activatesDrawer={false} href="/token-metadata">
-                    <div>
-                      <i className="mr-3">
-                        <InfoIcon />
-                      </i>
-                      Token Metadata
-                    </div>
+                    <i className="mr-3">
+                      <InfoIcon />
+                    </i>
+                    <span>Token Metadata</span>
                   </MenuLink>
                   <MenuLink activatesDrawer={false} href="/holder-snapshot">
                     <i className="inline-block mr-3">
                       <CameraIcon width={16} height={16} />
                     </i>
-                    <span> Holder Snapshot</span>
+                    <span>Holder Snapshot</span>
                   </MenuLink>
                   <MenuLink activatesDrawer={false} href="/nft-minters">
                     <i className="inline-block mr-3">
                       <CoinsIcon width={16} height={16} />
                     </i>
-                    NFT Minters
+                    <span>NFT Minters</span>
                   </MenuLink>
                   <MenuLink activatesDrawer={false} href="/burn-nfts">
                     <i className="mr-3">
                       <FireIcon />
                     </i>
-                    <span> Burn NFTs</span>
+                    <span>Burn NFTs</span>
                   </MenuLink>
                   <MenuLink activatesDrawer={false} href="/mint-nft">
                     <i className="mr-3">
                       <HammerIcon />
                     </i>
-                    <span> Mint NFT</span>
+                    <span>Mint NFT</span>
                   </MenuLink>
 
                   <MenuLink activatesDrawer={false} href="/send-nfts">
@@ -211,7 +209,7 @@ function Context({ children }: { children: React.ReactNode }) {
                   </li>
                   <MenuLink activatesDrawer={false} href="/shadow-drive">
                     <TerminalIcon width={16} height={16} className="mr-3" />
-                    <span> SHDW Drive Console</span>
+                    <span>SHDW Drive Console</span>
                   </MenuLink>
                   <MenuLink activatesDrawer={false} href="/shadow-drive/sned">
                     <CloudUploadIcon className="mr-3" width={16} height={16} />
@@ -296,7 +294,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Context>
       <Providers>
-        {/* <div className="mb-8 alert">
+        <div className="mb-8 alert">
           <div className="block">
             Hello dear creator! pentacle.tools is a fully open-source and free
             website with MIT license. Feel free to use and modify at will, link
@@ -305,18 +303,20 @@ function MyApp({ Component, pageProps }: AppProps) {
             to{" "}
             <span className="inline">
               <CopyToClipboard
-                text={"lolfees.sol"}
+                text={"GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR"}
                 onCopy={() =>
                   toast("Copied to clipboard!", {
                     autoClose: 2000,
                   })
                 }
               >
-                <span className={`ml-1 cursor-pointer`}>lolfees.sol</span>
+                <span className={`ml-1 cursor-pointer`}>
+                  GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR
+                </span>
               </CopyToClipboard>
             </span>
           </div>
-        </div> */}
+        </div>
         <PerformanceProvider>
           {/* @ts-ignore */}
           <Component {...pageProps} />

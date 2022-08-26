@@ -75,7 +75,7 @@ export default function Snedmaster() {
             }),
             new TransactionInstruction({
               keys: [{ pubkey: publicKey, isSigner: true, isWritable: true }],
-              data: Buffer.from(`Sent over pentacle.tools`, "utf-8"),
+              data: Buffer.from(`Sent over cryptostraps.tools`, "utf-8"),
               programId: MEMO_ID,
             }),
           ];

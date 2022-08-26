@@ -83,7 +83,7 @@ export default function HolderSnapshot() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - 📷 NFT Holders</title>
+        <title>🛠️ Cryptostraps Tools - 📷 NFT Holders</title>
       </Head>
       <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Holder Snapshot</h1>

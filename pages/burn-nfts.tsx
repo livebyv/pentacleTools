@@ -528,7 +528,7 @@ export default function BurnNFTs() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - 🔥 Burn NFTs</title>
+        <title>🛠️ Cryptostraps Tools - 🔥 Burn NFTs</title>
       </Head>
       <div className="mb-3 w-full max-w-full text-center">
         <h2 className="text-3xl text-white">Burn NFTs</h2>

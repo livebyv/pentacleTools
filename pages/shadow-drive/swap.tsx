@@ -9,7 +9,7 @@ function ShdwSwapPage() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - SHDW Swap</title>
+        <title>🛠️ Cryptostraps Tools - SHDW Swap</title>
       </Head>
       <div className="mb-3 max-w-full text-center">
         <h1 className="text-4xl text-white">

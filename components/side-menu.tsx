@@ -25,7 +25,7 @@ export default function SideMenu() {
       <ul className="side-menu--mobile">
         <li>
           <a
-            href="https://pentacle.xyz"
+            href="https://www.cryptostraps.io/"
             target="_blank"
             rel="noreferrer noopener"
             className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
@@ -33,10 +33,10 @@ export default function SideMenu() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               className="mb-6"
-              src="/pentacle.svg"
+              src="/cs-logo.webp"
               width={221}
               height={64}
-              alt="Pentacle"
+              alt="Cryptostraps"
             />
           </a>
         </li>

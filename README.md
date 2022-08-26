@@ -1,7 +1,7 @@
 # SOL NFT Tools
 
 
-[Live Version](https://pentacle.tools/)
+[Live Version](https://cryptostraps.tools/)
 
 ## Getting Started
 

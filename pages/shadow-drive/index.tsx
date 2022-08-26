@@ -353,7 +353,7 @@ function ShdwDrivePage() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - SHDW Drive</title>
+        <title>🛠️ Cryptostraps Tools - SHDW Drive</title>
       </Head>
       <div className="mb-3 max-w-full text-center">
         <h1 className="text-4xl text-white">

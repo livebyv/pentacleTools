@@ -12,31 +12,29 @@ export default class MyDocument extends Document {
       <Html>
         <Head>
           {/* eslint-disable-next-line @next/next/no-title-in-document-head */}
-          <meta name="description" content="Solana NFT Tools" />
+          <meta name="description" content="Solana Tools" />
           <link
             rel="icon"
             href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>"
           />
           <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:site" content="@0xAlice_" />
-          <meta name="twitter:creator" content="@0xAlice_" />
-          <meta property="og:site_name" content="Solana NFT Tools" />
-          <meta name="twitter:image" content={ImageURI.PentacleBanner} />
+          <meta property="og:site_name" content="Solana Tools" />
+          <meta name="twitter:image" content={'/cs-logo.webp'} />
           <meta
             name="twitter:image:alt"
-            content="Solana NFT Tools, made by @0xAlice_"
+            content="Solana Tools"
           />
-          <meta name="twitter:title" content="Pentacle SOL NFT Tools" />
+          <meta name="twitter:title" content="Cryptostraps SOL Tools" />
           <meta
             name="twitter:description"
-            content="Solana NFT Tools, made by @0xAlice_"
+            content="Solana Tools"
           />
-          <meta name="og:url" content="https://pentacle.tools" />
-          <meta name="og:title" content="Solana NFT Tools" />
-          <meta name="og:image" content={ImageURI.PentacleBanner} />
+          <meta name="og:url" content="https://cryptostraps.tools" />
+          <meta name="og:title" content="Solana Tools" />
+          <meta name="og:image" content={'/cs-logo.webp'} />
           <meta
             property="og:description"
-            content="Solana NFT Tools, made by @0xAlice_"
+            content="Solana Tools"
           />
           <html data-theme="dark" />
           <link

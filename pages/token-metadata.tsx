@@ -68,7 +68,7 @@ export default function GetMeta() {
   return (
     <div>
       <Head>
-        <title>🛠️ Pentacle Tools - ℹ️ NFT Metadata</title>
+        <title>🛠️ Cryptostraps Tools - ℹ️ NFT Metadata</title>
       </Head>
       <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Token Metadata</h1>

@@ -41,6 +41,7 @@ import { getPlatformFeeAccounts } from "@jup-ag/core";
 import { PublicKey } from "@solana/web3.js";
 import CloudUploadIcon from "@heroicons/react/solid/CloudUploadIcon";
 import { BalanceProvider } from "../contexts/BalanceProvider";
+import SideMenuLarge from "../components/side-menu-lg";
 
 const endpoint = process.env.NEXT_PUBLIC_RPC;
 
@@ -106,7 +107,7 @@ function Context({ children }: { children: React.ReactNode }) {
         <BalanceProvider>
           <>
             <Head>
-              <title>🛠️ Pentacle Tools</title>
+              <title>🛠️ Cryptostraps Tools</title>
             </Head>
             <div className="drawer drawer-end">
               <input id="my-drawer" type="checkbox" className="drawer-toggle" />
@@ -117,141 +118,7 @@ function Context({ children }: { children: React.ReactNode }) {
                 <div className="lg:hidden">
                   <TopMenu />
                 </div>
-                <ul className="side-menu--desktop">
-                  <li>
-                    <a
-                      href="https://pentacle.xyz"
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="hover:bg-opacity-0 focus:bg-opacity-0"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src="/pentacle.svg"
-                        className="mb-6"
-                        width={221}
-                        height={65}
-                        alt="Pentacle"
-                      />
-                    </a>
-                  </li>
-
-                  <li className="px-1">
-                    <hr className="my-2 opacity-20"></hr>
-                    <div className="flex gap-3 items-center px-2">
-                      <PhotographIcon width={16} height={16} className="mr-3" />
-                      <span>NFT</span>
-                    </div>
-                    <hr className="my-2 opacity-20"></hr>
-                  </li>
-                  <MenuLink activatesDrawer={false} href="/nft-mints">
-                    <div>
-                      <i className="mr-3">
-                        <FingerPrintIcon />
-                      </i>
-                      <span>Get NFT Mints</span>
-                    </div>
-                  </MenuLink>
-                  <MenuLink activatesDrawer={false} href="/token-metadata">
-                    <i className="mr-3">
-                      <InfoIcon />
-                    </i>
-                    <span>Token Metadata</span>
-                  </MenuLink>
-                  <MenuLink activatesDrawer={false} href="/holder-snapshot">
-                    <i className="inline-block mr-3">
-                      <CameraIcon width={16} height={16} />
-                    </i>
-                    <span>Holder Snapshot</span>
-                  </MenuLink>
-                  <MenuLink activatesDrawer={false} href="/nft-minters">
-                    <i className="inline-block mr-3">
-                      <CoinsIcon width={16} height={16} />
-                    </i>
-                    <span>NFT Minters</span>
-                  </MenuLink>
-                  <MenuLink activatesDrawer={false} href="/burn-nfts">
-                    <i className="mr-3">
-                      <FireIcon />
-                    </i>
-                    <span>Burn NFTs</span>
-                  </MenuLink>
-                  <MenuLink activatesDrawer={false} href="/mint-nft">
-                    <i className="mr-3">
-                      <HammerIcon />
-                    </i>
-                    <span>Mint NFT</span>
-                  </MenuLink>
-
-                  <MenuLink activatesDrawer={false} href="/send-nfts">
-                    <i className="mr-3">
-                      <SendIcon />
-                    </i>
-                    Send Multiple NFTs
-                  </MenuLink>
-                  <li className="px-1">
-                    <hr className="my-2 opacity-20"></hr>
-
-                    <div className="flex gap-3 items-center px-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={ImageURI.GenesysGo}
-                        alt="GenesysGo"
-                        className="inline mr-2 grayscale"
-                        style={{
-                          width: 16,
-                          height: 16,
-                        }}
-                      />
-                      <span>Shadow</span>
-                    </div>
-                    <hr className="my-2 opacity-20"></hr>
-                  </li>
-                  <MenuLink activatesDrawer={false} href="/shadow-drive">
-                    <TerminalIcon width={16} height={16} className="mr-3" />
-                    <span>SHDW Drive Console</span>
-                  </MenuLink>
-                  <MenuLink activatesDrawer={false} href="/shadow-drive/sned">
-                    <CloudUploadIcon className="mr-3" width={16} height={16} />
-                    SHDW Sned 9000
-                  </MenuLink>
-                  <MenuLink activatesDrawer={false} href="/shadow-drive/swap">
-                    <SwitchHorizontalIcon
-                      className="mr-3"
-                      width={16}
-                      height={16}
-                    />
-                    <span>SHDW Swap</span>
-                  </MenuLink>
-
-                  <li className="px-1">
-                    <hr className="my-2 opacity-20"></hr>
-
-                    <div className="flex gap-3 items-center px-2">
-                      <DotsHorizontalIcon
-                        className="mr-3"
-                        width={16}
-                        height={16}
-                      />
-                      <span>Misc</span>
-                    </div>
-                    <hr className="my-2 opacity-20"></hr>
-                  </li>
-
-                  <MenuLink activatesDrawer={false} href="/snedmaster">
-                    <i className="mr-3">
-                      <GetCashIcon width={16} height={16} />
-                    </i>
-                    <span>SnedMaster 9000</span>
-                  </MenuLink>
-
-                  <MenuLink activatesDrawer={false} href="/stake">
-                    <i className="mr-3">
-                      <BankIcon width={16} height={16} />
-                    </i>
-                    <span>Stake View</span>
-                  </MenuLink>
-                </ul>
+                <SideMenuLarge />
 
                 <main
                   className={`relative col-span-2 mt-28 mb-12 lg:col-span-1`}
@@ -294,29 +161,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Context>
       <Providers>
-        <div className="mb-8 alert">
-          <div className="block">
-            Hello dear creator! pentacle.tools is a fully open-source and free
-            website with MIT license. Feel free to use and modify at will, link
-            can be found in the menu. Contrary to the belief of many this is a
-            one-man effort with zero funding, if it helps you, consider donating
-            to{" "}
-            <span className="inline">
-              <CopyToClipboard
-                text={"GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR"}
-                onCopy={() =>
-                  toast("Copied to clipboard!", {
-                    autoClose: 2000,
-                  })
-                }
-              >
-                <span className={`ml-1 cursor-pointer`}>
-                  GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR
-                </span>
-              </CopyToClipboard>
-            </span>
-          </div>
-        </div>
         <PerformanceProvider>
           {/* @ts-ignore */}
           <Component {...pageProps} />

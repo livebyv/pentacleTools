@@ -655,7 +655,7 @@ function StakeView() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - 🪙 Validator Staking</title>
+        <title>🛠️ Cryptostraps Tools - 🪙 Validator Staking</title>
       </Head>
       <h2 className="text-3xl text-center text-white">
         SOL Validator Staking

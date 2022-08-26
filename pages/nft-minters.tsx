@@ -115,7 +115,7 @@ export default function GetHolders() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - 👛 NFT Minters</title>
+        <title>🛠️ Cryptostraps Tools - 👛 NFT Minters</title>
       </Head>
       <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">NFT Minters</h1>

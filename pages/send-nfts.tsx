@@ -677,7 +677,7 @@ export default function SendNFTs() {
   return (
     <>
       <Head>
-        <title>🛠️ Pentacle Tools - 📨 Send NFTs</title>
+        <title>🛠️ Cryptostraps Tools - 📨 Send NFTs</title>
       </Head>
       <div className="mb-3 w-full max-w-full text-center">
         <h1 className="text-3xl text-white">Send NFTs</h1>

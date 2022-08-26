@@ -12,18 +12,19 @@ export default function TopMenu() {
           className="flex items-center mr-4 text-white flex-no-shrink"
           style={{ width: 128 }}
         >
-          <a
-            href="https://pentacle.xyz"
+       <a
+            href="https://www.cryptostraps.io/"
             target="_blank"
             rel="noreferrer noopener"
-            className="grid place-content-center py-2"
+            className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/pentacle.svg"
+              className="mb-6"
+              src="/cs-logo.webp"
               width={221}
-              height={65}
-              alt="Pentacle"
+              height={64}
+              alt="Cryptostraps"
             />
           </a>
         </div>

@@ -1,6 +1,5 @@
 import { ImageURI } from "../util/image-uri";
 import { MenuLink } from "./menu-link";
-import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { MadeWithLove } from "./made-with-love";
 import {
   BankIcon,
@@ -13,7 +12,6 @@ import {
   InfoIcon,
   SendIcon,
 } from "./icons";
-import { toast } from "react-toastify";
 import SwitchHorizontalIcon from "@heroicons/react/solid/SwitchHorizontalIcon";
 import CloudUploadIcon from "@heroicons/react/solid/CloudUploadIcon";
 import DotsHorizontalIcon from "@heroicons/react/solid/DotsHorizontalIcon";
@@ -153,22 +151,6 @@ export default function SideMenu() {
             className={`flex flex-col gap-4 justify-center items-center mt-6 text-center`}
           >
             <MadeWithLove />
-          </div>
-          <div>
-            <div className="text-sm text-center transition-colors hover:text-primary">
-              <CopyToClipboard
-                text={"GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR"}
-                onCopy={() =>
-                  toast("Copied to clipboard!", {
-                    autoClose: 2000,
-                  })
-                }
-              >
-                <span className={`ml-1 cursor-pointer`}>
-                  Donations: GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR
-                </span>
-              </CopyToClipboard>
-            </div>
           </div>
         </div>
       </ul>

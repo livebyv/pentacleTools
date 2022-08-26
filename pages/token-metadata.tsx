@@ -32,7 +32,7 @@ export default function GetMeta() {
       if (localStorageItems) {
         const asObj = JSON.parse(localStorageItems);
         const items = asObj.find((obj) => obj.name === jobName)?.items;
-        setValue("mints", items);
+        setValue("mints", JSON.stringify(items));
       }
     } catch (e) {
       console.log(e);

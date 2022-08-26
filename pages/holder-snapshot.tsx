@@ -34,11 +34,12 @@ export default function HolderSnapshot() {
   useEffect(() => setModalState({ open: false, message: "" }), [setModalState]);
   useEffect(() => {
     try {
+      debugger;
       const localStorageItems = localStorage.getItem("user-mint-lists");
       if (localStorageItems) {
         const asObj = JSON.parse(localStorageItems);
         const items = asObj.find((obj) => obj.name === jobName)?.items;
-        setValue("mints", items);
+        setValue("mints", JSON.stringify(items));
       }
     } catch (e) {
       console.log(e);

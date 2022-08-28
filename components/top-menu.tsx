@@ -16,16 +16,18 @@ export default function TopMenu() {
             href="https://www.cryptostraps.io/"
             target="_blank"
             rel="noreferrer noopener"
-            className="py-2 hover:bg-opacity-0 focus:bg-opacity-0"
+            className="flex flex-row gap-4 items-center py-2 hover:bg-opacity-0 focus:bg-opacity-0"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              className="mb-6"
               src="/cs-logo.webp"
               width={221}
               height={64}
               alt="Cryptostraps"
+              style={{width: 'auto', maxHeight: 32}}
             />
+
+            <span className="text-2xl">Tools</span>
           </a>
         </div>
         <div className="flex col-start-4 w-1/4 xl:hidden">

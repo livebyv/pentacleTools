@@ -15,7 +15,7 @@ export default function SideMenuLarge() {
           href="https://cryptostraps.io"
           target="_blank"
           rel="noreferrer noopener"
-          className="hover:bg-opacity-0 focus:bg-opacity-0"
+          className="flex flex-col items-center hover:bg-opacity-0 focus:bg-opacity-0"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -24,7 +24,10 @@ export default function SideMenuLarge() {
             height={154}
             alt="CryptoStraps"
             className="p-4"
+            style={{maxHeight: 96, width: 'auto'}}
           />
+
+          <span className="text-2xl">Tools</span>
         </a>
       </li>
 

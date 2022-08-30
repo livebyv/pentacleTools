@@ -16,7 +16,7 @@ export function MadeWithLove() {
             <GithubIcon />
           </i>
         </a>
-        <div className="text-sm text-center transition-colors hover:text-primary">
+        {/* <div className="text-sm text-center transition-colors hover:text-primary">
           <CopyToClipboard
             text={"GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR"}
             onCopy={() =>
@@ -29,7 +29,7 @@ export function MadeWithLove() {
               Donations: GWGjF2iYHrzwNh6un8sfnz6RieXWXTBD9mEzh7GFraFR
             </span>
           </CopyToClipboard>
-        </div>
+        </div> */}
       </div>
     </div>
   );

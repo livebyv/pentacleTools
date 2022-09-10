@@ -72,6 +72,7 @@ export default function GetHolders() {
                 owners.push(owner);
               }
             }
+            return;
           } catch (e) {
             console.error(e?.message || e);
             errors.push({ address: addy, error: e?.message || e });
@@ -98,6 +99,7 @@ export default function GetHolders() {
           next: () => {
             const filename = `Minters-${Date.now()}.json`;
             download(filename, jsonFormat({ owners: [...owners], errors }));
+            setLoading(false);
             setModalState({
               message: `Succesfully downloaded ${filename}`,
               open: true,

@@ -170,7 +170,7 @@ export default function GibMints() {
                 </button>
               </div>
 
-              {connected ? (
+              {connected && !loading ? (
                 <div className="mt-3 text-center">
                   <button
                     onClick={(e) => {

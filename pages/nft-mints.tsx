@@ -171,7 +171,7 @@ export default function GibMints() {
               </div>
 
               {connected ? (
-                <>
+                <div className="mt-3 text-center">
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -188,7 +188,7 @@ export default function GibMints() {
                       pubkeyString.length
                     )}
                   </button>
-                </>
+                </div>
               ) : (
                 <></>
               )}

@@ -20,6 +20,8 @@ import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { FireIcon, LeftIcon, RightIcon } from "../components/icons";
 import { toast } from "react-toastify";
+import { chunk } from "../lib/metaplex/dist/esm/index.mjs";
+import { sliceIntoChunks } from "../util/slice-into-chunks";
 const initState: {
   nfts: any[];
   status: string;
@@ -27,6 +29,7 @@ const initState: {
   itemsPerPage: 12 | 24 | 120;
   isModalOpen: boolean;
   isBurning: boolean;
+  burnCounter: number;
   selectedNFTs: PublicKey[];
 } = {
   nfts: [],
@@ -35,15 +38,17 @@ const initState: {
   itemsPerPage: 12,
   isModalOpen: false,
   isBurning: false,
+  burnCounter: 0,
   selectedNFTs: [],
 };
 
 type BurnNftAction =
-  | { type: "started"; payload?: null }
-  | { type: "error"; payload?: null }
+  | { type: "started"; payload?: boolean }
+  | { type: "error"; payload?: any }
   | { type: "unselectAll"; payload?: null }
-  | { type: "burning"; payload?: null }
+  | { type: "burning"; payload?: boolean }
   | { type: "burned"; payload?: null }
+  | { type: "burnCounter"; payload?: number }
   | { type: "success"; payload: { nfts: any[] } }
   | { type: "nfts"; payload: { nfts: any[] } }
   | { type: "isModalOpen"; payload: { isModalOpen: boolean } }
@@ -86,7 +91,7 @@ const reducer = (state: typeof initState, action: BurnNftAction) => {
 export default function BurnNFTs() {
   const { setModalState } = useModal();
   const { connection } = useConnection();
-  const { publicKey, signTransaction } = useWallet();
+  const { publicKey, signTransaction, signAllTransactions } = useWallet();
   const router = useRouter();
 
   const [state, dispatch] = useReducer(reducer, initState);
@@ -245,69 +250,60 @@ export default function BurnNFTs() {
 
     try {
       dispatch({ type: "burning" });
-      let counter = 1;
-      for (const mint of state.selectedNFTs) {
-        toast(`Burning ${counter} of ${state.selectedNFTs.length} NFTs`, {
-          isLoading: true,
-        });
-        const mintAssociatedAccountAddress = await getAssociatedTokenAddress(
-          mint,
-          publicKey,
-          false
-        );
-        const instruction = createBurnInstruction(
-          mintAssociatedAccountAddress,
-          mint,
-          publicKey,
-          1,
-          []
-        );
-
-        const closeIx = createCloseAccountInstruction(
-          mintAssociatedAccountAddress,
-          publicKey,
-          publicKey,
-          []
-        );
-        const transaction = new Transaction().add(instruction, closeIx);
-        transaction.recentBlockhash = (
-          await getBlockhashWithRetries(connection)
-        ).blockhash;
-        transaction.feePayer = publicKey;
-        await signTransaction(transaction);
-
-        let tries = 0;
-        let completed = false;
-        while (!completed) {
-          try {
-            const signature = await connection.sendRawTransaction(
-              transaction.serialize()
+      toast(`Burning ${state.selectedNFTs.length} NFTs`, { isLoading: true });
+      const burnTransactions = (
+        await Promise.allSettled(
+          state.selectedNFTs.map(async (mint) => {
+            const mintAssociatedAccountAddress =
+              await getAssociatedTokenAddress(mint, publicKey, false);
+            const instruction = createBurnInstruction(
+              mintAssociatedAccountAddress,
+              mint,
+              publicKey,
+              1,
+              []
             );
-            await connection.confirmTransaction(signature, "processed");
-            dispatch({ type: "burned" });
-            removeNFT(mint);
-            handleNFTUnselect(mint);
-            completed = true;
-          } catch (e) {
-            console.error(e);
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            tries += 1;
-            if (tries >= 6) {
-              dispatch({ type: "burned" });
-              completed = true;
-              setModalState({
-                open: true,
-                message: "Error trying to send transaction!",
-              });
+
+            const closeIx = createCloseAccountInstruction(
+              mintAssociatedAccountAddress,
+              publicKey,
+              publicKey,
+              []
+            );
+            const transaction = new Transaction().add(instruction, closeIx);
+            transaction.recentBlockhash = (
+              await getBlockhashWithRetries(connection)
+            ).blockhash;
+            transaction.feePayer = publicKey;
+            return transaction;
+          })
+        )
+      )
+        .filter((result) => result.status === "fulfilled")
+        .map((result) => (result as PromiseFulfilledResult<Transaction>).value);
+      await signAllTransactions(burnTransactions);
+
+      for (const slice of sliceIntoChunks(burnTransactions, 5)) {
+        await Promise.all(
+          slice.map(async (tx) => {
+            const id = await connection.sendRawTransaction(tx.serialize());
+            let isDone = false;
+            while (!isDone) {
+              if (await connection.getTransaction(id)) {
+                isDone = true;
+              }
             }
-          }
-        }
+          })
+        );
       }
       toast.dismiss();
       setModalState({
         open: true,
         message: "Burned all NFTs!",
       });
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     } catch (err) {
       setModalState({
         message: err.message,
@@ -318,12 +314,10 @@ export default function BurnNFTs() {
     }
   }, [
     publicKey,
-    state,
-    removeNFT,
-    handleNFTUnselect,
-    connection,
-    signTransaction,
+    state.selectedNFTs,
+    signAllTransactions,
     setModalState,
+    connection,
   ]);
 
   const confirmationModal = useMemo(() => {

@@ -4,7 +4,6 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import { ParsedAccountData, PublicKey, Transaction } from "@solana/web3.js";
-import { CopyToClipboard } from "../components/copy-to-clipboard";
 
 import { useModal } from "../contexts/ModalProvider";
 import Head from "next/head";
@@ -20,8 +19,8 @@ import { NFTPreview } from "../components/nft-preview";
 import { getBlockhashWithRetries } from "../util/get-blockhash-with-retries";
 import { FireIcon, LeftIcon, RightIcon } from "../components/icons";
 import { toast } from "react-toastify";
-import { chunk } from "../lib/metaplex/dist/esm/index.mjs";
 import { sliceIntoChunks } from "../util/slice-into-chunks";
+import { sleep } from "../util/sleep";
 const initState: {
   nfts: any[];
   status: string;
@@ -222,27 +221,7 @@ export default function BurnNFTs() {
     },
     [state.selectedNFTs]
   );
-
-  const handleNFTUnselect = useCallback(
-    (mint: PublicKey) => {
-      const newItems = state.selectedNFTs.filter((nft) => !nft.equals(mint));
-      dispatch({ type: "selectedNFTs", payload: { selectedNFTs: newItems } });
-    },
-    [state.selectedNFTs]
-  );
-
-  const removeNFT = useCallback(
-    (nft: PublicKey) => {
-      dispatch({
-        type: "nfts",
-        payload: {
-          nfts: state.nfts.filter((i) => !toPublicKey(i.mint).equals(nft)),
-        },
-      });
-    },
-    [state.nfts]
-  );
-
+  
   const handleBurn = useCallback(async () => {
     if (!publicKey || !state.selectedNFTs) {
       return;
@@ -291,6 +270,8 @@ export default function BurnNFTs() {
             while (!isDone) {
               if (await connection.getTransaction(id)) {
                 isDone = true;
+              } else {
+                sleep(500)
               }
             }
           })
@@ -299,11 +280,17 @@ export default function BurnNFTs() {
       toast.dismiss();
       setModalState({
         open: true,
-        message: "Burned all NFTs!",
+        message: `Burned ${state.selectedNFTs.length} NFTs!`,
       });
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      dispatch({
+        type: "nfts",
+        payload: {
+          nfts: state.nfts.filter(
+            (nft) => !state.selectedNFTs.includes(nft.mint)
+          ),
+        },
+      });
+      dispatch({ type: "selectedNFTs", payload: { selectedNFTs: [] } });
     } catch (err) {
       setModalState({
         message: err.message,
@@ -315,6 +302,7 @@ export default function BurnNFTs() {
   }, [
     publicKey,
     state.selectedNFTs,
+    state.nfts,
     signAllTransactions,
     setModalState,
     connection,
@@ -413,12 +401,12 @@ export default function BurnNFTs() {
           onClick={handlePrevPage}
           disabled={page < 2}
         >
-          <i className="">
+          <i>
             <LeftIcon />
           </i>
         </button>
         <div className="text-xl text-center text-white">
-          {page} / {/* trying maffs */}
+          {page} /
           {state.nfts?.length % itemsPerPage === 0
             ? state.nfts?.length / itemsPerPage
             : Math.floor(state.nfts?.length / itemsPerPage) + 1}
@@ -434,7 +422,7 @@ export default function BurnNFTs() {
               : Math.floor(state.nfts?.length / itemsPerPage) + 1)
           }
         >
-          <i className="">
+          <i>
             <RightIcon />
           </i>
         </button>
@@ -467,7 +455,7 @@ export default function BurnNFTs() {
         <div>
           {state.nfts.length === 0 ? (
             <p className="text-lg text-center text-white">
-              You have no NFTs : (
+              {'You have no NFTs : ('}
             </p>
           ) : (
             <div className="flex flex-wrap items-center">

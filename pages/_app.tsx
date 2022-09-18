@@ -10,36 +10,18 @@ import { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
-import DotsHorizontalIcon from "@heroicons/react/solid/DotsHorizontalIcon";
-import SwitchHorizontalIcon from "@heroicons/react/solid/SwitchHorizontalIcon";
-import PhotographIcon from "@heroicons/react/solid/PhotographIcon";
-import TerminalIcon from "@heroicons/react/solid/TerminalIcon";
 import { ModalProvider } from "../contexts/ModalProvider";
 import SideMenu from "../components/side-menu";
 import TopMenu from "../components/top-menu";
-import { MenuLink } from "../components/menu-link";
 import { ImageURI } from "../util/image-uri";
 import { FileProvider } from "../contexts/FileProvider";
 import { MadeWithLove } from "../components/made-with-love";
-import { CopyToClipboard } from "../components/copy-to-clipboard";
 import { PerformanceProvider } from "../contexts/PerformanceProvider";
-import {
-  BankIcon,
-  CameraIcon,
-  CoinsIcon,
-  FingerPrintIcon,
-  FireIcon,
-  GetCashIcon,
-  HammerIcon,
-  InfoIcon,
-  SendIcon,
-} from "../components/icons";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { JupiterProvider } from "@jup-ag/react-hook";
 import { getPlatformFeeAccounts } from "@jup-ag/core";
 import { PublicKey } from "@solana/web3.js";
-import CloudUploadIcon from "@heroicons/react/solid/CloudUploadIcon";
 import { BalanceProvider } from "../contexts/BalanceProvider";
 import SideMenuLarge from "../components/side-menu-lg";
 
@@ -74,7 +56,6 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <FileProvider>
       {/* @ts-ignore */}
-
       <ToastContainer theme="dark" />
       <ModalProvider>
         <JupiterProvider
@@ -100,6 +81,7 @@ function Context({ children }: { children: React.ReactNode }) {
       endpoint={endpoint}
       config={{
         confirmTransactionInitialTimeout: 120000,
+        // TODO: only do this where needed
         commitment: "finalized",
       }}
     >

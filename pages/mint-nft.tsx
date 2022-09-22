@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AttributesForm } from "../components/attributes-form";
 import jsonFormat from "json-format";
 import { Controller, useForm } from "react-hook-form";
@@ -17,11 +17,13 @@ import {
   Metaplex,
   walletAdapterIdentity,
 } from "../lib/metaplex/dist/esm/index.mjs";
-import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { sleep } from "../util/sleep";
 import { useBalance } from "../contexts/BalanceProvider";
 import { toast } from "react-toastify";
 import JupiterForm from "../components/jupiter-swap";
+import { JupiterProvider } from "@jup-ag/react-hook";
+import { getPlatformFeeAccounts } from "@jup-ag/core";
 
 function MintNftPage() {
   const {
@@ -284,6 +286,7 @@ function MintNftPage() {
     },
     [connection, wallet, files, shdwBalanceAsNumber, setModalState]
   );
+  const { publicKey } = wallet;
 
   return (
     <>
@@ -292,7 +295,7 @@ function MintNftPage() {
         powered by SHDW Drive
       </h3>
       <br />
-      {wallet?.publicKey ? (
+      {publicKey ? (
         <div>
           <div className="text-center">
             {!!shdwBalance && (
@@ -547,7 +550,9 @@ function MintNftPage() {
             <div className="text-center card-body">
               <h2 className="">To begin please</h2>
               <br />
-              <div className="flex flex-row justify-center items-center"><WalletMultiButton /></div>
+              <div className="flex flex-row justify-center items-center">
+                <WalletMultiButton />
+              </div>
             </div>
           </div>
         </>
